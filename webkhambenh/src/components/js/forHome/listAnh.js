@@ -1,9 +1,6 @@
-import React, { Fragment } from 'react'
-
-import Script from 'dangerous-html/react'
-import PropTypes from 'prop-types'
-
-import '../../css/forHome/listAnh.css'
+import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
+import '../../css/forHome/listAnh.css';
 
 const ListAnh = (props) => {
   return (
@@ -188,33 +185,32 @@ const ListAnh = (props) => {
       </div>
       <div>
         <div className="hero17-container2">
-          <Script
-            html={`<style>
-  @keyframes scroll-x {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(calc(-100% - 16px));
-    }
-  }
+          <style>
+            {`
+              @keyframes scroll-x {
+                from {
+                  transform: translateX(0);
+                }
+                to {
+                  transform: translateX(calc(-100% - 16px));
+                }
+              }
 
-  @keyframes scroll-y {
-    from {
-      transform: translateY(0);
-    }
-    to {
-      transform: translateY(calc(-100% - 16px));
-    }
-  }
-</style>
-`}
-          ></Script>
+              @keyframes scroll-y {
+                from {
+                  transform: translateY(0);
+                }
+                to {
+                  transform: translateY(calc(-100% - 16px));
+                }
+              }
+            `}
+          </style>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 ListAnh.defaultProps = {
   image3Src:
@@ -257,7 +253,7 @@ ListAnh.defaultProps = {
   image9Alt: 'Hero Image',
   image1Src:
     'https://nld.mediacdn.vn/291774122806476800/2025/4/16/anh-chup-man-hinh-2025-04-16-luc-172821-1744799608713885340391.png',
-}
+};
 
 ListAnh.propTypes = {
   image3Src: PropTypes.string,
@@ -288,6 +284,6 @@ ListAnh.propTypes = {
   image10Src: PropTypes.string,
   image9Alt: PropTypes.string,
   image1Src: PropTypes.string,
-}
+};
 
-export default ListAnh
+export default ListAnh;

@@ -1,15 +1,15 @@
-import React, { useState, Fragment } from 'react'
-import PropTypes from 'prop-types'
-import { useHistory } from 'react-router-dom'
-import '../../css/forHome/navbar8.css'
+import React, { useState, Fragment } from 'react';
+import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom'; // Thay useHistory bằng useNavigate
+import '../../css/forHome/navbar8.css';
 
 const Navbar8 = (props) => {
-  const [link5DropdownVisible, setLink5DropdownVisible] = useState(false)
-  const history = useHistory()
+  const [link5DropdownVisible, setLink5DropdownVisible] = useState(false);
+  const navigate = useNavigate(); // Sử dụng useNavigate
 
   const handleDangNhapDangKyClick = () => {
-    history.push('/dang-nhap-dang-ky')
-  }
+    navigate('/dang-nhap-dang-ky'); // Sử dụng navigate
+  };
 
   return (
     <header className="navbar8-container1">
@@ -25,14 +25,14 @@ const Navbar8 = (props) => {
               href={props.trangChuUrl}
               className="navbar8-link11 thq-link thq-body-small"
             >
-              {props.trangChu ?? ( 
+              {props.trangChu ?? (
                 <Fragment>
                   <span className="navbar8-text18">Trang chủ</span>
                 </Fragment>
               )}
             </a>
-            <a 
-              href={props.tinTucUrl} 
+            <a
+              href={props.tinTucUrl}
               className="thq-link thq-body-small"
             >
               {props.tinTuc ?? (
@@ -58,9 +58,7 @@ const Navbar8 = (props) => {
               <span className="thq-link thq-body-small">
                 {props.them ?? (
                   <Fragment>
-                    <span className="navbar8-text21">
-                      Thêm
-                    </span>
+                    <span className="navbar8-text21">Thêm</span>
                   </Fragment>
                 )}
               </span>
@@ -68,14 +66,14 @@ const Navbar8 = (props) => {
                 {link5DropdownVisible && (
                   <div className="navbar8-container2">
                     <svg viewBox="0 0 1024 1024" className="navbar8-icon10">
-                      <path d="M298 426h428l-214 214z"></path> {/*icon mũi tên xuống*/}
+                      <path d="M298 426h428l-214 214z"></path>{/*icon mũi tên xuống*/}
                     </svg>
                   </div>
                 )}
                 {!link5DropdownVisible && (
                   <div className="navbar8-container3">
                     <svg viewBox="0 0 1024 1024" className="navbar8-icon12">
-                      <path d="M426 726v-428l214 214z"></path> {/*icon mũi tên lên*/} 
+                      <path d="M426 726v-428l214 214z"></path>{/*icon mũi tên lên*/}
                     </svg>
                   </div>
                 )}
@@ -92,7 +90,7 @@ const Navbar8 = (props) => {
                 )}
               </span>
             </button>
-            <button 
+            <button
               onClick={handleDangNhapDangKyClick}
               className="navbar8-action21 thq-button-outline thq-button-animated"
             >
@@ -120,9 +118,7 @@ const Navbar8 = (props) => {
                     <span className="navbar8-page12 thq-body-large">
                       {props.tieuDeThanhToan ?? (
                         <Fragment>
-                          <span className="navbar8-text17">
-                            Thanh toán
-                          </span>
+                          <span className="navbar8-text17">Thanh toán</span>
                         </Fragment>
                       )}
                     </span>
@@ -149,9 +145,7 @@ const Navbar8 = (props) => {
                     <span className="navbar8-page22 thq-body-large">
                       {props.tieuDeDatLich ?? (
                         <Fragment>
-                          <span className="navbar8-text20">
-                            Đặt lịch hẹn
-                          </span>
+                          <span className="navbar8-text20">Đặt lịch hẹn</span>
                         </Fragment>
                       )}
                     </span>
@@ -236,8 +230,8 @@ const Navbar8 = (props) => {
         ></div>
       )}
     </header>
-  )
-}
+  );
+};
 
 Navbar8.defaultProps = {
   // Logo properties

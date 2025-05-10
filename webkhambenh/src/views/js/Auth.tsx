@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import '../css/Auth.css'; 
-import 'boxicons/css/boxicons.min.css'; 
+import '../css/Auth.css';
+// import 'boxicons/css/boxicons.min.css'; // Xóa import của Boxicons
 
 const Auth: React.FC = () => {
     const [isActive, setIsActive] = useState(false);
@@ -25,11 +25,11 @@ const Auth: React.FC = () => {
                     <h1>Đăng nhập</h1>
                     <div className="input-box">
                         <input type="text" placeholder="Tên đăng nhập" required />
-                        <i className='bx bxs-user'></i>
+                        <i className="fas fa-user"></i> {/* Thay thế bxs-user */}
                     </div>
                     <div className="input-box">
                         <input type="password" placeholder="Mật khẩu" required />
-                        <i className='bx bxs-lock-alt' ></i>
+                        <i className="fas fa-lock"></i> {/* Thay thế bxs-lock-alt */}
                     </div>
                     <div className="forgot-link">
                         <a href="#">Quên mật khẩu?</a>
@@ -37,10 +37,10 @@ const Auth: React.FC = () => {
                     <button type="submit" className="btn">Đăng nhập</button>
                     <p>hoặc đăng nhập bằng</p>
                     <div className="social-icons">
-                        <a href="#"><i className='bx bxl-google' ></i></a>
-                        <a href="#"><i className='bx bxl-facebook' ></i></a>
-                        <a href="#"><i className='bx bxl-github' ></i></a>
-                        <a href="#"><i className='bx bxl-linkedin' ></i></a>
+                        <a href="#"><i className="fab fa-google"></i></a> {/* Thay thế bxl-google */}
+                        <a href="#"><i className="fab fa-facebook-f"></i></a> {/* Thay thế bxl-facebook */}
+                        <a href="#"><i className="fab fa-github"></i></a> {/* Thay thế bxl-github */}
+                        <a href="#"><i className="fab fa-linkedin-in"></i></a> {/* Thay thế bxl-linkedin */}
                     </div>
                 </form>
             </div>
@@ -50,23 +50,23 @@ const Auth: React.FC = () => {
                     <h1>Đăng ký</h1>
                     <div className="input-box">
                         <input type="text" placeholder="Tên đăng nhập" required />
-                        <i className='bx bxs-user'></i>
+                        <i className="fas fa-user"></i> {/* Thay thế bxs-user */}
                     </div>
                     <div className="input-box">
                         <input type="email" placeholder="Email" required />
-                        <i className='bx bxs-envelope' ></i>
+                        <i className="fas fa-envelope"></i> {/* Thay thế bxs-envelope */}
                     </div>
                     <div className="input-box">
                         <input type="password" placeholder="Mật khẩu" required />
-                        <i className='bx bxs-lock-alt' ></i>
+                        <i className="fas fa-lock"></i> {/* Thay thế bxs-lock-alt */}
                     </div>
                     <button type="submit" className="btn">Đăng ký</button>
                     <p>hoặc đăng ký bằng</p>
                     <div className="social-icons">
-                        <a href="#"><i className='bx bxl-google' ></i></a>
-                        <a href="#"><i className='bx bxl-facebook' ></i></a>
-                        <a href="#"><i className='bx bxl-github' ></i></a>
-                        <a href="#"><i className='bx bxl-linkedin' ></i></a>
+                        <a href="#"><i className="fab fa-google"></i></a> {/* Thay thế bxl-google */}
+                        <a href="#"><i className="fab fa-facebook-f"></i></a> {/* Thay thế bxl-facebook */}
+                        <a href="#"><i className="fab fa-github"></i></a> {/* Thay thế bxl-github */}
+                        <a href="#"><i className="fab fa-linkedin-in"></i></a> {/* Thay thế bxl-linkedin */}
                     </div>
                 </form>
             </div>
