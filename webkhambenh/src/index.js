@@ -4,7 +4,7 @@ import App from './App';
 import './style.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
-const rootElement = document.getElementById('app');
+const rootElement = document.getElementById('root');
 const root = createRoot(rootElement);
 root.render(
   <React.StrictMode>
