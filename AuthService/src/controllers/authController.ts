@@ -19,7 +19,7 @@ export const register = async (req: Request, res: Response): Promise<Response> =
         if (existingUser) {
             console.log('User already exists:', existingUser);
             return res.status(400).json({
-                error: "User with this email or username already exists"
+                error: "Email hoặc tên đăng nhập này đã tồn tại"
             });
         }
 
@@ -33,7 +33,19 @@ export const register = async (req: Request, res: Response): Promise<Response> =
         const errors = await validate(user);
         if (errors.length > 0) {
             console.log('Validation errors:', errors);
-            return res.status(400).json({ errors });
+            const errorMessages = errors.map(error => {
+                if (error.property === 'username') {
+                    return 'Tên đăng nhập phải có ít nhất 3 ký tự';
+                }
+                if (error.property === 'email') {
+                    return 'Email không hợp lệ';
+                }
+                if (error.property === 'password') {
+                    return 'Mật khẩu phải có ít nhất 6 ký tự';
+                }
+                return 'Dữ liệu không hợp lệ';
+            });
+            return res.status(400).json({ errors: errorMessages });
         }
 
         // Save user
@@ -56,7 +68,7 @@ export const register = async (req: Request, res: Response): Promise<Response> =
         });
     } catch (error) {
         console.error('Registration error:', error);
-        return res.status(500).json({ error: "Server error" });
+        return res.status(500).json({ error: "Lỗi máy chủ" });
     }
 };
 
@@ -69,13 +81,13 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
         const user = await userRepository.findOneBy({ email });
 
         if (!user) {
-            return res.status(401).json({ error: "Invalid credentials" });
+            return res.status(401).json({ error: "Email hoặc mật khẩu không đúng" });
         }
 
         // Check password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(401).json({ error: "Invalid credentials" });
+            return res.status(401).json({ error: "Email hoặc mật khẩu không đúng" });
         }
 
         // Generate token
@@ -93,7 +105,7 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
             token
         });
     } catch (error) {
-        return res.status(500).json({ error: "Server error" });
+        return res.status(500).json({ error: "Lỗi máy chủ" });
     }
 };
 
@@ -101,7 +113,7 @@ export const getProfile = async (req: Request, res: Response): Promise<Response>
     try {
         const user = req.user;
         if (!user) {
-            return res.status(401).json({ error: "Please authenticate" });
+            return res.status(401).json({ error: "Vui lòng đăng nhập" });
         }
 
         return res.json({
@@ -112,6 +124,6 @@ export const getProfile = async (req: Request, res: Response): Promise<Response>
             }
         });
     } catch (error) {
-        return res.status(500).json({ error: "Server error" });
+        return res.status(500).json({ error: "Lỗi máy chủ" });
     }
 }; 
