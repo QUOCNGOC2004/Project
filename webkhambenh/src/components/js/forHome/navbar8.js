@@ -7,12 +7,12 @@ const Navbar8 = (props) => {
   const [link5DropdownVisible, setLink5DropdownVisible] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [username, setUsername] = useState('')
-  const history = useHistory()
+  const history = useHistory() 
 
   useEffect(() => {
     // Kiểm tra trạng thái đăng nhập từ localStorage khi component mount
-    const token = localStorage.getItem('token')
-    const user = JSON.parse(localStorage.getItem('user') || '{}')
+    const token = localStorage.getItem('token') 
+    const user = JSON.parse(localStorage.getItem('user') || '{}') 
     if (token && user.username) {
       setIsLoggedIn(true)
       setUsername(user.username)

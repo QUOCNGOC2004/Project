@@ -46,10 +46,10 @@ const Auth: React.FC = () => {
             
             // Cập nhật trạng thái đăng nhập trong navbar
             const navbar = document.querySelector('.navbar8-navbar-interactive');
-            if (navbar) {
-                const event = new CustomEvent('loginStatusChanged', {
-                    detail: {
-                        isLoggedIn: true,
+            if (navbar) { 
+                const event = new CustomEvent('loginStatusChanged', { 
+                    detail: { 
+                        isLoggedIn: true, 
                         username: formData.username
                     }
                 });
@@ -81,7 +81,7 @@ const Auth: React.FC = () => {
                 const event = new CustomEvent('loginStatusChanged', {
                     detail: {
                         isLoggedIn: true,
-                        username: response.data.user.username
+                        username: response.data.user.username  
                     }
                 });
                 document.dispatchEvent(event);
@@ -95,7 +95,7 @@ const Auth: React.FC = () => {
     };
 
     useEffect(() => {
-        // Bạn có thể thêm các side effect khác ở đây nếu cần
+        //  thêm các side effect khác ở đây
     }, [isActive]);
 
     return (
