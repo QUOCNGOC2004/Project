@@ -1,14 +1,53 @@
-import React, { useState, Fragment } from 'react'
+import React, { useState, Fragment, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { useHistory } from 'react-router-dom'
 import '../../css/forHome/navbar8.css'
 
 const Navbar8 = (props) => {
   const [link5DropdownVisible, setLink5DropdownVisible] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [username, setUsername] = useState('')
   const history = useHistory()
 
+  useEffect(() => {
+    // Kiểm tra trạng thái đăng nhập từ localStorage khi component mount
+    const token = localStorage.getItem('token')
+    const user = JSON.parse(localStorage.getItem('user') || '{}')
+    if (token && user.username) {
+      setIsLoggedIn(true)
+      setUsername(user.username)
+    }
+
+    // Lắng nghe sự kiện thay đổi trạng thái đăng nhập
+    const handleLoginStatusChange = (event) => {
+      const { isLoggedIn: newLoginStatus, username: newUsername } = event.detail
+      setIsLoggedIn(newLoginStatus)
+      setUsername(newUsername)
+    }
+
+    document.addEventListener('loginStatusChanged', handleLoginStatusChange)
+
+    return () => {
+      document.removeEventListener('loginStatusChanged', handleLoginStatusChange)
+    }
+  }, [])
+
   const handleDangNhapDangKyClick = () => {
-    history.push('/dang-nhap-dang-ky')
+    if (isLoggedIn) {
+      // Xử lý đăng xuất
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      setIsLoggedIn(false)
+      setUsername('')
+    } else {
+      history.push('/dang-nhap-dang-ky')
+    }
+  }
+
+  // Hàm để cập nhật trạng thái đăng nhập và username
+  const updateLoginStatus = (status, name) => {
+    setIsLoggedIn(status)
+    setUsername(name)
   }
 
   return (
@@ -85,7 +124,11 @@ const Navbar8 = (props) => {
           <div className="navbar8-buttons1">
             <button className="navbar8-action11 thq-button-animated thq-button-filled">
               <span>
-                {props.nguoiDung ?? (
+                {isLoggedIn ? (
+                  <Fragment>
+                    <span className="navbar8-text15">{username}</span>
+                  </Fragment>
+                ) : (
                   <Fragment>
                     <span className="navbar8-text15">Người dùng</span>
                   </Fragment>
@@ -97,7 +140,11 @@ const Navbar8 = (props) => {
               className="navbar8-action21 thq-button-outline thq-button-animated"
             >
               <span>
-                {props.dangNhapDangKy ?? (
+                {isLoggedIn ? (
+                  <Fragment>
+                    <span className="navbar8-text27">Đăng xuất</span>
+                  </Fragment>
+                ) : (
                   <Fragment>
                     <span className="navbar8-text27">Đăng nhập/Đăng ký</span>
                   </Fragment>

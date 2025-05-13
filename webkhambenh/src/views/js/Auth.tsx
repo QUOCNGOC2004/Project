@@ -40,9 +40,21 @@ const Auth: React.FC = () => {
                 password: formData.password
             });
 
-            // Lưu token vào localStorage
+            // Lưu token và thông tin user vào localStorage
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('user', JSON.stringify(response.data.user));
+            
+            // Cập nhật trạng thái đăng nhập trong navbar
+            const navbar = document.querySelector('.navbar8-navbar-interactive');
+            if (navbar) {
+                const event = new CustomEvent('loginStatusChanged', {
+                    detail: {
+                        isLoggedIn: true,
+                        username: formData.username
+                    }
+                });
+                document.dispatchEvent(event);
+            }
 
             // Chuyển hướng về trang chủ
             window.location.href = '/';
@@ -59,9 +71,21 @@ const Auth: React.FC = () => {
                 password: formData.password
             });
 
-            // Lưu token vào localStorage
+            // Lưu token và thông tin user vào localStorage
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('user', JSON.stringify(response.data.user));
+
+            // Cập nhật trạng thái đăng nhập trong navbar
+            const navbar = document.querySelector('.navbar8-navbar-interactive');
+            if (navbar) {
+                const event = new CustomEvent('loginStatusChanged', {
+                    detail: {
+                        isLoggedIn: true,
+                        username: response.data.user.username
+                    }
+                });
+                document.dispatchEvent(event);
+            }
 
             // Chuyển hướng về trang chủ
             window.location.href = '/';
