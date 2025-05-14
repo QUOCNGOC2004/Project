@@ -201,52 +201,6 @@
   font-size: 1.25rem;
 }
 
-/* Chat icon */
-.chat-icon {
-  position: fixed;
-  bottom: 1.5rem;
-  left: 1.5rem;
-  background: #f97316;
-  border-radius: 9999px;
-  padding: 0.75rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
-
-.chat-icon:hover {
-  transform: scale(1.05);
-}
-
-.chat-icon-container {
-  position: relative;
-  width: 3rem;
-  height: 3rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.chat-icon-container i {
-  color: white;
-  font-size: 2rem;
-}
-
-.notification-badge {
-  position: absolute;
-  top: -0.25rem;
-  right: -0.25rem;
-  background: #ef4444;
-  color: white;
-  font-size: 0.75rem;
-  width: 1.25rem;
-  height: 1.25rem;
-  border-radius: 9999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* Responsive design */
 @media (max-width: 1024px) {
   .doctor-grid {

@@ -98,13 +98,6 @@ const DanhSachBs: React.FC = () => {
           ))}
         </div>
       </div>
-
-      <div className="chat-icon">
-        <div className="chat-icon-container">
-          <i className='bx bx-message-dots'></i>
-          <div className="notification-badge">1</div>
-        </div>
-      </div>
     </div>
   );
 };
