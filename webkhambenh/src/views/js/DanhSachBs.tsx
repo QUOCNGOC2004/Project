@@ -6,7 +6,7 @@ import FilterSection from '../../components/js/forDsBs/FilterSection';
 import Sidebar from '../../components/js/forDsBs/Sidebar';
 
 const DanhSachBs: React.FC = () => {
-  const [activeCenter, setActiveCenter] = useState("BS Trung Tâm Tim Mạch");
+  const [activeCenter, setActiveCenter] = useState("BS Trung Tâm Y Học Bảo Thai");
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearch = (query: string) => {
@@ -24,7 +24,7 @@ const DanhSachBs: React.FC = () => {
     // Implement center selection logic here
   };
 
-  // Sample doctor data - replace with actual data from database
+  // mẫu dữ liệu bác sĩ
   const doctors = [
     {
       name: "PGS.TS. BS Nguyễn Thanh Hồi",
@@ -74,13 +74,13 @@ const DanhSachBs: React.FC = () => {
     <div className="doctor-directory">
       <h1 className="directory-title">ĐỘI NGŨ CHUYÊN GIA BÁC SĨ</h1>
 
-      <FilterSection 
+      <FilterSection
         onSearch={handleSearch}
         onFilterChange={handleFilterChange}
       />
 
       <div className="content-container">
-        <Sidebar 
+        <Sidebar
           activeCenter={activeCenter}
           onCenterSelect={handleCenterSelect}
         />

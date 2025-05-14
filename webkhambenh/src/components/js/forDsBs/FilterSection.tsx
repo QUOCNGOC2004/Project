@@ -37,7 +37,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onSearch, onFilterChange 
           placeholder="Tìm kiếm bác sĩ..."
           onChange={(e) => onSearch(e.target.value)}
         />
-        <i className='bx bx-search'></i>
+        <i className='bx bx-search'></i> {/* thẻ icon tìm kiếm */}
       </div>
     </div>
   );
