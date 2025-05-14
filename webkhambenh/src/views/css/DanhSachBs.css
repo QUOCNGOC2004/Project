@@ -90,7 +90,7 @@
 }
 
 .sidebar-header {
-  background: #1e40af;
+  background: #E65103;
   color: white;
   font-weight: bold;
   padding: 1rem 1.5rem;
@@ -106,7 +106,7 @@
 }
 
 .sidebar-item h3 {
-  color: #1e40af;
+  color: #E65103;
   font-weight: bold;
 }
 
@@ -114,10 +114,14 @@
   position: relative;
 }
 
+.sidebar-item.active h3 {
+  color: #1e40af;
+}
+
 .active-dot {
   width: 0.75rem;
   height: 0.75rem;
-  background: #ef4444;
+  background: #E65103;
   border-radius: 9999px;
   margin-right: 0.5rem;
 }
