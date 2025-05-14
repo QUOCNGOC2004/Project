@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../../../components/css/forDsBs/FilterSection.css';
 import 'boxicons/css/boxicons.min.css';
 
@@ -8,27 +8,149 @@ interface FilterSectionProps {
 }
 
 const FilterSection: React.FC<FilterSectionProps> = ({ onSearch, onFilterChange }) => {
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+
+  const filterOptions = {
+    specialty: [
+      'Tất cả',
+      'Y học bào thai',
+      'Ung bướu',
+      'Tim mạch',
+      'Khoa sản',
+      'Nội tổng hợp',
+      'Ngoại tổng hợp',
+      'Khoa Dược'
+    ],
+    position: [
+      'Tất cả',
+      'Tổng giám đốc',
+      'Phó tổng giám đốc',
+      'Giám đốc trung tâm',
+      'Phó giám đốc trung tâm',
+      'Trưởng Khoa',
+      'Phó Trưởng Khoa'
+    ],
+    degree: [
+      'Tất cả',
+      'Tiến sĩ',
+      'Bác sĩ chuyên khoa',
+      'Thạc sĩ',
+      'Bác sĩ nội trú',
+      'Bác sĩ',
+      'Sinh viên thực tập'
+    ],
+    experience: [
+      'Tất cả',
+      'dưới 5 năm',
+      '10 năm',
+      '15 năm',
+      '20 năm',
+      'trên 20 năm'
+    ]
+  };
+
+  const handleFilterClick = (filterType: string) => {
+    setActiveDropdown(activeDropdown === filterType ? null : filterType);
+  };
+
+  const handleOptionSelect = (filterType: string, value: string) => {
+    onFilterChange(filterType, value);
+    setActiveDropdown(null);
+  };
+
   return (
     <div className="filter-section">
-      <button className="filter-button" onClick={() => onFilterChange('facility', '')}>
-        Cơ sở khám
-        <i className='bx bx-chevron-down'></i>
-      </button>
+      <div className="filter-button-container">
+        <button 
+          className="filter-button" 
+          onClick={() => handleFilterClick('specialty')}
+        >
+          Chuyên khoa
+          <i className='bx bx-chevron-down'></i>
+        </button>
+        {activeDropdown === 'specialty' && (
+          <div className="dropdown-menu">
+            {filterOptions.specialty.map((option, index) => (
+              <div
+                key={index}
+                className="dropdown-item"
+                onClick={() => handleOptionSelect('specialty', option)}
+              >
+                {option}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
-      <button className="filter-button" onClick={() => onFilterChange('position', '')}>
-        Chức vụ
-        <i className='bx bx-chevron-down'></i>
-      </button>
+      <div className="filter-button-container">
+        <button 
+          className="filter-button" 
+          onClick={() => handleFilterClick('position')}
+        >
+          Chức vụ
+          <i className='bx bx-chevron-down'></i>
+        </button>
+        {activeDropdown === 'position' && (
+          <div className="dropdown-menu">
+            {filterOptions.position.map((option, index) => (
+              <div
+                key={index}
+                className="dropdown-item"
+                onClick={() => handleOptionSelect('position', option)}
+              >
+                {option}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
-      <button className="filter-button" onClick={() => onFilterChange('specialty', '')}>
-        Chuyên khoa
-        <i className='bx bx-chevron-down'></i>
-      </button>
+      <div className="filter-button-container">
+        <button 
+          className="filter-button" 
+          onClick={() => handleFilterClick('degree')}
+        >
+          Học vị
+          <i className='bx bx-chevron-down'></i>
+        </button>
+        {activeDropdown === 'degree' && (
+          <div className="dropdown-menu">
+            {filterOptions.degree.map((option, index) => (
+              <div
+                key={index}
+                className="dropdown-item"
+                onClick={() => handleOptionSelect('degree', option)}
+              >
+                {option}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
-      <button className="filter-button" onClick={() => onFilterChange('experience', '')}>
-        Kinh nghiệm
-        <i className='bx bx-chevron-down'></i>
-      </button>
+      <div className="filter-button-container">
+        <button 
+          className="filter-button" 
+          onClick={() => handleFilterClick('experience')}
+        >
+          Kinh nghiệm
+          <i className='bx bx-chevron-down'></i>
+        </button>
+        {activeDropdown === 'experience' && (
+          <div className="dropdown-menu">
+            {filterOptions.experience.map((option, index) => (
+              <div
+                key={index}
+                className="dropdown-item"
+                onClick={() => handleOptionSelect('experience', option)}
+              >
+                {option}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="search-container">
         <input

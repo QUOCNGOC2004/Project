@@ -7,15 +7,14 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ activeCenter, onCenterSelect }) => {
   const centers = [
-    "BS Trung Tâm Y Học Bảo Thai",
-    "BS Trung Tâm Ung Bướu",
-    "BS Trung Tâm Tim Mạch"
+    "Bệnh viện Đại học Phenikaa",
+    "Phòng khám Đa khoa Đại học Phenikaa",
+    "Sinh viên tòa A8 "
   ];
 
   return (
     <div className="sidebar">
-      <div className="sidebar-header">Tất Cả</div>
-
+      <div className="sidebar-header">Cơ sở khám</div>
       {centers.map((center, index) => (
         <div
           key={index}
