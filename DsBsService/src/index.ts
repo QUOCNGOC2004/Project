@@ -9,9 +9,9 @@ dotenv.config();
 
 const app = express();
 
-// CORS configuration
+// Cấu hình CORS
 app.use(cors({
-    origin: 'http://localhost:3000', // Frontend URL
+    origin: 'http://localhost:3000', // URL của frontend
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -21,13 +21,13 @@ app.use(express.json());
 // Routes
 app.use('/api/doctors', doctorRoutes);
 
-// Initialize database connection and start server
+// Kết nối database và khởi chạy server
 AppDataSource.initialize()
     .then(() => {
-        console.log("Database connection established");
+        console.log("Kết nối database thành công");
         const PORT = process.env.PORT || 3002;
         app.listen(PORT, () => {
-            console.log(`DsBsService is running on port ${PORT}`);
+            console.log(`DsBsService đang chạy trên cổng ${PORT}`);
         });
     })
-    .catch((error: Error) => console.log("TypeORM connection error: ", error)); 
+    .catch((error: Error) => console.log("Lỗi kết nối database: ", error)); 

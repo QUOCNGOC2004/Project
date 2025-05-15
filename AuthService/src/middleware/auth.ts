@@ -3,10 +3,12 @@ import jwt from "jsonwebtoken";
 import { AppDataSource } from "../config/database";
 import { User } from "../entity/User";
 
+// kiểm tra token
 interface JwtPayload {
     id: number;
 }
 
+// khai báo user trong request
 declare global {
     namespace Express {
         interface Request {
@@ -15,6 +17,7 @@ declare global {
     }
 }
 
+// middleware kiểm tra token
 export const auth = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const token = req.header("Authorization")?.replace("Bearer ", "");

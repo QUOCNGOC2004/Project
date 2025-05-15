@@ -27,16 +27,16 @@ app.use('/api/auth', authRoutes);
 // Initialize database connection
 AppDataSource.initialize()
     .then(() => {
-        console.log('Database connected successfully');
+        console.log('Database đã kết nối thành công');
     })
     .catch((error) => {
-        console.error('Error connecting to database:', error);
+        console.error('Lỗi kết nối database:', error);
     });
 
 // Start server
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Server đang chạy trên cổng ${PORT}`);
 }); 
 
 export { AppDataSource };
