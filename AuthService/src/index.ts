@@ -2,8 +2,7 @@ import 'reflect-metadata';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { DataSource } from 'typeorm';
-import { User } from './entity/User';
+import { AppDataSource } from './config/database';
 import authRoutes from './routes/auth';
 
 // Load environment variables
@@ -24,21 +23,6 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
-
-// Database connection
-export const AppDataSource = new DataSource({
-    type: 'postgres',
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '5432'),
-    username: process.env.DB_USERNAME || 'postgres',
-    password: process.env.DB_PASSWORD || 'postgres',
-    database: process.env.DB_NAME || 'webkhambenh',
-    synchronize: true,
-    logging: true,
-    entities: [User],
-    subscribers: [],
-    migrations: [],
-});
 
 // Initialize database connection
 AppDataSource.initialize()
