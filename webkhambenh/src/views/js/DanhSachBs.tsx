@@ -38,33 +38,33 @@ const DanhSachBs: React.FC = () => {
         throw new Error(errorData?.error || `HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      console.log('Received doctors data:', data);
+      console.log('Lấy dữ liệu bác sĩ:', data);
       setDoctors(data);
       setLoading(false);
     } catch (err) {
-      console.error('Error fetching doctors:', err);
-      setError(err instanceof Error ? err.message : 'An error occurred while fetching doctors');
+      console.error('Lỗi lấy dữ liệu bác sĩ:', err);
+      setError(err instanceof Error ? err.message : 'Đã xảy ra lỗi khi lấy dữ liệu bác sĩ');
       setLoading(false);
     }
   };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    // Implement search logic here
+    // Thực hiện logic tìm kiếm ở đây
   };
 
   const handleFilterChange = (filterType: string, value: string) => {
-    // Implement filter logic here
-    console.log(`Filter changed: ${filterType} - ${value}`);
+    // Thực hiện logic lọc ở đây
+    console.log(`Lọc đã thay đổi: ${filterType} - ${value}`);
   };
 
   const handleCenterSelect = (center: string) => {
     setActiveCenter(center);
-    // Implement center selection logic here
+    // Thực hiện logic chọn trung tâm ở đây
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading) return <div>Đang tải...</div>;
+  if (error) return <div>Lỗi: {error}</div>;
 
   return (
     <div className="doctor-directory">
