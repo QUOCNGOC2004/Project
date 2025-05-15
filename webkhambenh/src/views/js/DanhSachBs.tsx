@@ -82,15 +82,20 @@ const DanhSachBs: React.FC = () => {
         />
 
         <div className="doctor-grid">
-          {doctors.map((doctor) => (
-            <DoctorCard
-              name={doctor.name}
-              position={doctor.chucVu}
-              imageUrl={doctor.linkAnh}
-              specialty={doctor.chuyenKhoa}
-              experience={doctor.kinhNghiem}
-            />
-          ))}
+          {doctors.length > 0 ? (
+            doctors.map((doctor) => (
+              <DoctorCard
+                key={doctor.id}
+                name={doctor.name}
+                position={doctor.chucVu}
+                imageUrl={doctor.linkAnh}
+                specialty={doctor.chuyenKhoa}
+                experience={doctor.kinhNghiem}
+              />
+            ))
+          ) : (
+            <p>Không có bác sĩ.</p>
+          )}
         </div>
       </div>
     </div>
