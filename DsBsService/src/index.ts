@@ -1,8 +1,8 @@
 import "reflect-metadata";
 import express from "express";
 import cors from "cors";
-import { DataSource } from "typeorm";
-import { Doctor } from "./entity/Doctor";
+import { AppDataSource } from "./config/database";
+import doctorRoutes from "./routes/doctorRoutes";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -18,33 +18,8 @@ app.use(cors({
 
 app.use(express.json());
 
-// Database connection
-export const AppDataSource = new DataSource({
-    type: "postgres",
-    host: process.env.DB_HOST || "localhost",
-    port: parseInt(process.env.DB_PORT || "5432"),
-    username: process.env.DB_USERNAME || "postgres",
-    password: process.env.DB_PASSWORD || "your_password",
-    database: process.env.DB_NAME || "webkhambenh",
-    synchronize: false,
-    logging: true,
-    entities: [Doctor],
-    subscribers: [],
-    migrations: [],
-});
-
-// API Routes
-app.get("/api/doctors", async (_req, res) => {
-    try {
-        const doctorRepository = AppDataSource.getRepository(Doctor);
-        const doctors = await doctorRepository.find();
-        console.log('Fetched doctors:', doctors); // Add logging
-        res.json(doctors);
-    } catch (error) {
-        console.error("Error fetching doctors:", error);
-        res.status(500).json({ error: "Internal server error" });
-    }
-});
+// Routes
+app.use('/api/doctors', doctorRoutes);
 
 // Initialize database connection and start server
 AppDataSource.initialize()
