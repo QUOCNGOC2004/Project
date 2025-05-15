@@ -1,13 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'boxicons/css/boxicons.min.css';
 import '../../views/css/DanhSachBs.css';
 import DoctorCard from '../../components/js/forDsBs/DoctorCard';
 import FilterSection from '../../components/js/forDsBs/FilterSection';
 import Sidebar from '../../components/js/forDsBs/Sidebar';
 
+interface Doctor {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  coSoKham: string;
+  chuyenKhoa: string;
+  chucVu: string;
+  hocVi: string;
+  kinhNghiem: string;
+  linkAnh: string;
+}
+
 const DanhSachBs: React.FC = () => {
   const [activeCenter, setActiveCenter] = useState("BS Trung Tâm Y Học Bảo Thai");
   const [searchQuery, setSearchQuery] = useState("");
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchDoctors();
+  }, []);
+
+  const fetchDoctors = async () => {
+    try {
+      console.log('Fetching doctors from:', 'http://localhost:3002/api/doctors');
+      const response = await fetch('http://localhost:3002/api/doctors');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.error || `HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log('Received doctors data:', data);
+      setDoctors(data);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching doctors:', err);
+      setError(err instanceof Error ? err.message : 'An error occurred while fetching doctors');
+      setLoading(false);
+    }
+  };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -24,51 +63,8 @@ const DanhSachBs: React.FC = () => {
     // Implement center selection logic here
   };
 
-  // mẫu dữ liệu bác sĩ
-  const doctors = [
-    {
-      name: "PGS.TS. BS Nguyễn Thanh Hồi",
-      position: "Tổng Giám đốc Bệnh viện",
-      imageUrl: "/placeholder.svg",
-      specialty: "Tim mạch",
-      experience: "20 năm"
-    },
-    {
-      name: "GS.TS. BS. Đỗ Quyết",
-      position: "Phó Tổng Giám Đốc Bệnh Viện",
-      imageUrl: "/placeholder.svg",
-      specialty: "Nội tổng hợp",
-      experience: "25 năm"
-    },
-    {
-      name: "PGS.TS. BSNT Vũ Hồng Thăng",
-      position: "Phó Tổng Giám Đốc Bệnh Viện",
-      imageUrl: "/placeholder.svg",
-      specialty: "Ngoại tổng hợp",
-      experience: "15 năm"
-    },
-    {
-      name: "TS. BS Nguyễn Văn A",
-      position: "Trưởng khoa Tim mạch",
-      imageUrl: "/placeholder.svg",
-      specialty: "Tim mạch",
-      experience: "15 năm"
-    },
-    {
-      name: "ThS. BS Trần Thị B",
-      position: "Phó khoa Nội tổng hợp",
-      imageUrl: "/placeholder.svg",
-      specialty: "Nội tổng hợp",
-      experience: "10 năm"
-    },
-    {
-      name: "BS. Nguyễn Văn C",
-      position: "Bác sĩ điều trị",
-      imageUrl: "/placeholder.svg",
-      specialty: "Ngoại tổng hợp",
-      experience: "8 năm"
-    }
-  ];
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="doctor-directory">
@@ -86,14 +82,14 @@ const DanhSachBs: React.FC = () => {
         />
 
         <div className="doctor-grid">
-          {doctors.map((doctor, index) => (
+          {doctors.map((doctor) => (
             <DoctorCard
-              key={index}
+              key={doctor.id}
               name={doctor.name}
-              position={doctor.position}
-              imageUrl={doctor.imageUrl}
-              specialty={doctor.specialty}
-              experience={doctor.experience}
+              position={doctor.chucVu}
+              imageUrl={doctor.linkAnh}
+              specialty={doctor.chuyenKhoa}
+              experience={doctor.kinhNghiem}
             />
           ))}
         </div>
