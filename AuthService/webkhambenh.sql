@@ -15,36 +15,22 @@ CREATE TABLE users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tạo bảng doctors
+-- Tạo bảng doctors 
 CREATE TABLE doctors (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    specialization VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     phone VARCHAR(20),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    co_so_kham VARCHAR(255),          
+    chuyen_khoa VARCHAR(255),         
+    chuc_vu VARCHAR(255),           
+    hoc_vi VARCHAR(255),              
+    kinh_nghiem TEXT,                 
+    link_anh VARCHAR(255)             
 );
 
--- Tạo bảng appointments
-CREATE TABLE appointments (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
-    doctor_id INTEGER REFERENCES doctors(id),
-    appointment_date TIMESTAMP NOT NULL,
-    status VARCHAR(50) DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- đổ dữ liệu vào bảng doctors
+INSERT INTO doctors (name, email, phone, co_so_kham, chuyen_khoa, chuc_vu, hoc_vi, kinh_nghiem, link_anh) VALUES
+('Nguyễn Văn A', 'nguyenvana@example.com', '0901234567', 'Bệnh viện Bạch Mai', 'Tim mạch', 'Trưởng khoa', 'Tiến sĩ', '15 năm kinh nghiệm trong lĩnh vực tim mạch, đã thực hiện thành công nhiều ca phẫu thuật phức tạp.', 'https://example.com/images/nguyenvana.jpg'),
+('Trần Thị B', 'tranthib@example.com', '0987654321', 'Bệnh viện Nhi Trung Ương', 'Nhi khoa', 'Bác sĩ chính', 'Thạc sĩ', '10 năm kinh nghiệm chăm sóc sức khỏe trẻ em, đặc biệt về các bệnh hô hấp.', 'https://example.com/images/tranthib.jpg');
 
--- Tạo bảng medical_records
-CREATE TABLE medical_records (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
-    doctor_id INTEGER REFERENCES doctors(id),
-    diagnosis TEXT,
-    prescription TEXT,
-    notes TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-); 
