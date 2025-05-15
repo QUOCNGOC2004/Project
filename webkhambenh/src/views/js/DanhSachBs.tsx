@@ -19,7 +19,7 @@ interface Doctor {
 }
 
 const DanhSachBs: React.FC = () => {
-  const [activeCenter, setActiveCenter] = useState("BS Trung Tâm Y Học Bảo Thai");
+  const [activeCenter, setActiveCenter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(true);
@@ -84,7 +84,6 @@ const DanhSachBs: React.FC = () => {
         <div className="doctor-grid">
           {doctors.map((doctor) => (
             <DoctorCard
-              key={doctor.id}
               name={doctor.name}
               position={doctor.chucVu}
               imageUrl={doctor.linkAnh}
