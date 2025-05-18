@@ -48,9 +48,9 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onSearch, onFilterChange 
     experience: [
       'Tất cả',
       'dưới 5 năm',
-      '10 năm',
-      '15 năm',
-      '20 năm',
+      '5-10 năm',
+      '10-15 năm',
+      '15-20 năm',
       'trên 20 năm'
     ]
   };
