@@ -7,7 +7,7 @@ interface DoctorCardProps {
   position: string;
   imageUrl: string;
   specialty: string;
-  experience: string;
+  experience : number;
 }
 
 const DoctorCard: React.FC<DoctorCardProps> = ({ name, position, imageUrl, specialty, experience }) => {
@@ -25,7 +25,7 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ name, position, imageUrl, speci
       <h3 className="doctor-name">{name}</h3>
       <p className="doctor-position">{position}</p>
       <p className="doctor-specialty">Chuyên khoa: {specialty}</p>
-      <p className="doctor-experience">Kinh nghiệm: {experience}</p>
+      <p className="doctor-experience">Kinh nghiệm: {experience} năm</p>
 
       <button className="appointment-button">
         <i className='bx bx-calendar-check'></i>

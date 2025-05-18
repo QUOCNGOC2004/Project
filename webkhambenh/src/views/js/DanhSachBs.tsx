@@ -14,7 +14,7 @@ interface Doctor {
   chuyenKhoa: string;
   chucVu: string;
   hocVi: string;
-  kinhNghiem: string;
+  kinhNghiem: number;
   linkAnh: string;
 }
 
