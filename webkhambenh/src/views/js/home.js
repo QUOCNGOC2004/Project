@@ -17,7 +17,7 @@ const Home = (props) => {
   return (
     <div className="home-container">
       <Helmet>
-        <title>Hệ thống đặt lịch khám bệnh trực tuyến</title>
+        <title>Web khám bệnh nhóm 13</title>
         <meta property="og:title" content="Hệ thống đặt lịch khám bệnh trực tuyến" />
       </Helmet>
       <ListAnh
