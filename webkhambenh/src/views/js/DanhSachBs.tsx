@@ -18,12 +18,21 @@ interface Doctor {
   linkAnh: string;
 }
 
+interface SelectedFilters {
+  specialty?: string;
+  position?: string;
+  degree?: string;
+  experience?: string;
+}
+
 const DanhSachBs: React.FC = () => {
   const [activeCenter, setActiveCenter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filterLoading, setFilterLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
 
   useEffect(() => {
     fetchDoctors();
@@ -53,18 +62,46 @@ const DanhSachBs: React.FC = () => {
     // Thực hiện logic tìm kiếm ở đây
   };
 
-  const handleFilterChange = (filterType: string, value: string) => {
-    // Thực hiện logic lọc ở đây
-    console.log(`Lọc đã thay đổi: ${filterType} - ${value}`);
+  const handleFilterChange = async (filterType: string, value: string) => {
+    try {
+      setFilterLoading(true);
+      setError(null);
+      
+      // Cập nhật state để lưu giá trị filter hiện tại
+      const newFilters = {
+        ...selectedFilters,
+        [filterType]: value
+      };
+      setSelectedFilters(newFilters);
+
+      // Tạo query params từ tất cả các filter
+      const queryParams = new URLSearchParams();
+      Object.entries(newFilters).forEach(([key, val]) => {
+        if (val && val !== 'Tất cả') {
+          queryParams.append(key, val);
+        }
+      });
+
+      // Gọi API lọc
+      const response = await fetch(`http://localhost:3002/api/doctors/filter?${queryParams.toString()}`);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.error || `HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setDoctors(data);
+    } catch (error) {
+      console.error('Lỗi khi lọc:', error);
+      setError(error instanceof Error ? error.message : 'Đã xảy ra lỗi khi lọc danh sách bác sĩ');
+    } finally {
+      setFilterLoading(false);
+    }
   };
 
   const handleCenterSelect = (center: string) => {
     setActiveCenter(center);
     // Thực hiện logic chọn trung tâm ở đây
   };
-
-  if (loading) return <div>Đang tải...</div>;
-  if (error) return <div>Lỗi: {error}</div>;
 
   return (
     <div className="doctor-directory">
@@ -82,7 +119,13 @@ const DanhSachBs: React.FC = () => {
         />
 
         <div className="doctor-grid">
-          {doctors.length > 0 ? (
+          {loading ? (
+            <div>Đang tải...</div>
+          ) : filterLoading ? (
+            <div>Đang lọc...</div>
+          ) : error ? (
+            <div className="error-message">Lỗi: {error}</div>
+          ) : doctors.length > 0 ? (
             doctors.map((doctor) => (
               <DoctorCard
                 key={doctor.id}
