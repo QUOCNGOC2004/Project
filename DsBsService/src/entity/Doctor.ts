@@ -27,7 +27,7 @@ export class Doctor {
     hocVi!: string;
 
     @Column({ name: 'kinh_nghiem' })
-    kinhNghiem!: string;
+    kinhNghiem!: number;
 
     @Column({ name: 'link_anh' })
     linkAnh!: string;
@@ -40,7 +40,7 @@ export class Doctor {
         this.chuyenKhoa = '';
         this.chucVu = '';
         this.hocVi = '';
-        this.kinhNghiem = '';
+        this.kinhNghiem = 0;
         this.linkAnh = '';
     }
 } 

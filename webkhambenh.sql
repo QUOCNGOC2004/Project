@@ -25,7 +25,7 @@ CREATE TABLE doctors (
     chuyen_khoa VARCHAR(255),         
     chuc_vu VARCHAR(255),           
     hoc_vi VARCHAR(255),              
-    kinh_nghiem TEXT,                 
+    kinh_nghiem INT,                 
     link_anh VARCHAR(255)             
 );
 
