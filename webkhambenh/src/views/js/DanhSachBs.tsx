@@ -86,14 +86,12 @@ const DanhSachBs: React.FC = () => {
 
   const fetchDoctors = async () => {
     try {
-      console.log('Fetching doctors from:', 'http://localhost:3002/api/doctors');
       const response = await fetch('http://localhost:3002/api/doctors');
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
         throw new Error(errorData?.error || `HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      console.log('Lấy dữ liệu bác sĩ:', data);
       setDoctors(data);
       setLoading(false);
     } catch (err) {
@@ -123,6 +121,11 @@ const DanhSachBs: React.FC = () => {
         }
       });
 
+      // Thêm facility vào query params nếu có
+      if (activeCenter && activeCenter !== 'Tất cả') {
+        queryParams.append('facility', activeCenter);
+      }
+
       // Gọi API lọc
       const response = await fetch(`http://localhost:3002/api/doctors/filter?${queryParams.toString()}`);
       if (!response.ok) {
@@ -139,34 +142,36 @@ const DanhSachBs: React.FC = () => {
     }
   };
 
-  const handleCenterSelect = async (center: string) => { 
+  const handleCenterSelect = async (center: string) => {
     try {
       setActiveCenter(center);
       setLoading(true);
       setError(null);
 
-      if (!center.trim()) {
-        // Nếu không chọn cơ sở, lấy lại toàn bộ danh sách bác sĩ
-        await fetchDoctors();
-        return;
+      // Tạo query params từ các filter hiện tại
+      const queryParams = new URLSearchParams();
+      Object.entries(selectedFilters).forEach(([key, val]) => {
+        if (val && val !== 'Tất cả') {
+          queryParams.append(key, val);
+        }
+      });
+
+      // Thêm facility vào query params
+      if (center && center !== 'Tất cả') {
+        queryParams.append('facility', center);
       }
 
-      const response = await fetch(`http://localhost:3002/api/doctors/search-with-co-so-kham?facility=${encodeURIComponent(center)}`);
-      
+      // Gọi API lọc với facility mới
+      const response = await fetch(`http://localhost:3002/api/doctors/filter?${queryParams.toString()}`);
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
+        throw new Error(errorData?.error || `HTTP error! status: ${response.status}`);
       }
-
-      const result = await response.json();
-      if (result.success) {
-        setDoctors(result.data);
-      } else {
-        throw new Error(result.message);
-      }
+      const data = await response.json();
+      setDoctors(data);
     } catch (err) {
-      console.error('Lỗi khi tìm kiếm bác sĩ theo cơ sở:', err);
-      setError(err instanceof Error ? err.message : 'Đã xảy ra lỗi khi tìm kiếm bác sĩ');
+      console.error('Lỗi khi lọc bác sĩ theo cơ sở:', err);
+      setError(err instanceof Error ? err.message : 'Đã xảy ra lỗi khi lọc bác sĩ');
     } finally {
       setLoading(false);
     }
