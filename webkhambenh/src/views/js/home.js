@@ -21,24 +21,24 @@ const Home = (props) => {
         <meta property="og:title" content="Hệ thống đặt lịch khám bệnh trực tuyến" />
       </Helmet>
       <ListAnh
-        action2={
+        nutPhu={
           <Fragment>
             <span className="home-text114">Tìm bác sĩ</span>
           </Fragment>
         }
-        action1={
+        nutChinh={
           <Fragment>
             <span className="home-text115">Đặt lịch ngay</span>
           </Fragment>
         }
-        heading1={
+        tieuDe={
           <Fragment>
             <span className="home-text116">
               Chào mừng đến với Hệ thống đặt lịch khám bệnh trực tuyến
             </span>
           </Fragment>
         }
-        content1={
+        noiDung={
           <Fragment>
             <span className="home-text117">
               Đặt lịch khám bệnh dễ dàng chỉ với vài cú nhấp chuột. Tìm bác sĩ phù hợp với nhu cầu của bạn và quản lý lịch hẹn một cách thuận tiện.

@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react'
-
 import Script from 'dangerous-html/react'
 import PropTypes from 'prop-types'
 
@@ -11,45 +10,47 @@ const ListAnh = (props) => {
       <div className="hero17-column thq-section-padding thq-section-max-width">
         <div className="hero17-content1">
           <h1 className="hero17-text1 thq-heading-1">
-            {props.heading1 ?? (
+            {props.tieuDe ?? (
               <Fragment>
                 <span className="hero17-text7">
-                  Welcome to our Online Booking System
+                  Chào mừng đến với Hệ thống đặt lịch khám bệnh trực tuyến
                 </span>
               </Fragment>
             )}
           </h1>
           <p className="hero17-text2 thq-body-large">
-            {props.content1 ?? (
+            {props.noiDung ?? (
               <Fragment>
                 <span className="hero17-text8">
-                  Easily schedule your medical appointments with just a few
-                  clicks. Find the right doctor for your needs and manage your
-                  appointments hassle-free.
+                  Đặt lịch khám bệnh dễ dàng chỉ với vài cú nhấp chuột. Tìm bác sĩ phù hợp với nhu cầu của bạn và quản lý lịch hẹn một cách thuận tiện.
                 </span>
               </Fragment>
             )}
           </p>
         </div>
         <div className="hero17-actions">
-          <button className="thq-button-filled hero17-button1">
-            <span className="thq-body-small">
-              {props.action1 ?? (
-                <Fragment>
-                  <span className="hero17-text6">Get Started</span>
-                </Fragment>
-              )}
-            </span>
-          </button>
-          <button className="thq-button-outline hero17-button2">
-            <span className="thq-body-small">
-              {props.action2 ?? (
-                <Fragment>
-                  <span className="hero17-text5">Secondary action</span>
-                </Fragment>
-              )}
-            </span>
-          </button>
+          <a href={props.lienKetDatLich}>
+            <button className="thq-button-filled hero17-button1">
+              <span className="thq-body-small">
+                {props.nutChinh ?? (
+                  <Fragment>
+                    <span className="hero17-text6">Đặt lịch ngay</span>
+                  </Fragment>
+                )}
+              </span>
+            </button>
+          </a>
+          <a href={props.lienKetTimBS}>
+            <button className="thq-button-outline hero17-button2">
+              <span className="thq-body-small">
+                {props.nutPhu ?? (
+                  <Fragment>
+                    <span className="hero17-text5">Tìm bác sĩ</span>
+                  </Fragment>
+                )}
+              </span>
+            </button>
+          </a>
         </div>
       </div>
       <div className="hero17-content2">
@@ -257,6 +258,12 @@ ListAnh.defaultProps = {
   image9Alt: 'Hero Image',
   image1Src:
     'https://nld.mediacdn.vn/291774122806476800/2025/4/16/anh-chup-man-hinh-2025-04-16-luc-172821-1744799608713885340391.png',
+  nutPhu: undefined,
+  nutChinh: undefined,
+  tieuDe: undefined,
+  noiDung: undefined,
+  lienKetDatLich: '/dat-lich',
+  lienKetTimBS: '/danh-sach-bs'
 }
 
 ListAnh.propTypes = {
@@ -288,6 +295,12 @@ ListAnh.propTypes = {
   image10Src: PropTypes.string,
   image9Alt: PropTypes.string,
   image1Src: PropTypes.string,
+  nutPhu: PropTypes.element,
+  nutChinh: PropTypes.element,
+  tieuDe: PropTypes.element,
+  noiDung: PropTypes.element,
+  lienKetDatLich: PropTypes.string,
+  lienKetTimBS: PropTypes.string
 }
 
 export default ListAnh
