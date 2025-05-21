@@ -20,6 +20,9 @@ export class Doctor {
     @Column({ name: 'chuyen_khoa' })
     chuyenKhoa!: string;
 
+    @Column({ name: 'mo_ta_chuc_vu' })
+    moTaChucVu!: string;
+
     @Column({ name: 'chuc_vu' })
     chucVu!: string;
 
@@ -39,6 +42,7 @@ export class Doctor {
         this.coSoKham = '';
         this.chuyenKhoa = '';
         this.chucVu = '';
+        this.moTaChucVu = '';
         this.hocVi = '';
         this.kinhNghiem = 0;
         this.linkAnh = '';

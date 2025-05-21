@@ -13,6 +13,7 @@ interface Doctor {
   coSoKham: string;
   chuyenKhoa: string;
   chucVu: string;
+  moTaChucVu: string;
   hocVi: string;
   kinhNghiem: number;
   linkAnh: string;
@@ -130,7 +131,7 @@ const DanhSachBs: React.FC = () => {
               <DoctorCard
                 key={doctor.id}
                 name={doctor.name}
-                position={doctor.chucVu}
+                position={doctor.moTaChucVu}
                 imageUrl={doctor.linkAnh}
                 specialty={doctor.chuyenKhoa}
                 experience={doctor.kinhNghiem}
