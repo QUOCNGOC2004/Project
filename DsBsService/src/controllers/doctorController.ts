@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../config/database';
 import { Doctor } from '../entity/Doctor';
-import { Between } from 'typeorm';
+import { Between, Like } from 'typeorm';
 
 export const getDoctors = async (_req: Request, res: Response) => {
     try {
@@ -76,4 +76,31 @@ export const filterDoctors = async (req: Request, res: Response) => {
         console.error("Lỗi lọc danh sách bác sĩ:", error);
         res.status(500).json({ error: "Lỗi máy chủ" });
     }
-}; 
+};
+
+export const searchDoctorsByName = async (req: Request, res: Response) => {
+    try {
+        const { name } = req.query;
+        
+        if (!name || typeof name !== 'string') {
+            return res.status(400).json({ error: 'Thiếu tham số tên hoặc tham số không hợp lệ' });
+        }
+
+        const doctorRepository = AppDataSource.getRepository(Doctor);
+        
+        const doctors = await doctorRepository.find({
+            where: {
+                name: Like(`%${name}%`)
+            },
+            order: {
+                name: 'ASC'
+            }
+        });
+
+        return res.json(doctors);
+        
+    } catch (error) {
+        console.error('Lỗi khi tìm kiếm bác sĩ:', error);
+        return res.status(500).json({ error: 'Lỗi máy chủ khi tìm kiếm bác sĩ' });
+    }
+};

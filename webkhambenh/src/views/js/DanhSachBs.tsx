@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import 'boxicons/css/boxicons.min.css';
 import '../../views/css/DanhSachBs.css';
 import DoctorCard from '../../components/js/forDsBs/DoctorCard';
@@ -35,6 +35,51 @@ const DanhSachBs: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
 
+  // Tạo hàm debounce
+  const debounce = (func: Function, wait: number) => {
+    let timeout: NodeJS.Timeout;
+    return (...args: any[]) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), wait);
+    };
+  };
+
+  // Tạo hàm search với debounce
+  const debouncedSearch = useCallback(
+    debounce(async (query: string) => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        if (!query.trim()) {
+          await fetchDoctors();
+          return;
+        }
+
+        const response = await fetch(`http://localhost:3002/api/doctors/search?name=${encodeURIComponent(query)}`);
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => null);
+          throw new Error(errorData?.error || `HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setDoctors(data);
+      } catch (err) {
+        console.error('Lỗi khi tìm kiếm bác sĩ:', err);
+        setError(err instanceof Error ? err.message : 'Đã xảy ra lỗi khi tìm kiếm bác sĩ');
+      } finally {
+        setLoading(false);
+      }
+    }, 500), // Đợi 500ms sau khi người dùng ngừng gõ
+    []
+  );
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    debouncedSearch(query);
+  };
+
   useEffect(() => {
     fetchDoctors();
   }, []);
@@ -56,11 +101,6 @@ const DanhSachBs: React.FC = () => {
       setError(err instanceof Error ? err.message : 'Đã xảy ra lỗi khi lấy dữ liệu bác sĩ');
       setLoading(false);
     }
-  };
-
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    // Thực hiện logic tìm kiếm ở đây
   };
 
   const handleFilterChange = async (filterType: string, value: string) => {
