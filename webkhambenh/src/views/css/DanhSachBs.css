@@ -130,7 +130,7 @@
 .doctor-grid {
   flex: 1;
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Show 3 doctors per row */
+  grid-template-columns: repeat(3, 1fr); /* hiển thị 3 bác sĩ trên 1 hàng */
   gap: 1.5rem;
 }
 
@@ -204,7 +204,7 @@
 /* Responsive design */
 @media (max-width: 1024px) {
   .doctor-grid {
-    grid-template-columns: repeat(2, 1fr); /* 2 doctors per row on medium screens */
+    grid-template-columns: repeat(2, 1fr); /* hiển thị 2 bác sĩ trên 1 hàng */
   }
 }
 
@@ -214,6 +214,6 @@
   }
 
   .doctor-grid {
-    grid-template-columns: 1fr; /* 1 doctor per row on mobile */
+    grid-template-columns: 1fr; /* hiển thị 1 bác sĩ trên 1 hàng */
   }
 } 
