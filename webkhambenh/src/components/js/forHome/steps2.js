@@ -16,11 +16,13 @@ const Steps2 = (props) => {
             <p className="thq-body-large">
               Theo dõi và quản lý lịch hẹn khám bệnh của bạn một cách thuận tiện. Xem lịch sử khám bệnh, nhận thông báo nhắc lịch, và dễ dàng hủy hoặc thay đổi lịch hẹn khi cần thiết.
             </p>
-            <div className="steps2-actions">
-              <button className="thq-button-animated thq-button-filled steps2-button">
-                <span className="thq-body-small">Quản lý lịch hẹn</span>
-              </button>
-            </div>
+            <a href={props.lienKetQuanLyLich}>
+              <div className="steps2-actions">
+                <button className="thq-button-animated thq-button-filled steps2-button">
+                  <span className="thq-body-small">Quản lý lịch hẹn</span>
+                </button>
+              </div>
+            </a>
           </div>
           <div className="steps2-container3">
             <div className="steps2-container4 thq-card">
@@ -115,6 +117,7 @@ Steps2.defaultProps = {
   tieuDe3: undefined,
   moTa4: undefined,
   tieuDe4: undefined,
+  lienKetQuanLyLich: "/quan-ly-lich",
 }
 
 Steps2.propTypes = {
@@ -126,6 +129,7 @@ Steps2.propTypes = {
   tieuDe3: PropTypes.element,
   moTa4: PropTypes.element,
   tieuDe4: PropTypes.element,
+  lienKetQuanLyLich: PropTypes.string
 }
 
 export default Steps2
