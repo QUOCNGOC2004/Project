@@ -9,7 +9,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeCenter, onCenterSelect }) => {
   const centers = [
     "Bệnh viện Đại học Phenikaa",
     "Phòng khám Đa khoa Đại học Phenikaa",
-    "Sinh viên tòa A8 "
+    "Sinh viên tòa A8"
   ];
 
   return (

@@ -104,3 +104,44 @@ export const searchDoctorsByName = async (req: Request, res: Response) => {
         return res.status(500).json({ error: 'Lỗi máy chủ khi tìm kiếm bác sĩ' });
     }
 };
+
+export const searchDoctorsWithCoSoKham = async (req: Request, res: Response) => {
+    try {
+        const { facility } = req.query;
+        
+        // Validate input
+        if (!facility || typeof facility !== 'string') {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Thiếu tham số cơ sở khám hoặc tham số không hợp lệ' 
+            });
+        }
+
+        const doctorRepository = AppDataSource.getRepository(Doctor);
+        
+        // Tìm kiếm không phân biệt hoa thường và tìm kiếm một phần
+        const doctors = await doctorRepository.find({
+            where: {
+                coSoKham: Like(`%${facility}%`)
+            },
+            order: {
+                name: 'ASC' // Sắp xếp theo tên A-Z
+            }
+        });
+
+        return res.json({
+            success: true,
+            data: doctors,
+            message: doctors.length > 0 
+                ? 'Tìm thấy bác sĩ phù hợp' 
+                : 'Không tìm thấy bác sĩ tại cơ sở này'
+        });
+
+    } catch (error) {
+        console.error('Lỗi khi tìm kiếm bác sĩ theo cơ sở khám:', error);
+        return res.status(500).json({ 
+            success: false,
+            message: 'Lỗi máy chủ khi tìm kiếm bác sĩ' 
+        });
+    }
+};
