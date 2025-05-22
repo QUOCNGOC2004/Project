@@ -1,8 +1,13 @@
 #!/bin/bash
 
-# Đợi Kong khởi động
+# Đợi Kong khởi động và kiểm tra trạng thái
 echo "Đợi Kong khởi động..."
-sleep 10
+until curl -s http://localhost:8001/status | grep -q '"database":{"reachable":true}'; do
+  echo "Đang đợi Kong khởi động..."
+  sleep 5
+done
+
+echo "Kong đã sẵn sàng, bắt đầu cấu hình..."
 
 # Tạo service cho AuthService
 curl -i -X POST http://localhost:8001/services \

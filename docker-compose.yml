@@ -10,12 +10,13 @@ services:
     volumes:
       - kong_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5432:5432"  # Cổng PostgreSQL mặc định, dùng riêng cho Kong
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U kong"]
       interval: 5s
       timeout: 5s
       retries: 5
+      start_period: 10s
 
   # Database cho ứng dụng
   app-database:
@@ -24,7 +25,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_DB: webkhambenh
-      POSTGRES_PASSWORD: 0000
+      POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - app_data:/var/lib/postgresql/data
       - ./webkhambenh.sql:/docker-entrypoint-initdb.d/webkhambenh.sql
@@ -39,7 +40,7 @@ services:
   # Kong migration
   kong-migration:
     image: kong:3.4
-    command: kong migrations bootstrap
+    command: kong migrations up
     environment:
       KONG_DATABASE: postgres
       KONG_PG_HOST: kong-database
@@ -83,7 +84,7 @@ services:
       - DB_HOST=app-database
       - DB_PORT=5432
       - DB_USERNAME=postgres
-      - DB_PASSWORD=0000
+      - DB_PASSWORD=
       - DB_NAME=webkhambenh
       - PORT=3001
     ports:
@@ -102,7 +103,7 @@ services:
       - DB_HOST=app-database
       - DB_PORT=5432
       - DB_USERNAME=postgres
-      - DB_PASSWORD=0000
+      - DB_PASSWORD=
       - DB_NAME=webkhambenh
       - PORT=3002
     ports:
@@ -126,4 +127,4 @@ services:
 
 volumes:
   kong_data:
-  app_data: 
+  app_data:
