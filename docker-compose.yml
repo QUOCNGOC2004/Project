@@ -128,22 +128,26 @@ services:
         condition: service_completed_successfully
     networks:
       - webkhambenh-network
+    healthcheck:
+      test: ["CMD-SHELL", "kong health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   # Kong Setup Service
   kong-setup:
-    image: curlimages/curl:latest
+    image: alpine:latest
     container_name: kong-setup
     volumes:
-      - ./setup-kong.sh:/setup-kong.sh:ro
+      - ./setup-kong.sh:/setup-kong.sh
     command: >
       sh -c "
-        echo 'Waiting for Kong to start...' &&
-        sleep 30 &&
+        apk add --no-cache curl &&
         sh /setup-kong.sh
       "
     depends_on:
       kong:
-        condition: service_started
+        condition: service_healthy
     networks:
       - webkhambenh-network
 
