@@ -5,15 +5,87 @@ services:
   - name: auth-service
     url: http://auth-service:3001
     routes:
-      - name: auth-route
+      - name: auth-register
         paths:
-          - /auth
+          - /auth/register
+        methods:
+          - POST
         strip_path: true
+      - name: auth-login
+        paths:
+          - /auth/login
+        methods:
+          - POST
+        strip_path: true
+      - name: auth-profile
+        paths:
+          - /auth/profile
+        methods:
+          - GET
+        strip_path: true
+        plugins:
+          - name: jwt
+            config:
+              header_names: ["Authorization"]
+              claims_to_verify: ["exp"]
 
   - name: doctor-service
     url: http://doctor-service:3002
     routes:
-      - name: doctor-route
+      - name: doctor-filter
+        paths:
+          - /doctors/filter
+        methods:
+          - GET
+        strip_path: true
+      - name: doctor-search
+        paths:
+          - /doctors/search
+        methods:
+          - GET
+        strip_path: true
+      - name: doctor-list
         paths:
           - /doctors
-        strip_path: true 
+        methods:
+          - GET
+        strip_path: true
+      - name: doctor-detail
+        paths:
+          - /doctors/(?<id>\d+)
+        methods:
+          - GET
+        strip_path: true
+      - name: doctor-create
+        paths:
+          - /doctors
+        methods:
+          - POST
+        strip_path: true
+        plugins:
+          - name: jwt
+            config:
+              header_names: ["Authorization"]
+              claims_to_verify: ["exp"]
+      - name: doctor-update
+        paths:
+          - /doctors/(?<id>\d+)
+        methods:
+          - PUT
+        strip_path: true
+        plugins:
+          - name: jwt
+            config:
+              header_names: ["Authorization"]
+              claims_to_verify: ["exp"]
+      - name: doctor-delete
+        paths:
+          - /doctors/(?<id>\d+)
+        methods:
+          - DELETE
+        strip_path: true
+        plugins:
+          - name: jwt
+            config:
+              header_names: ["Authorization"]
+              claims_to_verify: ["exp"] 

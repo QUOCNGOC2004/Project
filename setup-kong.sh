@@ -15,24 +15,13 @@ wait_for_kong
 # Cấu hình Kong services và routes
 echo "Configuring Kong..."
 
-# Tạo auth service
-curl -i -X POST http://kong:8001/services \
-  --data name=auth-service \
-  --data url=http://auth-service:3001
+# Cài đặt JWT plugin
+curl -i -X POST http://kong:8001/plugins \
+  --data name=jwt
 
-# Tạo auth route
-curl -i -X POST http://kong:8001/services/auth-service/routes \
-  --data paths[]=/auth \
-  --data strip_path=true
-
-# Tạo doctor service
-curl -i -X POST http://kong:8001/services \
-  --data name=doctor-service \
-  --data url=http://doctor-service:3002
-
-# Tạo doctor route
-curl -i -X POST http://kong:8001/services/doctor-service/routes \
-  --data paths[]=/doctors \
-  --data strip_path=true
+# Áp dụng cấu hình từ file kong.yml
+curl -i -X POST http://kong:8001/config \
+  -H "Content-Type: application/json" \
+  -d @/kong.yml
 
 echo "Kong configuration completed!" 
