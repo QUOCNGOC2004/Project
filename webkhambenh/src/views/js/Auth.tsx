@@ -34,7 +34,7 @@ const Auth: React.FC = () => {
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:8000/auth/register', {
+            const response = await axios.post('http://localhost:3001/api/auth/register', {
                 username: formData.username,
                 email: formData.email,
                 password: formData.password
@@ -66,7 +66,7 @@ const Auth: React.FC = () => {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:8000/auth/login', {
+            const response = await axios.post('http://localhost:3001/api/auth/login', {
                 email: formData.email,
                 password: formData.password
             });

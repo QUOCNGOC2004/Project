@@ -33,6 +33,8 @@ services:
       - DB_NAME=webkhambenh
       - JWT_SECRET=haha
       - JWT_EXPIRES_IN=24h
+    ports:
+      - "3001:3001"
     depends_on:
       db:
         condition: service_healthy
@@ -49,6 +51,8 @@ services:
       - DB_USERNAME=postgres
       - DB_PASSWORD=postgres
       - DB_NAME=webkhambenh
+    ports:
+      - "3002:3002"
     depends_on:
       db:
         condition: service_healthy
@@ -62,99 +66,16 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - REACT_APP_AUTH_API_URL=http://localhost:8000/auth
-      - REACT_APP_DOCTOR_API_URL=http://localhost:8000/doctors
+      - REACT_APP_AUTH_API_URL=http://localhost:3001/api
+      - REACT_APP_DOCTOR_API_URL=http://localhost:3002/api
     depends_on:
       - auth-service
       - doctor-service
     networks:
       - webkhambenh-network
 
-  # Kong API Gateway
-  kong-database:
-    image: postgres:13
-    container_name: kong-database
-    environment:
-      POSTGRES_USER: kong
-      POSTGRES_DB: kong
-      POSTGRES_PASSWORD: kong
-      PGDATA: /var/lib/postgresql/data/pgdata
-    volumes:
-      - kong_data:/var/lib/postgresql/data
-    networks:
-      - webkhambenh-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U kong -d kong"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  kong-migration:
-    image: kong:3.0
-    container_name: kong-migration
-    command: kong migrations bootstrap
-    environment:
-      KONG_DATABASE: postgres
-      KONG_PG_HOST: kong-database
-      KONG_PG_USER: kong
-      KONG_PG_PASSWORD: kong
-      KONG_PG_DATABASE: kong
-    depends_on:
-      kong-database:
-        condition: service_healthy
-    networks:
-      - webkhambenh-network
-
-  kong:
-    image: kong:3.0
-    container_name: kong
-    environment:
-      KONG_DATABASE: postgres
-      KONG_PG_HOST: kong-database
-      KONG_PG_USER: kong
-      KONG_PG_PASSWORD: kong
-      KONG_PG_DATABASE: kong
-      KONG_PROXY_ACCESS_LOG: /dev/stdout
-      KONG_ADMIN_ACCESS_LOG: /dev/stdout
-      KONG_PROXY_ERROR_LOG: /dev/stderr
-      KONG_ADMIN_ERROR_LOG: /dev/stderr
-      KONG_ADMIN_LISTEN: 0.0.0.0:8001
-      KONG_PROXY_LISTEN: 0.0.0.0:8000
-    ports:
-      - "8000:8000"
-      - "8001:8001"
-    depends_on:
-      kong-migration:
-        condition: service_completed_successfully
-    networks:
-      - webkhambenh-network
-    healthcheck:
-      test: ["CMD-SHELL", "kong health"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  # Kong Setup Service
-  kong-setup:
-    image: alpine:latest
-    container_name: kong-setup
-    volumes:
-      - ./setup-kong.sh:/setup-kong.sh
-      - ./kong.yml:/kong.yml
-    command: >
-      sh -c "
-        apk add --no-cache curl &&
-        sh /setup-kong.sh
-      "
-    depends_on:
-      kong:
-        condition: service_healthy
-    networks:
-      - webkhambenh-network
-
 volumes:
   postgres_data:
-  kong_data:
 
 networks:
   webkhambenh-network:
