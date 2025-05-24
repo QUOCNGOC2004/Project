@@ -2,53 +2,54 @@ import React, { useState, Fragment, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { useHistory } from 'react-router-dom'
 import '../../css/forHome/navbar8.css'
+import { isLoggedIn, getCurrentUser, logout } from '../../../ktraLogin'
 
 const Navbar8 = (props) => {
   const [link5DropdownVisible, setLink5DropdownVisible] = useState(false)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false)
   const [username, setUsername] = useState('')
   const history = useHistory() 
 
   useEffect(() => {
-    // Kiểm tra trạng thái đăng nhập từ localStorage khi component mount
-    const token = localStorage.getItem('token') 
-    const user = JSON.parse(localStorage.getItem('user') || '{}') 
-    if (token && user.username) {
-      setIsLoggedIn(true)
-      setUsername(user.username)
-    }
+    // Kiểm tra trạng thái đăng nhập khi component mount
+    const checkLoginStatus = () => {
+      const loggedIn = isLoggedIn();
+      setIsUserLoggedIn(loggedIn);
+      if (loggedIn) {
+        const user = getCurrentUser();
+        if (user) {
+          setUsername(user.username);
+        }
+      }
+    };
+
+    checkLoginStatus();
 
     // Lắng nghe sự kiện thay đổi trạng thái đăng nhập
     const handleLoginStatusChange = (event) => {
-      const { isLoggedIn: newLoginStatus, username: newUsername } = event.detail
-      setIsLoggedIn(newLoginStatus)
-      setUsername(newUsername)
-    }
+      const { isLoggedIn: newLoginStatus, username: newUsername } = event.detail;
+      setIsUserLoggedIn(newLoginStatus);
+      setUsername(newUsername);
+    };
 
-    document.addEventListener('loginStatusChanged', handleLoginStatusChange)
+    document.addEventListener('loginStatusChanged', handleLoginStatusChange);
 
     return () => {
-      document.removeEventListener('loginStatusChanged', handleLoginStatusChange)
-    }
-  }, [])
+      document.removeEventListener('loginStatusChanged', handleLoginStatusChange);
+    };
+  }, []);
 
   const handleDangNhapDangKyClick = () => {
-    if (isLoggedIn) {
-      // Xử lý đăng xuất
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      setIsLoggedIn(false)
-      setUsername('')
+    if (isUserLoggedIn) {
+      if (window.confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+        logout();
+        setIsUserLoggedIn(false);
+        setUsername('');
+      }
     } else {
-      history.push('/dang-nhap-dang-ky')
+      history.push('/dang-nhap-dang-ky');
     }
-  }
-
-  // Hàm để cập nhật trạng thái đăng nhập và username
-  const updateLoginStatus = (status, name) => {
-    setIsLoggedIn(status)
-    setUsername(name)
-  }
+  };
 
   return (
     <header className="navbar8-container1">
@@ -124,7 +125,7 @@ const Navbar8 = (props) => {
           <div className="navbar8-buttons1">
             <button className="navbar8-action11 thq-button-animated thq-button-filled">
               <span>
-                {isLoggedIn ? (
+                {isUserLoggedIn ? (
                   <Fragment>
                     <span className="navbar8-text15">{username}</span>
                   </Fragment>
@@ -140,7 +141,7 @@ const Navbar8 = (props) => {
               className="navbar8-action21 thq-button-outline thq-button-animated"
             >
               <span>
-                {isLoggedIn ? (
+                {isUserLoggedIn ? (
                   <Fragment>
                     <span className="navbar8-text27">Đăng xuất</span>
                   </Fragment>
