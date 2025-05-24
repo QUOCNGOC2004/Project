@@ -1,6 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, ChevronDown, Info } from "lucide-react";
 import '../../../components/css/forDatLich/form1.css';
+
+interface Doctor {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  coSoKham: string;
+  chuyenKhoa: string;
+  chucVu: string;
+  moTaChucVu: string;
+  hocVi: string;
+  kinhNghiem: number;
+  linkAnh: string;
+}
 
 interface DuLieuChiTietLichHen {
   benhVien: string;
@@ -16,6 +30,10 @@ interface PropsForm1 {
 }
 
 const Form1: React.FC<PropsForm1> = ({ duLieuForm, xuLyThayDoi }) => {
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const danhSachBenhVien = [
     "Chọn cơ sở khám",
     "Bệnh viện Đại học Phenikaa",
@@ -32,7 +50,42 @@ const Form1: React.FC<PropsForm1> = ({ duLieuForm, xuLyThayDoi }) => {
     'Ngoại tổng hợp',
     'Khoa Dược'];
 
-  const danhSachBacSi = ["PGS.TS.BS Nguyễn Thanh Hồi", "TS.BS Trần Văn Nam", "BS.CKI Lê Thị Hoa", "PGS.TS Phạm Minh Tuấn"];
+  useEffect(() => {
+    fetchDoctors();
+  }, []);
+
+  const fetchDoctors = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch(`${process.env.REACT_APP_DOCTOR_API_URL}/doctors`);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.error || `HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setDoctors(data);
+    } catch (err) {
+      console.error('Lỗi lấy dữ liệu bác sĩ:', err);
+      setError(err instanceof Error ? err.message : 'Đã xảy ra lỗi khi lấy dữ liệu bác sĩ');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Lọc danh sách bác sĩ theo chuyên khoa và cơ sở khám đã chọn
+  const filteredDoctors = doctors.filter(doctor => {
+    const matchChuyenKhoa = !duLieuForm.chuyenKhoa || doctor.chuyenKhoa === duLieuForm.chuyenKhoa;
+    const matchCoSoKham = !duLieuForm.benhVien || doctor.coSoKham === duLieuForm.benhVien;
+    return matchChuyenKhoa && matchCoSoKham;
+  });
+
+  // Reset lựa chọn bác sĩ khi thay đổi chuyên khoa hoặc cơ sở khám
+  useEffect(() => {
+    xuLyThayDoi("bacSi", "");
+  }, [duLieuForm.chuyenKhoa, duLieuForm.benhVien]);
 
   return (
     <div className="form-section">
@@ -120,13 +173,26 @@ const Form1: React.FC<PropsForm1> = ({ duLieuForm, xuLyThayDoi }) => {
               className="form-select"
               value={duLieuForm.bacSi}
               onChange={(e) => xuLyThayDoi("bacSi", e.target.value)}
+              disabled={loading || !duLieuForm.chuyenKhoa || !duLieuForm.benhVien}
             >
               <option value="">Chọn bác sĩ</option>
-              {danhSachBacSi.map((bacSi, index) => (
-                <option key={index} value={bacSi}>
-                  {bacSi}
-                </option>
-              ))}
+              {loading ? (
+                <option disabled>Đang tải...</option>
+              ) : error ? (
+                <option disabled>Lỗi: {error}</option>
+              ) : !duLieuForm.chuyenKhoa ? (
+                <option disabled>Vui lòng chọn chuyên khoa</option>
+              ) : !duLieuForm.benhVien ? (
+                <option disabled>Vui lòng chọn cơ sở khám</option>
+              ) : filteredDoctors.length === 0 ? (
+                <option disabled>Không có bác sĩ phù hợp</option>
+              ) : (
+                filteredDoctors.map((doctor) => (
+                  <option key={doctor.id} value={doctor.name}>
+                    {doctor.hocVi} {doctor.name}
+                  </option>
+                ))
+              )}
             </select>
             <ChevronDown className="select-icon" />
           </div>
