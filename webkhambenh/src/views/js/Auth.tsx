@@ -95,7 +95,7 @@ const Auth: React.FC = () => {
     };
 
     useEffect(() => {
-        //  thêm các side effect khác ở đây
+        
     }, [isActive]);
 
     return (
