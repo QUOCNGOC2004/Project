@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import '../../views/css/DatLich.css';
 import Form1 from '../../components/js/forDatLich/form1';
 import Form2 from '../../components/js/forDatLich/form2';
+import { isLoggedIn, getCurrentUser } from '../../ktraLogin';
 
 interface DuLieuChiTietLichHen {
   benhVien: string;
@@ -91,6 +92,17 @@ const DatLich: React.FC = () => {
   const xuLyGuiForm = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!isLoggedIn()) {
+      alert('Vui lòng đăng nhập để đặt lịch khám bệnh!');
+      return;
+    }
+
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+      alert('Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại!');
+      return;
+    }
+    
     if (!kiemTraForm()) {
       return;
     }
@@ -106,7 +118,7 @@ const DatLich: React.FC = () => {
         },
         body: JSON.stringify({
           doctor_id: duLieuForm.bacSiId,
-          user_id: null,
+          user_id: currentUser.id,
           ngay_dat_lich: duLieuForm.ngayHen,
           gio_dat_lich: duLieuForm.gioHen,
           ten_benh_nhan: duLieuForm.hoTen,
