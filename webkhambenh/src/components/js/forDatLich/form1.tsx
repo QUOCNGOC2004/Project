@@ -23,7 +23,7 @@ const Form1: React.FC<PropsForm1> = ({ duLieuForm, xuLyThayDoi }) => {
     "Sinh viên tòa A8"
   ];
 
-  const danhSachChuyenKhoa = ['Tất cả',
+  const danhSachChuyenKhoa = ['Chọn chuyên khoa',
     'Y học bào thai',
     'Ung bướu',
     'Tim mạch',
