@@ -1,54 +1,54 @@
 import React, { useState } from 'react';
 import '../../views/css/DatLich.css';
-import AppointmentDetailsForm from '../../components/js/forDatLich/AppointmentDetailsForm';
-import PatientInfoForm from '../../components/js/forDatLich/PatientInfoForm';
+import Form1 from '../../components/js/forDatLich/form1';
+import Form2 from '../../components/js/forDatLich/form2';
 
-interface AppointmentDetailsData {
-  hospital: string;
-  specialty: string;
-  doctor: string;
-  date: string;
-  time: string;
+interface DuLieuChiTietLichHen {
+  benhVien: string;
+  chuyenKhoa: string;
+  bacSi: string;
+  ngayHen: string;
+  gioHen: string;
 }
 
-interface PatientInfoData {
-  fullName: string;
+interface DuLieuBenhNhan {
+  hoTen: string;
   email: string;
-  gender: string;
-  birthDate: string;
-  phone: string;
-  reason: string;
-  agreeTerms: boolean;
+  gioiTinh: string;
+  ngaySinh: string;
+  soDienThoai: string;
+  lyDoKham: string;
+  dongYDieuKhoan: boolean;
 }
 
-interface FormData extends AppointmentDetailsData, PatientInfoData {}
+interface DuLieuForm extends DuLieuChiTietLichHen, DuLieuBenhNhan {}
 
 const DatLich: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>({
-    hospital: "",
-    specialty: "",
-    doctor: "",
-    date: "",
-    time: "",
-    fullName: "",
+  const [duLieuForm, setDuLieuForm] = useState<DuLieuForm>({
+    benhVien: "",
+    chuyenKhoa: "",
+    bacSi: "",
+    ngayHen: "",
+    gioHen: "",
+    hoTen: "",
     email: "",
-    gender: "",
-    birthDate: "",
-    phone: "",
-    reason: "",
-    agreeTerms: false,
+    gioiTinh: "",
+    ngaySinh: "",
+    soDienThoai: "",
+    lyDoKham: "",
+    dongYDieuKhoan: false,
   });
 
-  const handleInputChange = (field: keyof FormData, value: string | boolean) => {
-    setFormData((prev) => ({
+  const xuLyThayDoi = (truong: keyof DuLieuForm, giaTri: string | boolean) => {
+    setDuLieuForm((prev) => ({
       ...prev,
-      [field]: value,
+      [truong]: giaTri,
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const xuLyGuiForm = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    console.log("Form đã gửi:", duLieuForm);
     alert("Đã gửi thông tin đặt lịch thành công!");
   };
 
@@ -58,14 +58,14 @@ const DatLich: React.FC = () => {
         <h1>Đặt Lịch Khám Bệnh</h1>
         <p>Đặt lịch khám bệnh trực tuyến nhanh chóng và tiện lợi. Chúng tôi sẽ liên hệ xác nhận lịch hẹn của bạn trong thời gian sớm nhất.</p>
       </div>
-      <form onSubmit={handleSubmit} className="appointment-form">
-        <AppointmentDetailsForm 
-          formData={formData}
-          handleInputChange={handleInputChange}
+      <form onSubmit={xuLyGuiForm} className="appointment-form">
+        <Form1 
+          duLieuForm={duLieuForm}
+          xuLyThayDoi={xuLyThayDoi}
         />
-        <PatientInfoForm 
-          formData={formData}
-          handleInputChange={handleInputChange}
+        <Form2 
+          duLieuForm={duLieuForm}
+          xuLyThayDoi={xuLyThayDoi}
         />
         <div className="submit-section">
           <button type="submit" className="submit-button">
