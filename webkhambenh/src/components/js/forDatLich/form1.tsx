@@ -20,13 +20,14 @@ interface DuLieuChiTietLichHen {
   benhVien: string;
   chuyenKhoa: string;
   bacSi: string;
+  bacSiId: number;
   ngayHen: string;
   gioHen: string;
 }
 
 interface PropsForm1 {
   duLieuForm: DuLieuChiTietLichHen;
-  xuLyThayDoi: (truong: keyof DuLieuChiTietLichHen, giaTri: string) => void;
+  xuLyThayDoi: (truong: keyof DuLieuChiTietLichHen, giaTri: string | number) => void;
 }
 
 const Form1: React.FC<PropsForm1> = ({ duLieuForm, xuLyThayDoi }) => {
@@ -81,6 +82,21 @@ const Form1: React.FC<PropsForm1> = ({ duLieuForm, xuLyThayDoi }) => {
     const matchCoSoKham = !duLieuForm.benhVien || doctor.coSoKham === duLieuForm.benhVien;
     return matchChuyenKhoa && matchCoSoKham;
   });
+
+  const handleDoctorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedDoctorName = e.target.value;
+    const selectedDoctor = doctors.find(doctor => doctor.name === selectedDoctorName);
+    
+    if (selectedDoctor) {
+      // Cập nhật cả tên và ID bác sĩ
+      xuLyThayDoi("bacSi", selectedDoctor.name);
+      xuLyThayDoi("bacSiId", selectedDoctor.id);
+      console.log("Đã chọn bác sĩ:", selectedDoctor.name, "ID:", selectedDoctor.id);
+    } else {
+      xuLyThayDoi("bacSi", "");
+      xuLyThayDoi("bacSiId", 0);
+    }
+  };
 
   return (
     <div className="form-section">
@@ -162,12 +178,12 @@ const Form1: React.FC<PropsForm1> = ({ duLieuForm, xuLyThayDoi }) => {
         </div>
 
         <div className="form-group">
-          <label className="form-label">Chọn bác sĩ</label>
+          <label className="form-label">Chọn bác sĩ <span className="required">*</span></label>
           <div className="select-wrapper">
             <select
               className="form-select"
               value={duLieuForm.bacSi}
-              onChange={(e) => xuLyThayDoi("bacSi", e.target.value)}
+              onChange={handleDoctorChange}
               disabled={loading || !duLieuForm.chuyenKhoa || !duLieuForm.benhVien}
             >
               <option value="">Chọn bác sĩ</option>

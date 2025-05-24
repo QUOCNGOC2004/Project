@@ -48,6 +48,23 @@ export const createLichHen = async (req: Request, res: Response): Promise<void> 
       so_dien_thoai,
       ly_do_kham
     } = req.body;
+
+    // Kiểm tra dữ liệu đầu vào
+    if (!doctor_id || !ngay_dat_lich || !gio_dat_lich || !ten_benh_nhan || !email || !so_dien_thoai) {
+      res.status(400).json({ error: 'Thiếu thông tin bắt buộc' });
+      return;
+    }
+
+    // Kiểm tra xem bác sĩ có tồn tại không
+    const doctorExists = await AppDataSource.query(
+      'SELECT id FROM doctors WHERE id = $1',
+      [doctor_id]
+    );
+
+    if (doctorExists.length === 0) {
+      res.status(400).json({ error: 'Không tìm thấy bác sĩ' });
+      return;
+    }
     
     const result = await AppDataSource.query(
       `INSERT INTO appointments (
@@ -56,9 +73,17 @@ export const createLichHen = async (req: Request, res: Response): Promise<void> 
         so_dien_thoai, ly_do_kham, trang_thai
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
       [
-        doctor_id, user_id, ngay_dat_lich, gio_dat_lich,
-        ten_benh_nhan, email, gioi_tinh, ngay_sinh,
-        so_dien_thoai, ly_do_kham, 'chờ xác nhận'
+        doctor_id,
+        user_id || null, // Cho phép user_id là null
+        ngay_dat_lich,
+        gio_dat_lich,
+        ten_benh_nhan,
+        email,
+        gioi_tinh || null,
+        ngay_sinh || null,
+        so_dien_thoai,
+        ly_do_kham || null,
+        'chờ xác nhận'
       ]
     );
 

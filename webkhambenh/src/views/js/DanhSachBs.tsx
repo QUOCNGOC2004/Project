@@ -202,7 +202,7 @@ const DanhSachBs: React.FC = () => {
           ) : doctors.length > 0 ? (
             doctors.map((doctor) => (
               <DoctorCard
-                key={doctor.id}
+                id={doctor.id}
                 name={doctor.name}
                 position={doctor.moTaChucVu}
                 imageUrl={doctor.linkAnh}

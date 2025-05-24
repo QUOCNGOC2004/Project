@@ -9,14 +9,15 @@ interface DoctorCardProps {
   specialty: string;
   experience: number;
   hospital: string;
+  id: number;
 }
 
-const DoctorCard: React.FC<DoctorCardProps> = ({ name, position, imageUrl, specialty, experience, hospital }) => {
+const DoctorCard: React.FC<DoctorCardProps> = ({ name, position, imageUrl, specialty, experience, hospital, id }) => {
   const queryParams = new URLSearchParams({
     doctorName: name,
     specialty: specialty,
-    position: position,
-    hospital: hospital
+    hospital: hospital,
+    id: id.toString()
   }).toString();
 
   return (

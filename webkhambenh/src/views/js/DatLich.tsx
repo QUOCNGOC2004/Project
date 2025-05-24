@@ -8,6 +8,7 @@ interface DuLieuChiTietLichHen {
   benhVien: string;
   chuyenKhoa: string;
   bacSi: string;
+  bacSiId: number;
   ngayHen: string;
   gioHen: string;
 }
@@ -27,13 +28,14 @@ interface DuLieuForm extends DuLieuChiTietLichHen, DuLieuBenhNhan {}
 const DatLich: React.FC = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-
-
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [duLieuForm, setDuLieuForm] = useState<DuLieuForm>({
     benhVien: searchParams.get('hospital') || "",
     chuyenKhoa: searchParams.get('specialty') || "",
     bacSi: searchParams.get('doctorName') || "",
+    bacSiId: parseInt(searchParams.get('id') || "0"),
     ngayHen: "",
     gioHen: "",
     hoTen: "",
@@ -48,17 +50,108 @@ const DatLich: React.FC = () => {
   useEffect(() => {
   }, []);
 
-  const xuLyThayDoi = (truong: keyof DuLieuForm, giaTri: string | boolean) => {
+  const xuLyThayDoi = (truong: keyof DuLieuForm, giaTri: string | boolean | number) => {
     setDuLieuForm((prev) => ({
       ...prev,
       [truong]: giaTri,
     }));
   };
 
-  const xuLyGuiForm = (e: React.FormEvent) => {
+  const kiemTraForm = (): boolean => {
+    const requiredFields: (keyof DuLieuForm)[] = [
+      'benhVien',
+      'chuyenKhoa',
+      'bacSi',
+      'bacSiId',
+      'ngayHen',
+      'gioHen',
+      'hoTen',
+      'email',
+      'gioiTinh',
+      'ngaySinh',
+      'soDienThoai',
+      'lyDoKham'
+    ];
+
+    for (const field of requiredFields) {
+      if (!duLieuForm[field]) {
+        alert(`Vui lòng điền đầy đủ thông tin ${field}`);
+        return false;
+      }
+    }
+
+    if (!duLieuForm.dongYDieuKhoan) {
+      alert('Vui lòng đồng ý với các điều khoản và điều kiện');
+      return false;
+    }
+
+    return true;
+  };
+
+  const xuLyGuiForm = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form đã gửi:", duLieuForm);
-    alert("Đã gửi thông tin đặt lịch thành công!");
+    
+    if (!kiemTraForm()) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch(`${process.env.REACT_APP_APPOINTMENT_API_URL}/appointments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          doctor_id: duLieuForm.bacSiId,
+          user_id: null,
+          ngay_dat_lich: duLieuForm.ngayHen,
+          gio_dat_lich: duLieuForm.gioHen,
+          ten_benh_nhan: duLieuForm.hoTen,
+          email: duLieuForm.email,
+          gioi_tinh: duLieuForm.gioiTinh,
+          ngay_sinh: duLieuForm.ngaySinh,
+          so_dien_thoai: duLieuForm.soDienThoai,
+          ly_do_kham: duLieuForm.lyDoKham,
+          trang_thai: 'chờ xác nhận'
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.error || `HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Đặt lịch thành công:', data);
+      alert('Đã gửi thông tin đặt lịch thành công!');
+      
+      // Reset form sau khi gửi thành công
+      setDuLieuForm({
+        benhVien: "",
+        chuyenKhoa: "",
+        bacSi: "",
+        bacSiId:0,
+        ngayHen: "",
+        gioHen: "",
+        hoTen: "",
+        email: "",
+        gioiTinh: "",
+        ngaySinh: "",
+        soDienThoai: "",
+        lyDoKham: "",
+        dongYDieuKhoan: false,
+      });
+
+    } catch (err) {
+      console.error('Lỗi khi đặt lịch:', err);
+      setError(err instanceof Error ? err.message : 'Đã xảy ra lỗi khi đặt lịch');
+      alert('Có lỗi xảy ra khi đặt lịch. Vui lòng thử lại sau.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -67,6 +160,7 @@ const DatLich: React.FC = () => {
         <h1>Đặt Lịch Khám Bệnh</h1>
         <p>Đặt lịch khám bệnh trực tuyến nhanh chóng và tiện lợi. Chúng tôi sẽ liên hệ xác nhận lịch hẹn của bạn trong thời gian sớm nhất.</p>
       </div>
+      {error && <div className="error-message">{error}</div>}
       <form onSubmit={xuLyGuiForm} className="appointment-form">
         <Form1 
           duLieuForm={duLieuForm}
@@ -77,8 +171,12 @@ const DatLich: React.FC = () => {
           xuLyThayDoi={xuLyThayDoi}
         />
         <div className="submit-section">
-          <button type="submit" className="submit-button">
-            Gửi thông tin
+          <button 
+            type="submit" 
+            className="submit-button"
+            disabled={loading}
+          >
+            {loading ? 'Đang gửi...' : 'Gửi thông tin'}
             <span className="button-arrow"></span>
           </button>
         </div>
