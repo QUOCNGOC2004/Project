@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import '../../views/css/DatLich.css';
 import Form1 from '../../components/js/forDatLich/form1';
 import Form2 from '../../components/js/forDatLich/form2';
@@ -24,10 +25,13 @@ interface DuLieuBenhNhan {
 interface DuLieuForm extends DuLieuChiTietLichHen, DuLieuBenhNhan {}
 
 const DatLich: React.FC = () => {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+
   const [duLieuForm, setDuLieuForm] = useState<DuLieuForm>({
-    benhVien: "",
-    chuyenKhoa: "",
-    bacSi: "",
+    benhVien: searchParams.get('hospital') || "",
+    chuyenKhoa: searchParams.get('specialty') || "",
+    bacSi: searchParams.get('doctorName') || "",
     ngayHen: "",
     gioHen: "",
     hoTen: "",

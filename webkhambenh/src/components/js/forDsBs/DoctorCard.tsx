@@ -7,10 +7,18 @@ interface DoctorCardProps {
   position: string;
   imageUrl: string;
   specialty: string;
-  experience : number;
+  experience: number;
+  hospital: string;
 }
 
-const DoctorCard: React.FC<DoctorCardProps> = ({ name, position, imageUrl, specialty, experience }) => {
+const DoctorCard: React.FC<DoctorCardProps> = ({ name, position, imageUrl, specialty, experience, hospital }) => {
+  const queryParams = new URLSearchParams({
+    doctorName: name,
+    specialty: specialty,
+    position: position,
+    hospital: hospital
+  }).toString();
+
   return (
     <div className="doctor-card">
       <div className="doctor-image-container">
@@ -27,10 +35,12 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ name, position, imageUrl, speci
       <p className="doctor-specialty">Chuyên khoa: {specialty}</p>
       <p className="doctor-experience">Kinh nghiệm: {experience} năm</p>
 
-      <button className="appointment-button">
-        <i className='bx bx-calendar-check'></i>
-        Đặt lịch khám
-      </button>
+      <a href={`/dat-lich?${queryParams}`}>
+        <button className="appointment-button">
+          <i className='bx bx-calendar-check'></i>
+          Đặt lịch khám
+        </button>
+      </a>
     </div>
   );
 };

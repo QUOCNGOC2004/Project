@@ -208,6 +208,7 @@ const DanhSachBs: React.FC = () => {
                 imageUrl={doctor.linkAnh}
                 specialty={doctor.chuyenKhoa}
                 experience={doctor.kinhNghiem}
+                hospital={doctor.coSoKham}
               />
             ))
           ) : (
