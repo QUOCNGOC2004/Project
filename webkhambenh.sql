@@ -8,10 +8,6 @@ CREATE TABLE users (
     so_dien_thoai VARCHAR(20), 
     ngay_sinh DATE
 );
-
-INSERT INTO users (username, email, password, gioi_tinh, so_dien_thoai, ngay_sinh) VALUES
-('user1', 'u@example.com', '0000000', 'Nam', '0901234567', '1990-01-01');
-
 -- Tạo bảng doctors
 CREATE TABLE doctors (
     id SERIAL PRIMARY KEY,
