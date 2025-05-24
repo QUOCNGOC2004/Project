@@ -1,5 +1,5 @@
 .appointment-container {
-  width: 100%;
+  width: 1280px;
   display: flex;
   min-height: 100vh;
   align-items: center;
@@ -9,10 +9,43 @@
   padding: 20px;
 }
 
+.appointment-header {
+  width: 100%;
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.9) 0%, rgba(234, 88, 12, 0.9) 100%);
+  background-image: url(https://cdn-media.sforum.vn/storage/app/media/ctv_seo3/mau-background-dep-thumb.jpg);
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: overlay;
+  padding: 40px;
+  border-radius: 8px 8px 0 0;
+  color: rgb(215, 115, 7);
+  text-align: center;
+  margin-bottom: 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.appointment-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.appointment-header p {
+  font-size: 16px;
+  opacity: 0.9;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
 .appointment-form {
   width: 1280px;
   background: white;
-  border-radius: 8px;
+  border-radius: 0 0 8px 8px;
   overflow: hidden;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
@@ -85,6 +118,7 @@
 .select-wrapper,
 .input-wrapper {
   position: relative;
+  width: 100%;
 }
 
 .select-icon,
@@ -93,21 +127,24 @@
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   color: #6b7280;
   pointer-events: none;
+  z-index: 1;
 }
 
 .form-select {
   appearance: none;
   cursor: pointer;
   padding-right: 40px;
+  width: 100%;
 }
 
 .date-input,
 .time-input {
   padding-right: 40px;
+  width: 100%;
 }
 
 .date-input::-webkit-calendar-picker-indicator,
@@ -206,7 +243,8 @@
 .submit-section {
   display: flex;
   justify-content: center;
-  margin-top: 30px;
+  margin: 30px 0;
+  padding: 0 40px;
 }
 
 .submit-button {
@@ -244,9 +282,11 @@
 }
 
 /* Responsive Design */
-@media (max-width: 1024px) {
-  .form-grid {
-    grid-template-columns: 1fr 1fr;
+@media (max-width: 1300px) {
+  .appointment-header,
+  .appointment-form {
+    width: 100%;
+    max-width: 1280px;
   }
 }
 
@@ -255,32 +295,34 @@
     padding: 10px;
   }
 
-  .form-section {
-    padding: 20px;
+  .appointment-header {
+    padding: 30px 20px;
   }
 
-  .form-grid {
-    grid-template-columns: 1fr;
-    gap: 15px;
+  .appointment-header h1 {
+    font-size: 24px;
   }
 
-  .section-title {
-    font-size: 20px;
-    margin-bottom: 20px;
-  }
-}
-
-@media (max-width: 480px) {
-  .form-section {
-    padding: 15px;
-  }
-
-  .section-title {
-    font-size: 18px;
+  .submit-section {
+    padding: 0 20px;
   }
 
   .submit-button {
     width: 100%;
     justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .appointment-header {
+    padding: 20px 15px;
+  }
+
+  .appointment-header h1 {
+    font-size: 20px;
+  }
+
+  .appointment-header p {
+    font-size: 14px;
   }
 } 
