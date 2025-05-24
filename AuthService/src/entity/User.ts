@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 import { IsEmail } from "class-validator";
 
 @Entity('users')
@@ -16,16 +16,12 @@ export class User {
     @Column()
     password!: string;
 
-    @Column({ default: false })
-    isVerified!: boolean;
+    @Column({ nullable: true })
+    gioi_tinh!: string;
 
-    @CreateDateColumn()
-    createdAt!: Date;
+    @Column({ nullable: true })
+    so_dien_thoai!: string;
 
-    @UpdateDateColumn()
-    updatedAt!: Date;
-
-    constructor() {
-        this.isVerified = false;
-    }
+    @Column({ type: 'date', nullable: true })
+    ngay_sinh!: Date;
 } 
