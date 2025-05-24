@@ -1,6 +1,7 @@
-const express = require('express');
-const router = express.Router();
-const appointmentController = require('../controllers/appointmentController');
+import { Router } from 'express';
+import appointmentController from '../controllers/appointmentController';
+
+const router = Router();
 
 // Lấy danh sách lịch hẹn
 router.get('/', appointmentController.getAllAppointments);
@@ -17,4 +18,4 @@ router.put('/:id', appointmentController.updateAppointment);
 // Xóa lịch hẹn
 router.delete('/:id', appointmentController.deleteAppointment);
 
-module.exports = router; 
+export default router; 

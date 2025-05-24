@@ -1,5 +1,3 @@
-
-
 -- Tạo bảng users
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
@@ -29,9 +27,28 @@ CREATE TABLE doctors (
     chuc_vu VARCHAR(255)
 );
 
+-- Tạo bảng appointments
+CREATE TABLE appointments (
+    id SERIAL PRIMARY KEY,
+    doctor_id INTEGER REFERENCES doctors(id),
+    user_id INTEGER REFERENCES users(id),
+    ngay_dat_lich DATE NOT NULL,
+    gio_dat_lich TIME NOT NULL,
+    co_so_kham VARCHAR(255) NOT NULL,
+    chuyen_khoa VARCHAR(255) NOT NULL,
+    ten_benh_nhan VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    gioi_tinh VARCHAR(10) NOT NULL,
+    ngay_sinh DATE NOT NULL,
+    so_dien_thoai VARCHAR(20) NOT NULL,
+    ly_do_kham TEXT,
+    trang_thai VARCHAR(20) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Đổ dữ liệu vào bảng doctors
 INSERT INTO doctors (name, email, phone, co_so_kham, chuyen_khoa, mo_ta_chuc_vu, hoc_vi, kinh_nghiem, link_anh, chuc_vu) VALUES
-
 ('PGS.TS. BS Nguyễn Thanh Hồi', 'nguyenthanhh@example.com', '0901234567', 'Bệnh viện Đại học Phenikaa', 'Tim mạch', 'Tổng Giám đốc Bệnh viện', 'Tiến sĩ', 20, 'https://cdn.phenikaamec.com/phenikaa-mec/image/5-14-2025/d09837dc-0ab8-400e-b486-fe7027180151-image.webp', 'Tổng giám đốc'),
 ('GS.TS. BS. Đỗ Quyết', 'doquyet@example.com', '0987654321', 'Phòng khám Đa khoa Đại học Phenikaa', 'Nội tổng hợp', 'Phó Tổng Giám Đốc Bệnh Viện', 'Tiến sĩ', 25, 'https://cdn.phenikaamec.com/phenikaa-mec/image/5-14-2025/15362c14-c585-472a-9999-aacdd5919507-image.webp', 'Phó tổng giám đốc'),
 ('PGS.TS. BSNT Vũ Hồng Thăng', 'vuhongthang@example.com', '0912345678', 'Bệnh viện Đại học Phenikaa', 'Ngoại tổng hợp', 'Phó Tổng Giám Đốc Bệnh Viện', 'Tiến sĩ', 15, 'https://cdn.phenikaamec.com/phenikaa-mec/image/5-14-2025/b17b466f-9ff2-4569-929f-cee64024d7d3-image.webp', 'Phó tổng giám đốc'),

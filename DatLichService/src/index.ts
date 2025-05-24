@@ -1,7 +1,10 @@
-const express = require('express');
-const cors = require('cors');
-const pool = require('./config/database');
-const appointmentRoutes = require('./routes/appointmentRoutes');
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import pool from './config/database';
+import appointmentRoutes from './routes/appointmentRoutes';
+
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3003;
