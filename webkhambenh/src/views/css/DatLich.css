@@ -266,7 +266,6 @@
 .submit-button:hover {
   transform: translateY(-2px);
   background: #1e3a8a;
-  box-shadow: 0 6px 20px
 }
 
 .submit-button:active {
