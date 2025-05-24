@@ -28,6 +28,11 @@ const DatLich: React.FC = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
 
+  console.log('URL Search Params:', location.search);
+  console.log('Hospital:', searchParams.get('hospital'));
+  console.log('Specialty:', searchParams.get('specialty'));
+  console.log('Doctor Name:', searchParams.get('doctorName'));
+
   const [duLieuForm, setDuLieuForm] = useState<DuLieuForm>({
     benhVien: searchParams.get('hospital') || "",
     chuyenKhoa: searchParams.get('specialty') || "",
@@ -42,6 +47,10 @@ const DatLich: React.FC = () => {
     lyDoKham: "",
     dongYDieuKhoan: false,
   });
+
+  useEffect(() => {
+    console.log('Form State:', duLieuForm);
+  }, [duLieuForm]);
 
   const xuLyThayDoi = (truong: keyof DuLieuForm, giaTri: string | boolean) => {
     setDuLieuForm((prev) => ({

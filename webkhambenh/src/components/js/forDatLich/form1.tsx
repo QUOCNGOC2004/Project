@@ -82,11 +82,6 @@ const Form1: React.FC<PropsForm1> = ({ duLieuForm, xuLyThayDoi }) => {
     return matchChuyenKhoa && matchCoSoKham;
   });
 
-  // Reset lựa chọn bác sĩ khi thay đổi chuyên khoa hoặc cơ sở khám
-  useEffect(() => {
-    xuLyThayDoi("bacSi", "");
-  }, [duLieuForm.chuyenKhoa, duLieuForm.benhVien]);
-
   return (
     <div className="form-section">
       <h2 className="section-title">NỘI DUNG CHI TIẾT ĐẶT LỊCH HẸN</h2>
