@@ -6,10 +6,13 @@ CREATE TABLE users (
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    is_verified BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    gioi_tinh VARCHAR(10), 
+    so_dien_thoai VARCHAR(20), 
+    ngay_sinh DATE
 );
+
+INSERT INTO users (username, email, password, gioi_tinh, so_dien_thoai, ngay_sinh) VALUES
+('user1', 'u@example.com', '0000000', 'Nam', '0901234567', '1990-01-01');
 
 -- Tạo bảng doctors
 CREATE TABLE doctors (

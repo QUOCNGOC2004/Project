@@ -18,13 +18,19 @@ interface PropsForm1 {
 const Form1: React.FC<PropsForm1> = ({ duLieuForm, xuLyThayDoi }) => {
   const danhSachBenhVien = [
     "Chọn cơ sở khám",
-    "Bệnh viện Bạch Mai",
-    "Bệnh viện Việt Đức",
-    "Bệnh viện K",
-    "Bệnh viện Đại học Y Hà Nội",
+    "Bệnh viện Đại học Phenikaa",
+    "Phòng khám Đa khoa Đại học Phenikaa",
+    "Sinh viên tòa A8"
   ];
 
-  const danhSachChuyenKhoa = ["Chọn chuyên khoa", "Tim mạch", "Thần kinh", "Tiêu hóa", "Hô hấp", "Nội tiết", "Da liễu"];
+  const danhSachChuyenKhoa = ['Tất cả',
+    'Y học bào thai',
+    'Ung bướu',
+    'Tim mạch',
+    'Khoa sản',
+    'Nội tổng hợp',
+    'Ngoại tổng hợp',
+    'Khoa Dược'];
 
   const danhSachBacSi = ["PGS.TS.BS Nguyễn Thanh Hồi", "TS.BS Trần Văn Nam", "BS.CKI Lê Thị Hoa", "PGS.TS Phạm Minh Tuấn"];
 
