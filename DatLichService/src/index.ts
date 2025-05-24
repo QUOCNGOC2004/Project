@@ -1,36 +1,33 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import pool from './config/database';
-import appointmentRoutes from './routes/appointmentRoutes';
+import "reflect-metadata";
+import express from "express";
+import cors from "cors";
+import { AppDataSource } from "./config/database";
+import lichHenRoutes from "./routes/LichHenRoutes";
+import dotenv from "dotenv";
 
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3003;
 
-// Middleware
-app.use(cors());
+// Cấu hình CORS
+app.use(cors({
+    origin: 'http://localhost:3000', // URL của frontend
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
-// Test database connection
-pool.connect((err, client, release) => {
-  if (err) {
-    return console.error('Error acquiring client', err.stack);
-  }
-  console.log('Connected to database');
-  release();
-});
-
 // Routes
-app.use('/api/appointments', appointmentRoutes);
+app.use('/api/appointments', lichHenRoutes);
 
-// Basic route
-app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to Appointment Service' });
-});
-
-// Start server
-app.listen(port, () => {
-  console.log(`Appointment service is running on port ${port}`);
-}); 
+// Kết nối database và khởi chạy server
+AppDataSource.initialize()
+    .then(() => {
+        console.log("Kết nối database thành công");
+        const PORT = process.env.PORT || 3003;
+        app.listen(PORT, () => {
+            console.log(`DatLichService đang chạy trên cổng ${PORT}`);
+        });
+    })
+    .catch((error: Error) => console.log("Lỗi kết nối database: ", error)); 

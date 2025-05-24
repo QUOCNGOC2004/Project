@@ -1,14 +1,19 @@
-import { Pool } from 'pg';
-import dotenv from 'dotenv';
+import { DataSource } from "typeorm";
+import { LichHen } from "../entity/LichHen";
+import dotenv from "dotenv";
 
 dotenv.config();
 
-const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
-  user: process.env.DB_USERNAME || 'postgres',
-  password: process.env.DB_PASSWORD || 'postgres',
-  database: process.env.DB_NAME || 'webkhambenh'
-});
-
-export default pool; 
+export const AppDataSource = new DataSource({
+    type: "postgres",
+    host: process.env.DB_HOST || "localhost",
+    port: parseInt(process.env.DB_PORT || "5432"),
+    username: process.env.DB_USERNAME || "postgres",
+    password: process.env.DB_PASSWORD || "your_password",
+    database: process.env.DB_NAME || "webkhambenh",
+    synchronize: false,
+    logging: true,
+    entities: [LichHen],
+    subscribers: [],
+    migrations: [],
+}); 

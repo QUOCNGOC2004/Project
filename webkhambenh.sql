@@ -34,8 +34,6 @@ CREATE TABLE appointments (
     user_id INTEGER REFERENCES users(id),
     ngay_dat_lich DATE NOT NULL,
     gio_dat_lich TIME NOT NULL,
-    co_so_kham VARCHAR(255) NOT NULL,
-    chuyen_khoa VARCHAR(255) NOT NULL,
     ten_benh_nhan VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     gioi_tinh VARCHAR(10) NOT NULL,
