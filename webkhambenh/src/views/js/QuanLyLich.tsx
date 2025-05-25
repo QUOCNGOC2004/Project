@@ -42,7 +42,10 @@ const QuanLyLich: React.FC = () => {
 
   return (
     <div className="appointment-management">
-      <h1 className="management-title">Quản Lý Lịch Hẹn</h1>
+      <div className="management-title">
+        <h1 className="management-title-heading">Quản Lý Lịch Hẹn</h1>
+        <p className="management-title-description">Kiểm tra thông tin đặt lịch hẹn</p>
+      </div>
       
       <div className="appointment-grid">
         {appointments.map((appointment) => {
