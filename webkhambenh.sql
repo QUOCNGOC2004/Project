@@ -20,7 +20,7 @@ CREATE TABLE doctors (
     mo_ta_chuc_vu VARCHAR(255),
     hoc_vi VARCHAR(255),
     kinh_nghiem INT,
-    link_anh VARCHAR(255),
+    link_anh VARCHAR(1000),
     chuc_vu VARCHAR(255)
 );
 
