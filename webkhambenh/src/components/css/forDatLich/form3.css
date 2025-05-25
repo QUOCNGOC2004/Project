@@ -51,6 +51,7 @@
   padding: 0 1.5rem 1.5rem; 
 }
 
+.detail-button,
 .edit-button,
 .cancel-button {
   padding: 0.5rem 1rem;
@@ -59,6 +60,15 @@
   cursor: pointer;
   font-weight: 500;
   transition: background-color 0.2s ease;
+}
+
+.detail-button {
+  background-color: #48bb78;
+  color: white;
+}
+
+.detail-button:hover {
+  background-color: #38a169;
 }
 
 .edit-button {

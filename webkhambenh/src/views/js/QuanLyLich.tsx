@@ -1,14 +1,14 @@
 import React from 'react';
 import '../../views/css/QuanLyLich.css';
-import Form3 from '../../components/js/forDatLich/form3'; // Import Form3 component
+import Form3 from '../../components/js/forDatLich/form3';
 
 interface Appointment {
   id: number;
   ngay_dat_lich: string;
   gio_dat_lich: string;
   doctor_name: string;
-  ly_do_kham: string;
-  trang_thai: string;
+  co_so_kham: string;
+  doctor_phone: string;
 }
 
 const QuanLyLich: React.FC = () => {
@@ -18,25 +18,25 @@ const QuanLyLich: React.FC = () => {
       id: 1,
       ngay_dat_lich: '2024-03-20',
       gio_dat_lich: '09:00',
-      doctor_name: 'Bác sĩ Nguyễn Văn A',
-      ly_do_kham: 'Khám tổng quát',
-      trang_thai: 'Chờ xác nhận'
+      doctor_name: 'PGS.TS. BS Nguyễn Thanh Hồi',
+      co_so_kham: 'Bệnh viện Đại học Phenikaa',
+      doctor_phone: '0901234567'
     },
     {
       id: 2,
       ngay_dat_lich: '2024-03-21',
       gio_dat_lich: '14:30',
-      doctor_name: 'Bác sĩ Trần Thị B',
-      ly_do_kham: 'Tư vấn sức khỏe',
-      trang_thai: 'Đã xác nhận'
+      doctor_name: 'GS.TS. BS. Đỗ Quyết',
+      co_so_kham: 'Phòng khám Đa khoa Đại học Phenikaa',
+      doctor_phone: '0987654321'
     },
     {
       id: 3,
       ngay_dat_lich: '2024-03-22',
       gio_dat_lich: '10:15',
-      doctor_name: 'Bác sĩ Lê Văn C',
-      ly_do_kham: 'Khám chuyên khoa',
-      trang_thai: 'Chờ xác nhận'
+      doctor_name: 'PGS.TS. BSNT Vũ Hồng Thăng',
+      co_so_kham: 'Bệnh viện Đại học Phenikaa',
+      doctor_phone: '0912345678'
     }
   ];
 
