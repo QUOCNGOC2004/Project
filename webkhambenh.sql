@@ -8,6 +8,7 @@ CREATE TABLE users (
     so_dien_thoai VARCHAR(20), 
     ngay_sinh DATE
 );
+
 -- Tạo bảng doctors
 CREATE TABLE doctors (
     id SERIAL PRIMARY KEY,
@@ -48,20 +49,24 @@ INSERT INTO doctors (name, email, phone, co_so_kham, chuyen_khoa, mo_ta_chuc_vu,
 ('PGS.TS. BSNT Vũ Hồng Thăng', 'vuhongthang@example.com', '0912345678', 'Bệnh viện Đại học Phenikaa', 'Ngoại tổng hợp', 'Phó Tổng Giám Đốc Bệnh Viện', 'Tiến sĩ', 15, 'https://cdn.phenikaamec.com/phenikaa-mec/image/5-14-2025/b17b466f-9ff2-4569-929f-cee64024d7d3-image.webp', 'Phó tổng giám đốc'),
 ('TS. BS Nguyễn Văn A', 'nguyenvana@example.com', '0923456789', 'Bệnh viện Đại học Phenikaa', 'Tim mạch', 'Trưởng khoa Tim mạch', 'Tiến sĩ', 15, '/placeholder.svg', 'Trưởng Khoa'),
 ('ThS. BS Trần Thị B', 'tranthib@example.com', '0934567890', 'Phòng khám Đa khoa Đại học Phenikaa', 'Nội tổng hợp', 'Phó khoa Nội tổng hợp', 'Thạc sĩ', 10, '/placeholder.svg', 'Phó Trưởng Khoa'),
-('BS. Nguyễn Văn C', 'nguyenvanc@example.com', '0945678901', 'Sinh viên tòa A8', 'Ngoại tổng hợp', 'Bác sĩ điều trị', 'Bác sĩ', 8, '/placeholder.svg', 'Bác sĩ điều trị'),
-('BS. Nguyễn Văn D', 'nguyenvanD@example.com', '0945678901', 'Sinh viên tòa A8', 'Ngoại tổng hợp', 'Bác sĩ điều trị', 'Bác sĩ', 8, '/placeholder.svg', 'Bác sĩ điều trị'),
+('Sinh viên Nguyễn Văn C', 'nguyenvanc@example.com', '0945678901', 'Sinh viên tòa A8', 'Ngoại tổng hợp', 'Bác sĩ điều trị', 'Sinh viên thực tập', 1, '/placeholder.svg', 'Sinh viên thực tập'),
+('Sinh viên Nguyễn Văn D', 'nguyenvanD@example.com', '0945678901', 'Sinh viên tòa A8', 'Ngoại tổng hợp', 'Bác sĩ điều trị', 'Sinh viên thực tập', 2, '/placeholder.svg', 'Sinh viên thực tập'),
 ('BSNT. Lê Thị Hương', 'lethuong@example.com', '0901111222', 'Bệnh viện Đại học Phenikaa', 'Khoa sản', 'Trưởng khoa Sản', 'Bác sĩ nội trú', 12, '/placeholder.svg', 'Trưởng Khoa'),
 ('ThS. BS. Phạm Văn Khánh', 'phamvankhanh@example.com', '0911222333', 'Phòng khám Đa khoa Đại học Phenikaa', 'Ung bướu', 'Phó khoa Ung bướu', 'Thạc sĩ', 7, '/placeholder.svg', 'Phó Trưởng Khoa'),
-('BS. Nguyễn Hữu Tài', 'nguyenhuutai@example.com', '0922333444', 'Sinh viên tòa A8', 'Khoa Dược', 'Bác sĩ phụ trách tư vấn thuốc', 'Bác sĩ', 4, '/placeholder.svg', 'Bác sĩ điều trị'),
+('Sinh viên Nguyễn Hữu Tài', 'nguyenhuutai@example.com', '0922333444', 'Sinh viên tòa A8', 'Khoa Dược', 'Bác sĩ phụ trách tư vấn thuốc', 'Sinh viên thực tập', 1, '/placeholder.svg', 'Sinh viên thực tập'),
 ('TS. BS. Đặng Minh Châu', 'dangminhchau@example.com', '0933444555', 'Bệnh viện Đại học Phenikaa', 'Y học bào thai', 'Giám đốc Trung tâm Chẩn đoán trước sinh', 'Tiến sĩ', 18, '/placeholder.svg', 'Giám đốc trung tâm'),
-('Sinh viên Nguyễn Thị Thu', 'nguyenthithu@example.com', '0944555666', 'Sinh viên tòa A8', 'Nội tổng hợp', 'Sinh viên thực tập tại khoa Nội', 'Sinh viên thực tập', 1, '/placeholder.svg', 'Sinh viên thực tập'),
+('Sinh viên Nguyễn Thị Thu', 'nguyenthithu@example.com', '0944555666', 'Sinh viên tòa A8', 'Nội tổng hợp', 'Sinh viên thực tập tại khoa Nội', 'Sinh viên thực tập', 2, '/placeholder.svg', 'Sinh viên thực tập'),
 ('BSCKI. Trần Văn Lâm', 'tranvanlam@example.com', '0955666777', 'Bệnh viện Đại học Phenikaa', 'Tim mạch', 'Trưởng khoa Tim mạch can thiệp', 'Bác sĩ chuyên khoa', 14, '/placeholder.svg', 'Trưởng Khoa'),
 ('BSCKII. Hoàng Thị Mai', 'hoangthimai@example.com', '0966777888', 'Phòng khám Đa khoa Đại học Phenikaa', 'Khoa sản', 'Phó khoa Sản', 'Bác sĩ chuyên khoa', 11, '/placeholder.svg', 'Phó Trưởng Khoa'),
 ('BSCKI. Lý Minh Tuấn', 'lyminhtuan@example.com', '0977888999', 'Bệnh viện Đại học Phenikaa', 'Ung bướu', 'Bác sĩ điều trị cao cấp', 'Bác sĩ chuyên khoa', 9, '/placeholder.svg', 'Bác sĩ điều trị'),
 ('BSNT. Nguyễn Quốc Bảo', 'nguyenquocbao@example.com', '0988999000', 'Phòng khám Đa khoa Đại học Phenikaa', 'Nội tổng hợp', 'Bác sĩ nội trú khoa Nội', 'Bác sĩ nội trú', 3, '/placeholder.svg', 'Bác sĩ điều trị'),
 ('BSNT. Trịnh Thị Hằng', 'trinhthihang@example.com', '0999000111', 'Bệnh viện Đại học Phenikaa', 'Ngoại tổng hợp', 'Bác sĩ nội trú phẫu thuật', 'Bác sĩ nội trú', 4, '/placeholder.svg', 'Bác sĩ điều trị'),
-('BSNT. Phạm Văn Toàn', 'phamvantoan@example.com', '0911000222', 'Sinh viên tòa A8', 'Tim mạch', 'Bác sĩ nội trú chuyên khoa tim', 'Bác sĩ nội trú', 2, '/placeholder.svg', 'Bác sĩ điều trị'),
+('Sinh viên Phạm Văn Toàn', 'phamvantoan@example.com', '0911000222', 'Sinh viên tòa A8', 'Tim mạch', 'Bác sĩ nội trú chuyên khoa tim', 'Sinh viên thực tập', 1, '/placeholder.svg', 'Sinh viên thực tập'),
 ('ThS. BS. Lê Thị Ngọc', 'lethingoc@example.com', '0911223344', 'Phòng khám Đa khoa Đại học Phenikaa', 'Khoa sản', 'Phó khoa Sản', 'Thạc sĩ', 6, '/placeholder.svg', 'Phó Trưởng Khoa'),
 ('BS. Đặng Minh Hòa', 'dangminhhoa@example.com', '0933445566', 'Bệnh viện Đại học Phenikaa', 'Khoa sản', 'Bác sĩ điều trị sản phụ khoa', 'Bác sĩ', 5, '/placeholder.svg', 'Bác sĩ điều trị'),
 ('ThS. DS. Phạm Huyền Trang', 'phamtrang@example.com', '0944556677', 'Phòng khám Đa khoa Đại học Phenikaa', 'Khoa Dược', 'Trưởng khoa Dược', 'Thạc sĩ', 12, '/placeholder.svg', 'Trưởng Khoa'),
-('DS. Nguyễn Văn Hưng', 'nguyenvanhung@example.com', '0955667788', 'Sinh viên tòa A8', 'Khoa Dược', 'Dược sĩ tư vấn', 'Bác sĩ', 3, '/placeholder.svg', 'Bác sĩ điều trị');
+('Sinh viên Nguyễn Văn Hưng', 'nguyenvanhung@example.com', '0955667788', 'Sinh viên tòa A8', 'Khoa Dược', 'Dược sĩ tư vấn', 'Sinh viên thực tập', 2, '/placeholder.svg', 'Sinh viên thực tập'),
+('Sinh viên Trần Văn Nam', 'tranvannam@example.com', '0911223345', 'Bệnh viện Đại học Phenikaa', 'Nội tổng hợp', 'Sinh viên thực tập tại khoa Nội', 'Sinh viên thực tập', 1, '/placeholder.svg', 'Sinh viên thực tập'),
+('Sinh viên Lê Thị Hoa', 'lethihoa@example.com', '0922334456', 'Bệnh viện Đại học Phenikaa', 'Ngoại tổng hợp', 'Sinh viên thực tập tại khoa Ngoại', 'Sinh viên thực tập', 2, '/placeholder.svg', 'Sinh viên thực tập'),
+('Sinh viên Phạm Quốc Việt', 'phamquocviet@example.com', '0933445567', 'Phòng khám Đa khoa Đại học Phenikaa', 'Tim mạch', 'Sinh viên thực tập tại khoa Tim mạch', 'Sinh viên thực tập', 1, '/placeholder.svg', 'Sinh viên thực tập'),
+('Sinh viên Nguyễn Thị Lan', 'nguyenthilan@example.com', '0944556678', 'Phòng khám Đa khoa Đại học Phenikaa', 'Khoa sản', 'Sinh viên thực tập tại khoa Sản', 'Sinh viên thực tập', 2, '/placeholder.svg', 'Sinh viên thực tập');
