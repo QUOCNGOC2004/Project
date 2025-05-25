@@ -1,161 +1,140 @@
-.quan-ly-lich-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #f5f5f5;
-    padding: 20px;
-  }
-  
-.quan-ly-lich-content {
-    background-color: white;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    max-width: 600px;
-    width: 100%;
-  }
-  
-.quan-ly-lich-content h1 {
-    color: #333;
-    margin-bottom: 20px;
-  }
-  
-.quan-ly-lich-message {
-    margin: 30px 0;
-    color: #666;
-  }
-  
-.quan-ly-lich-message p {
-    margin: 10px 0;
-  }
-  
-.quan-ly-lich-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
-  }
-  
-.quan-ly-lich-button:hover {
-    background-color: #0056b3;
-  }
-
 .appointment-management {
-  max-width: 1200px;
-  margin: 0 auto;
   padding: 2rem;
+  width: 1280px;
+  margin: 0 auto;
+  background-color: #706c6a4c;
 }
 
 .management-title {
+  width: 100%;
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.9) 0%, rgba(234, 88, 12, 0.9) 100%);
+  background-image: url(https://media.istockphoto.com/id/1635568638/vi/vec-to/n%E1%BB%81n-k%E1%BA%BFt-c%E1%BA%A5u-gi%E1%BA%A5y-m%C3%A0u-cam-v%C3%A0-v%C3%A0ng-tr%E1%BB%ABu-t%C6%B0%E1%BB%A3ng.jpg?s=612x612&w=0&k=20&c=2Eu_LuLwixK3xazX2xtK2lubtJDGHBen3xaHlixalB4=);
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: overlay;
+  padding: 40px;
+  border-radius: 8px 8px 0 0;
+  color: #ffffff;
   text-align: center;
-  color: #333;
   margin-bottom: 2rem;
-  font-size: 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .appointment-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
+  gap: 1.5rem;
   padding: 1rem;
 }
 
 .appointment-card {
   background: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease-in-out;
+  overflow: hidden;
 }
 
 .appointment-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.appointment-card-header {
+  padding: 1rem 1.5rem;
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.appointment-card-header h3 {
+  margin: 0;
+  color: inherit;
+  font-size: 1.25rem;
+  padding-bottom: 0;
+  border-bottom: none;
 }
 
 .appointment-info {
+  padding: 1.5rem;
   margin-bottom: 1.5rem;
-}
-
-.appointment-info h3 {
-  color: #2c3e50;
-  margin-bottom: 1rem;
-  font-size: 1.2rem;
-  border-bottom: 2px solid #3498db;
-  padding-bottom: 0.5rem;
+  border-radius: 4px;
+  background-color: white;
 }
 
 .appointment-info p {
   margin: 0.5rem 0;
-  color: #555;
+  color: #333;
   line-height: 1.5;
 }
 
 .appointment-info strong {
-  color: #2c3e50;
-  font-weight: 600;
+  color: #1a1a1a;
+  margin-right: 0.5rem;
 }
 
 .appointment-actions {
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
+  padding: 0 1.5rem 1.5rem;
 }
 
 .edit-button,
 .cancel-button {
   padding: 0.5rem 1rem;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 500;
   transition: background-color 0.2s ease;
 }
 
 .edit-button {
-  background-color: #3498db;
+  background-color: #4299e1;
   color: white;
 }
 
 .edit-button:hover {
-  background-color: #2980b9;
+  background-color: #3182ce;
 }
 
 .cancel-button {
-  background-color: #e74c3c;
+  background-color: #f56565;
   color: white;
 }
 
 .cancel-button:hover {
-  background-color: #c0392b;
+  background-color: #e53e3e;
 }
 
 .loading {
   text-align: center;
-  font-size: 1.2rem;
-  color: #666;
-  margin: 2rem 0;
+  font-size: 1.25rem;
+  color: #4a5568;
+  padding: 2rem;
 }
 
 .error-message {
   text-align: center;
-  color: #e74c3c;
-  background-color: #fde8e8;
+  color: #e53e3e;
   padding: 1rem;
-  border-radius: 5px;
+  background-color: #fff5f5;
+  border-radius: 4px;
   margin: 1rem 0;
 }
 
 .no-appointments {
   text-align: center;
-  color: #666;
+  color: #4a5568;
   font-size: 1.1rem;
-  margin: 2rem 0;
+  padding: 2rem;
+  background-color: #f7fafc;
+  border-radius: 8px;
+  margin: 1rem 0;
 }
 
 /* Responsive Design */
@@ -164,11 +143,24 @@
     padding: 1rem;
   }
 
+  .management-title {
+    font-size: 1.5rem;
+  }
+
   .appointment-grid {
     grid-template-columns: 1fr;
   }
 
   .appointment-card {
-    margin-bottom: 1rem;
+    padding: 0;
   }
-} 
+
+  .appointment-actions {
+    flex-direction: column;
+  }
+
+  .edit-button,
+  .cancel-button {
+    width: 100%;
+  }
+}
