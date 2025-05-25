@@ -21,6 +21,15 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel }) => {
   const [showModal, setShowModal] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+  };
+
   const handleDetailClick = () => {
     setShowModal(true);
   };
@@ -58,7 +67,7 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel }) => {
           <h3>Thông Tin Lịch Hẹn</h3>
         </div>
         <div className="appointment-info">
-          <p><strong>Ngày khám:</strong> {appointment.ngay_dat_lich}</p>
+          <p><strong>Ngày khám:</strong> {formatDate(appointment.ngay_dat_lich)}</p>
           <p><strong>Giờ khám:</strong> {appointment.gio_dat_lich}</p>
           <p><strong>Bác sĩ:</strong> {appointment.doctor_name}</p>
           <p><strong>Cơ sở khám:</strong> {appointment.co_so_kham}</p>
