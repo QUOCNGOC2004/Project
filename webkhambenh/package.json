@@ -7,6 +7,7 @@
     "axios": "^1.9.0",
     "boxicons": "^2.1.4",
     "dangerous-html": "0.1.13",
+    "lucide-react": "^0.511.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-helmet": "^6.1.0",
