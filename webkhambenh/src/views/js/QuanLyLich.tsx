@@ -64,6 +64,10 @@ const QuanLyLich: React.FC = () => {
     );
   };
 
+  const handleUpdateAppointment = () => {
+    fetchAppointments(); // Refresh lại danh sách lịch hẹn sau khi cập nhật
+  };
+
   useEffect(() => {
     fetchAppointments();
 
@@ -127,6 +131,7 @@ const QuanLyLich: React.FC = () => {
                 appointment={appointment} 
                 cardColor={cardColor}
                 onCancel={handleCancelAppointment}
+                onUpdate={handleUpdateAppointment}
               />
             );
           })}
