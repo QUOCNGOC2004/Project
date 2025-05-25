@@ -24,39 +24,56 @@ const QuanLyLich: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchAppointments = async () => {
+    if (!isLoggedIn()) {
+      setError('Vui lòng đăng nhập để xem lịch hẹn');
+      setLoading(false);
+      setAppointments([]); // Reset appointments khi chưa đăng nhập
+      return;
+    }
+
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+      setError('Không thể lấy thông tin người dùng');
+      setLoading(false);
+      setAppointments([]); // Reset appointments khi không lấy được thông tin user
+      return;
+    }
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_APPOINTMENT_API_URL}/appointments/user/${currentUser.id}`);
+      
+      if (!response.ok) {
+        throw new Error('Không thể lấy danh sách lịch hẹn');
+      }
+
+      const data = await response.json();
+      setAppointments(data);
+    } catch (err) {
+      console.error('Lỗi khi lấy danh sách lịch hẹn:', err);
+      setError('Có lỗi xảy ra khi lấy danh sách lịch hẹn');
+      setAppointments([]); // Reset appointments khi có lỗi
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchAppointments = async () => {
-      if (!isLoggedIn()) {
-        setError('Vui lòng đăng nhập để xem lịch hẹn');
-        setLoading(false);
-        return;
-      }
+    fetchAppointments();
 
-      const currentUser = getCurrentUser();
-      if (!currentUser) {
-        setError('Không thể lấy thông tin người dùng');
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const response = await fetch(`${process.env.REACT_APP_APPOINTMENT_API_URL}/appointments/user/${currentUser.id}`);
-        
-        if (!response.ok) {
-          throw new Error('Không thể lấy danh sách lịch hẹn');
-        }
-
-        const data = await response.json();
-        setAppointments(data);
-      } catch (err) {
-        console.error('Lỗi khi lấy danh sách lịch hẹn:', err);
-        setError('Có lỗi xảy ra khi lấy danh sách lịch hẹn');
-      } finally {
-        setLoading(false);
-      }
+    // Thêm event listener cho sự kiện đăng xuất
+    const handleLogout = () => {
+      setAppointments([]); // Reset appointments
+      setError('Vui lòng đăng nhập để xem lịch hẹn');
+      setLoading(false);
     };
 
-    fetchAppointments();
+    document.addEventListener('loginStatusChanged', handleLogout);
+
+    // Cleanup function
+    return () => {
+      document.removeEventListener('loginStatusChanged', handleLogout);
+    };
   }, []);
 
   // Hàm tạo màu ngẫu nhiên

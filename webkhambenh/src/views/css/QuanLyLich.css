@@ -3,6 +3,9 @@
   width: 1280px;
   margin: 0 auto;
   background-color: #706c6a4c;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .management-title {
@@ -131,15 +134,24 @@
   font-size: 1.25rem;
   color: #4a5568;
   padding: 2rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 2rem auto;
+  max-width: 400px;
 }
 
 .error-message {
   text-align: center;
   color: #e53e3e;
-  padding: 1rem;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 2rem auto;
+  max-width: 400px;
+  border: 1px solid #feb2b2;
   background-color: #fff5f5;
-  border-radius: 4px;
-  margin: 1rem 0;
 }
 
 .no-appointments {
@@ -147,9 +159,13 @@
   color: #4a5568;
   font-size: 1.1rem;
   padding: 2rem;
-  background-color: #f7fafc;
+  background-color: white;
   border-radius: 8px;
-  margin: 1rem 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 2rem auto;
+  max-width: 400px;
+  border: 1px solid #e2e8f0;
+  background-color: #f7fafc;
 }
 
 /* Responsive Design */
@@ -177,5 +193,12 @@
   .edit-button,
   .cancel-button {
     width: 100%;
+  }
+
+  .loading,
+  .error-message,
+  .no-appointments {
+    margin: 1rem;
+    padding: 1.5rem;
   }
 }
