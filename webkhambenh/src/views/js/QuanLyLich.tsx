@@ -28,7 +28,7 @@ const QuanLyLich: React.FC = () => {
     if (!isLoggedIn()) {
       setError('Vui lòng đăng nhập để xem lịch hẹn');
       setLoading(false);
-      setAppointments([]); // Reset appointments khi chưa đăng nhập
+      setAppointments([]);
       return;
     }
 
@@ -36,7 +36,7 @@ const QuanLyLich: React.FC = () => {
     if (!currentUser) {
       setError('Không thể lấy thông tin người dùng');
       setLoading(false);
-      setAppointments([]); // Reset appointments khi không lấy được thông tin user
+      setAppointments([]);
       return;
     }
 
@@ -52,10 +52,16 @@ const QuanLyLich: React.FC = () => {
     } catch (err) {
       console.error('Lỗi khi lấy danh sách lịch hẹn:', err);
       setError('Có lỗi xảy ra khi lấy danh sách lịch hẹn');
-      setAppointments([]); // Reset appointments khi có lỗi
+      setAppointments([]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCancelAppointment = (id: number) => {
+    setAppointments(prevAppointments => 
+      prevAppointments.filter(appointment => appointment.id !== id)
+    );
   };
 
   useEffect(() => {
@@ -78,7 +84,7 @@ const QuanLyLich: React.FC = () => {
 
   // Hàm tạo màu ngẫu nhiên
   const getRandomColor = () => {
-    const letters = '0123456789abc'; 
+    const letters = '0123456789abc';
     let color = '#';
     for (let i = 0; i < 6; i++) {
       color += letters[Math.floor(Math.random() * letters.length)];
@@ -119,7 +125,8 @@ const QuanLyLich: React.FC = () => {
               <Form3 
                 key={appointment.id} 
                 appointment={appointment} 
-                cardColor={cardColor} 
+                cardColor={cardColor}
+                onCancel={handleCancelAppointment}
               />
             );
           })}
