@@ -1,0 +1,80 @@
+.appointment-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+  overflow: hidden; /* Ensure border-radius applies to children */
+}
+
+.appointment-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.appointment-card-header {
+  padding: 1rem 1.5rem; /* Add padding to the header */
+  color: #ffffff; /* Set text color for the header */
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.appointment-card-header h3 {
+  margin: 0;
+  color: inherit; /* Inherit color from parent */
+  font-size: 1.25rem;
+  padding-bottom: 0;
+  border-bottom: none; /* Remove border from h3 */
+}
+
+.appointment-info {
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 4px;
+  background-color: white; /* Ensure white background */
+}
+
+.appointment-info p {
+  margin: 0.5rem 0;
+  color: #333;
+  line-height: 1.5;
+}
+
+.appointment-info strong {
+  color: #1a1a1a;
+  margin-right: 0.5rem;
+}
+
+.appointment-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding: 0 1.5rem 1.5rem; /* Add padding to actions */
+}
+
+.edit-button,
+.cancel-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.edit-button {
+  background-color: #4299e1;
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #3182ce;
+}
+
+.cancel-button {
+  background-color: #f56565;
+  color: white;
+}
+
+.cancel-button:hover {
+  background-color: #e53e3e;
+}

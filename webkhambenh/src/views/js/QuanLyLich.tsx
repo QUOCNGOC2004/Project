@@ -1,9 +1,19 @@
 import React from 'react';
 import '../../views/css/QuanLyLich.css';
+import Form3 from '../../components/js/forDatLich/form3'; // Import Form3 component
+
+interface Appointment {
+  id: number;
+  ngay_dat_lich: string;
+  gio_dat_lich: string;
+  doctor_name: string;
+  ly_do_kham: string;
+  trang_thai: string;
+}
 
 const QuanLyLich: React.FC = () => {
   // Dữ liệu mẫu để hiển thị
-  const appointments = [
+  const appointments: Appointment[] = [
     {
       id: 1,
       ngay_dat_lich: '2024-03-20',
@@ -51,28 +61,11 @@ const QuanLyLich: React.FC = () => {
         {appointments.map((appointment) => {
           const cardColor = getRandomColor();
           return (
-            <div key={appointment.id} className="appointment-card">
-              {/* Header card with random background color */}
-              <div className="appointment-card-header" style={{ backgroundColor: cardColor }}>
-                <h3>Thông Tin Lịch Hẹn</h3>
-              </div>
-              {/* Appointment details section */}
-              <div className="appointment-info">
-                <p><strong>Ngày khám:</strong> {appointment.ngay_dat_lich}</p>
-                <p><strong>Giờ khám:</strong> {appointment.gio_dat_lich}</p>
-                <p><strong>Bác sĩ:</strong> {appointment.doctor_name}</p>
-                <p><strong>Lý do khám:</strong> {appointment.ly_do_kham}</p>
-                <p><strong>Trạng thái:</strong> {appointment.trang_thai}</p>
-              </div>
-              <div className="appointment-actions">
-                <button className="edit-button">
-                  Sửa
-                </button>
-                <button className="cancel-button">
-                  Hủy
-                </button>
-              </div>
-            </div>
+            <Form3 
+              key={appointment.id} 
+              appointment={appointment} 
+              cardColor={cardColor} 
+            />
           );
         })}
       </div>
