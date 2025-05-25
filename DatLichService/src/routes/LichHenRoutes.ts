@@ -4,7 +4,8 @@ import {
   getLichHenById,
   createLichHen,
   updateLichHen,
-  deleteLichHen
+  deleteLichHen,
+  getLichHenByUserId
 } from '../controllers/LichHenController';
 
 const router = Router();
@@ -23,4 +24,8 @@ router.delete('/:id', deleteLichHen);
 
 // Lấy lịch hẹn theo ID
 router.get('/:id', getLichHenById);
+
+// Lấy lịch hẹn theo user_id
+router.get('/user/:userId', getLichHenByUserId);
+
 export default router;

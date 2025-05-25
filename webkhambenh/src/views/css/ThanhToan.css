@@ -1,5 +1,6 @@
 .thanh-toan-container {
   display: flex;
+  width: 1280px;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
@@ -22,14 +23,6 @@
   margin-bottom: 20px;
 }
 
-.thanh-toan-message {
-  margin: 30px 0;
-  color: #666;
-}
-
-.thanh-toan-message p {
-  margin: 10px 0;
-}
 
 .thanh-toan-button {
   background-color: #007bff;

@@ -155,4 +155,24 @@ export const deleteLichHen = async (req: Request, res: Response): Promise<void> 
     console.error('Lỗi khi xóa lịch hẹn:', error);
     res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
   }
+};
+
+export const getLichHenByUserId = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { userId } = req.params;
+    const result = await AppDataSource.query(
+      'SELECT a.*, d.name as doctor_name FROM appointments a LEFT JOIN doctors d ON a.doctor_id = d.id WHERE a.user_id = $1',
+      [userId]
+    );
+    
+    if (result.length === 0) {
+      res.json([]); // Trả về mảng rỗng nếu không có lịch hẹn
+      return;
+    }
+
+    res.json(result);
+  } catch (error) {
+    console.error('Lỗi khi lấy danh sách lịch hẹn theo user:', error);
+    res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
+  }
 }; 
