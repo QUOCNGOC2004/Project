@@ -40,9 +40,9 @@ const QuanLyLich: React.FC = () => {
     }
   ];
 
-  // Hàm tạo màu ngẫu nhiên (màu nhạt để chữ dễ đọc)
+  // Hàm tạo màu ngẫu nhiên
   const getRandomColor = () => {
-    const letters = '0123456789abc'; // Sử dụng các ký tự tạo màu đậm hơn
+    const letters = '0123456789abc'; 
     let color = '#';
     for (let i = 0; i < 6; i++) {
       color += letters[Math.floor(Math.random() * letters.length)];
