@@ -161,7 +161,15 @@ export const getLichHenByUserId = async (req: Request, res: Response): Promise<v
   try {
     const { userId } = req.params;
     const result = await AppDataSource.query(
-      'SELECT a.*, d.name as doctor_name FROM appointments a LEFT JOIN doctors d ON a.doctor_id = d.id WHERE a.user_id = $1',
+      `SELECT 
+        a.*,
+        d.name as doctor_name,
+        d.phone as doctor_phone,
+        d.co_so_kham as co_so_kham
+      FROM appointments a 
+      LEFT JOIN doctors d ON a.doctor_id = d.id 
+      WHERE a.user_id = $1
+      ORDER BY a.ngay_dat_lich DESC, a.gio_dat_lich DESC`,
       [userId]
     );
     

@@ -1,44 +1,63 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import '../../views/css/QuanLyLich.css';
 import Form3 from '../../components/js/forDatLich/form3';
+import { isLoggedIn, getCurrentUser } from '../../ktraLogin';
 
 interface Appointment {
   id: number;
   ngay_dat_lich: string;
   gio_dat_lich: string;
   doctor_name: string;
-  co_so_kham: string;
   doctor_phone: string;
+  co_so_kham: string;
+  ten_benh_nhan: string;
+  email: string;
+  gioi_tinh: string;
+  ngay_sinh: string;
+  so_dien_thoai: string;
+  ly_do_kham: string;
+  trang_thai: string;
 }
 
 const QuanLyLich: React.FC = () => {
-  // Dữ liệu mẫu để hiển thị
-  const appointments: Appointment[] = [
-    {
-      id: 1,
-      ngay_dat_lich: '2024-03-20',
-      gio_dat_lich: '09:00',
-      doctor_name: 'PGS.TS. BS Nguyễn Thanh Hồi',
-      co_so_kham: 'Bệnh viện Đại học Phenikaa',
-      doctor_phone: '0901234567'
-    },
-    {
-      id: 2,
-      ngay_dat_lich: '2024-03-21',
-      gio_dat_lich: '14:30',
-      doctor_name: 'GS.TS. BS. Đỗ Quyết',
-      co_so_kham: 'Phòng khám Đa khoa Đại học Phenikaa',
-      doctor_phone: '0987654321'
-    },
-    {
-      id: 3,
-      ngay_dat_lich: '2024-03-22',
-      gio_dat_lich: '10:15',
-      doctor_name: 'PGS.TS. BSNT Vũ Hồng Thăng',
-      co_so_kham: 'Bệnh viện Đại học Phenikaa',
-      doctor_phone: '0912345678'
-    }
-  ];
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      if (!isLoggedIn()) {
+        setError('Vui lòng đăng nhập để xem lịch hẹn');
+        setLoading(false);
+        return;
+      }
+
+      const currentUser = getCurrentUser();
+      if (!currentUser) {
+        setError('Không thể lấy thông tin người dùng');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${process.env.REACT_APP_APPOINTMENT_API_URL}/appointments/user/${currentUser.id}`);
+        
+        if (!response.ok) {
+          throw new Error('Không thể lấy danh sách lịch hẹn');
+        }
+
+        const data = await response.json();
+        setAppointments(data);
+      } catch (err) {
+        console.error('Lỗi khi lấy danh sách lịch hẹn:', err);
+        setError('Có lỗi xảy ra khi lấy danh sách lịch hẹn');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
 
   // Hàm tạo màu ngẫu nhiên
   const getRandomColor = () => {
@@ -50,6 +69,22 @@ const QuanLyLich: React.FC = () => {
     return color;
   };
 
+  if (loading) {
+    return (
+      <div className="appointment-management">
+        <div className="loading">Đang tải danh sách lịch hẹn...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="appointment-management">
+        <div className="error-message">{error}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="appointment-management">
       <div className="management-title">
@@ -57,18 +92,22 @@ const QuanLyLich: React.FC = () => {
         <p className="management-title-description">Kiểm tra thông tin đặt lịch hẹn</p>
       </div>
       
-      <div className="appointment-grid">
-        {appointments.map((appointment) => {
-          const cardColor = getRandomColor();
-          return (
-            <Form3 
-              key={appointment.id} 
-              appointment={appointment} 
-              cardColor={cardColor} 
-            />
-          );
-        })}
-      </div>
+      {appointments.length === 0 ? (
+        <div className="no-appointments">Không có lịch khám</div>
+      ) : (
+        <div className="appointment-grid">
+          {appointments.map((appointment) => {
+            const cardColor = getRandomColor();
+            return (
+              <Form3 
+                key={appointment.id} 
+                appointment={appointment} 
+                cardColor={cardColor} 
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
