@@ -38,7 +38,6 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
     ngay_sinh: appointment.ngay_sinh,
     so_dien_thoai: appointment.so_dien_thoai,
     ly_do_kham: appointment.ly_do_kham,
-    trang_thai: appointment.trang_thai,
   });
 
   const formatDate = (dateString: string) => {
@@ -246,20 +245,6 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
                   onChange={handleInputChange}
                   required
                 />
-              </div>
-              <div className="form-group">
-                <label>Trạng thái:</label>
-                <select
-                  name="trang_thai"
-                  value={editData.trang_thai}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="chờ xác nhận">Chờ xác nhận</option>
-                  <option value="đã xác nhận">Đã xác nhận</option>
-                  <option value="đã hủy">Đã hủy</option>
-                  <option value="hoàn thành">Hoàn thành</option>
-                </select>
               </div>
               <div className="form-group">
                 <label>Lý do khám:</label>
