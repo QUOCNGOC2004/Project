@@ -239,3 +239,39 @@
   opacity: 0.7;
   cursor: not-allowed;
 }
+
+/* Media Queries cho điện thoại */
+@media(max-width: 479px) {
+  .form3-container {
+    padding: 15px;
+  }
+
+  .form3-form {
+    padding: 15px;
+  }
+
+  .form3-textinput,
+  .form3-textarea,
+  .form3-select {
+    padding: 8px 12px;
+    font-size: 14px;
+    width: 100%;
+  }
+
+  .form3-button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    margin-top: 15px;
+  }
+
+  .form3-heading {
+    font-size: 24px;
+    margin-bottom: 15px;
+  }
+
+  .form3-text {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+}

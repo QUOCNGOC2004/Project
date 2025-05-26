@@ -628,3 +628,60 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Media Queries cho điện thoại */
+@media(max-width: 479px) {
+  .thq-section-padding {
+    padding: var(--dl-layout-space-threeunits);
+  }
+
+  .thq-heading-1 {
+    font-size: 32px;
+  }
+
+  .thq-heading-2 {
+    font-size: 28px;
+  }
+
+  .thq-heading-3 {
+    font-size: 22px;
+  }
+
+  .thq-body-large {
+    font-size: 16px;
+  }
+
+  .thq-body-small {
+    font-size: 14px;
+  }
+
+  .thq-button-filled,
+  .thq-button-outline,
+  .thq-button-flat {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  .thq-input {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  .thq-grid-2,
+  .thq-grid-3,
+  .thq-grid-4,
+  .thq-grid-5,
+  .thq-grid-6 {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .thq-card {
+    padding: 16px;
+  }
+
+  .thq-team-image-round {
+    width: 60px;
+    height: 60px;
+  }
+}

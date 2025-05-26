@@ -322,3 +322,53 @@
 .navbar8-text27 {
   display: inline-block;
 }
+
+/* Media Queries cho điện thoại */
+@media(max-width: 479px) {
+  .navbar8-nav {
+    padding: 10px;
+  }
+
+  .navbar8-container {
+    padding: 0 10px;
+  }
+
+  .navbar8-logo {
+    font-size: 20px;
+  }
+
+  .navbar8-menu {
+    display: none;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    background: var(--dl-color-theme-neutral-light);
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .navbar8-menu.active {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .navbar8-navlink {
+    font-size: 16px;
+    padding: 8px 0;
+  }
+
+  .navbar8-burger-menu {
+    display: block;
+  }
+
+  .navbar8-container1 {
+    display: none;
+  }
+
+  .navbar8-button {
+    width: 100%;
+    margin-top: 10px;
+  }
+}

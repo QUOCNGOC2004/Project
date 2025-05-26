@@ -186,4 +186,40 @@
   .section-title {
     font-size: 18px;
   }
-} 
+}
+
+/* Media Queries cho điện thoại */
+@media(max-width: 479px) {
+  .form2-container {
+    padding: 15px;
+  }
+
+  .form2-form {
+    padding: 15px;
+  }
+
+  .form2-textinput,
+  .form2-textarea,
+  .form2-select {
+    padding: 8px 12px;
+    font-size: 14px;
+    width: 100%;
+  }
+
+  .form2-button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    margin-top: 15px;
+  }
+
+  .form2-heading {
+    font-size: 24px;
+    margin-bottom: 15px;
+  }
+
+  .form2-text {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+}

@@ -1,5 +1,5 @@
 .appointment-container {
-  width: 1280px;
+  width: 100%;
   display: flex;
   min-height: 100vh;
   align-items: center;
