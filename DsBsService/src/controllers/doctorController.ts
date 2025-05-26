@@ -2,27 +2,51 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../config/database';
 import { Doctor } from '../entity/Doctor';
 import { Between, Like } from 'typeorm';
+import { 
+  cacheDoctors, 
+  cacheDoctor, 
+  cacheDoctorSpecialty} from '../services/CacheService';
 
 export const getDoctors = async (_req: Request, res: Response) => {
     try {
+        // Kiểm tra cache
+        const cachedData = await cacheDoctors.getAll();
+        if (cachedData) {
+            return res.json(cachedData);
+        }
+
         const doctorRepository = AppDataSource.getRepository(Doctor);
         const doctors = await doctorRepository.find();
-        res.json(doctors);
+        
+        // Lưu vào cache
+        await cacheDoctors.setAll(doctors);
+        
+        return res.json(doctors);
     } catch (error) {
         console.error("Lỗi lấy danh sách bác sĩ:", error);
-        res.status(500).json({ error: "Lỗi máy chủ" });
+        return res.status(500).json({ error: "Lỗi máy chủ" });
     }
 };
 
 export const getDoctorById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
+        
+        // Kiểm tra cache
+        const cachedData = await cacheDoctor.get(id);
+        if (cachedData) {
+            return res.json(cachedData);
+        }
+
         const doctorRepository = AppDataSource.getRepository(Doctor);
         const doctor = await doctorRepository.findOne({ where: { id: parseInt(id) } });
         
         if (!doctor) {
             return res.status(404).json({ error: "Bác sĩ không tồn tại" });
         }
+        
+        // Lưu vào cache
+        await cacheDoctor.set(id, doctor);
         
         return res.json(doctor);
     } catch (error) {
@@ -34,6 +58,15 @@ export const getDoctorById = async (req: Request, res: Response) => {
 export const filterDoctors = async (req: Request, res: Response) => {
     try {
         const { specialty, position, degree, experience, facility } = req.query;
+        
+        // Nếu chỉ lọc theo chuyên khoa, kiểm tra cache
+        if (specialty && specialty !== 'Tất cả' && !position && !degree && !experience && !facility) {
+            const cachedData = await cacheDoctorSpecialty.get(specialty as string);
+            if (cachedData) {
+                return res.json(cachedData);
+            }
+        }
+
         const doctorRepository = AppDataSource.getRepository(Doctor);
         
         let whereClause: any = {};
@@ -75,10 +108,16 @@ export const filterDoctors = async (req: Request, res: Response) => {
         }
 
         const doctors = await doctorRepository.find({ where: whereClause });
-        res.json(doctors);
+
+        // Nếu chỉ lọc theo chuyên khoa, lưu vào cache
+        if (specialty && specialty !== 'Tất cả' && !position && !degree && !experience && !facility) {
+            await cacheDoctorSpecialty.set(specialty as string, doctors);
+        }
+
+        return res.json(doctors);
     } catch (error) {
         console.error("Lỗi lọc danh sách bác sĩ:", error);
-        res.status(500).json({ error: "Lỗi máy chủ" });
+        return res.status(500).json({ error: "Lỗi máy chủ" });
     }
 };
 

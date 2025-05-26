@@ -1,12 +1,29 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../config/database';
 import { LichHen } from '../entity/LichHen';
+import { 
+  cacheAppointments, 
+  cacheAppointment, 
+  cacheUserAppointments,
+  invalidateAppointmentCache 
+} from '../services/CacheService';
 
 // Lấy danh sách lịch hẹn
 export const getAllLichHen = async (_req: Request, res: Response): Promise<void> => {
   try {
+    // Kiểm tra cache
+    const cachedData = await cacheAppointments.getAll();
+    if (cachedData) {
+      res.json(cachedData);
+      return;
+    }
+
     const result = await AppDataSource.query('SELECT * FROM appointments ORDER BY ngay_dat_lich, gio_dat_lich');
     const lichHen: LichHen[] = result;
+    
+    // Lưu vào cache
+    await cacheAppointments.setAll(lichHen);
+    
     res.json(lichHen);
   } catch (error) {
     console.error('Lỗi khi lấy danh sách lịch hẹn:', error);
@@ -18,6 +35,14 @@ export const getAllLichHen = async (_req: Request, res: Response): Promise<void>
 export const getLichHenById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    
+    // Kiểm tra cache
+    const cachedData = await cacheAppointment.get(id);
+    if (cachedData) {
+      res.json(cachedData);
+      return;
+    }
+
     const result = await AppDataSource.query('SELECT * FROM appointments WHERE id = $1', [id]);
     
     if (result.length === 0) {
@@ -26,6 +51,10 @@ export const getLichHenById = async (req: Request, res: Response): Promise<void>
     }
 
     const lichHen: LichHen = result[0];
+    
+    // Lưu vào cache
+    await cacheAppointment.set(id, lichHen);
+    
     res.json(lichHen);
   } catch (error) {
     console.error('Lỗi khi lấy thông tin lịch hẹn:', error);
@@ -74,7 +103,7 @@ export const createLichHen = async (req: Request, res: Response): Promise<void> 
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
       [
         doctor_id,
-        user_id || null, // Cho phép user_id là null
+        user_id || null,
         ngay_dat_lich,
         gio_dat_lich,
         ten_benh_nhan,
@@ -88,6 +117,10 @@ export const createLichHen = async (req: Request, res: Response): Promise<void> 
     );
 
     const lichHen: LichHen = result[0];
+    
+    // Xóa cache liên quan
+    await invalidateAppointmentCache(lichHen.id.toString(), user_id);
+    
     res.status(201).json(lichHen);
   } catch (error) {
     console.error('Lỗi khi tạo lịch hẹn mới:', error);
@@ -132,6 +165,10 @@ export const updateLichHen = async (req: Request, res: Response): Promise<void> 
     }
 
     const lichHen: LichHen = result[0];
+    
+    // Xóa cache liên quan
+    await invalidateAppointmentCache(id, lichHen.user_id?.toString());
+    
     res.json(lichHen);
   } catch (error) {
     console.error('Lỗi khi cập nhật lịch hẹn:', error);
@@ -143,12 +180,19 @@ export const updateLichHen = async (req: Request, res: Response): Promise<void> 
 export const deleteLichHen = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    
+    // Lấy thông tin lịch hẹn trước khi xóa để có user_id
+    const appointment = await AppDataSource.query('SELECT user_id FROM appointments WHERE id = $1', [id]);
+    
     const result = await AppDataSource.query('DELETE FROM appointments WHERE id = $1 RETURNING *', [id]);
 
     if (result.length === 0) {
       res.status(404).json({ error: 'Không tìm thấy lịch hẹn' });
       return;
     }
+
+    // Xóa cache liên quan
+    await invalidateAppointmentCache(id, appointment[0]?.user_id);
 
     res.json({ message: 'Xóa lịch hẹn thành công' });
   } catch (error) {
@@ -160,6 +204,14 @@ export const deleteLichHen = async (req: Request, res: Response): Promise<void> 
 export const getLichHenByUserId = async (req: Request, res: Response): Promise<void> => {
   try {
     const { userId } = req.params;
+    
+    // Kiểm tra cache
+    const cachedData = await cacheUserAppointments.get(userId);
+    if (cachedData) {
+      res.json(cachedData);
+      return;
+    }
+
     const result = await AppDataSource.query(
       `SELECT 
         a.*,
@@ -174,9 +226,12 @@ export const getLichHenByUserId = async (req: Request, res: Response): Promise<v
     );
     
     if (result.length === 0) {
-      res.json([]); // Trả về mảng rỗng nếu không có lịch hẹn
+      res.json([]);
       return;
     }
+
+    // Lưu vào cache
+    await cacheUserAppointments.set(userId, result);
 
     res.json(result);
   } catch (error) {

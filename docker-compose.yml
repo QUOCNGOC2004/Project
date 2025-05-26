@@ -19,6 +19,20 @@ services:
     networks:
       - webkhambenh-network
 
+  # Redis
+  redis:
+    image: redis:alpine
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
+    networks:
+      - webkhambenh-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   # Database
   db:
     image: postgres:13
@@ -89,10 +103,14 @@ services:
       - DB_USERNAME=postgres
       - DB_PASSWORD=postgres
       - DB_NAME=webkhambenh
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     ports:
       - "3003:3003"
     depends_on:
       db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - webkhambenh-network
