@@ -12,9 +12,8 @@ const app = express();
 
 // Cấu hình CORS
 app.use(cors({
-    origin: 'http://localhost:3000', // URL của frontend
-    credentials: true, // Cho phép gửi cookies
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    origin: ['http://localhost:3000', 'http://localhost:8000'], // Allow both frontend and Kong Gateway
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 

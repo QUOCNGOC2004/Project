@@ -1,4 +1,24 @@
 services:
+  # Kong Gateway
+  kong:
+    build: ./KongAPI
+    container_name: kong-gateway
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_PROXY_LISTEN: 0.0.0.0:8000, 0.0.0.0:8443 ssl
+    ports:
+      - "8000:8000"  # Kong proxy port
+      - "8443:8443"  # Kong proxy SSL port
+      - "8001:8001"  # Kong admin API
+    networks:
+      - webkhambenh-network
+
   # Database
   db:
     image: postgres:13
@@ -84,13 +104,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - REACT_APP_AUTH_API_URL=http://localhost:3001/api
-      - REACT_APP_DOCTOR_API_URL=http://localhost:3002/api
-      - REACT_APP_APPOINTMENT_API_URL=http://localhost:3003/api
+      - REACT_APP_API_URL=http://localhost:8000/api
     depends_on:
-      - auth-service
-      - doctor-service
-      - appointment-service
+      - kong
     networks:
       - webkhambenh-network
 

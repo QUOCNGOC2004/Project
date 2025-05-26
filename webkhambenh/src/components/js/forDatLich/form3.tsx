@@ -77,7 +77,7 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
     e.preventDefault();
     setIsUpdating(true);
     try {
-      const response = await fetch(`${process.env.REACT_APP_APPOINTMENT_API_URL}/appointments/${appointment.id}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/appointments/${appointment.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
     if (window.confirm('Bạn có chắc chắn muốn hủy lịch hẹn này?')) {
       setIsCancelling(true);
       try {
-        const response = await fetch(`${process.env.REACT_APP_APPOINTMENT_API_URL}/appointments/${appointment.id}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/appointments/${appointment.id}`, {
           method: 'DELETE',
         });
 

@@ -41,7 +41,7 @@ const QuanLyLich: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_APPOINTMENT_API_URL}/appointments/user/${currentUser.id}`);
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/appointments/user/${currentUser.id}`);
       
       if (!response.ok) {
         throw new Error('Không thể lấy danh sách lịch hẹn');

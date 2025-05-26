@@ -1,0 +1,66 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: auth-service
+    url: http://auth-service:3001
+    routes:
+      - name: auth-route
+        paths:
+          - /api/auth
+        strip_path: false
+    plugins:
+      - name: cors
+        config:
+          origins: ['*']
+          methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+          headers: ['Accept', 'Accept-Version', 'Content-Length', 'Content-MD5', 'Content-Type', 'Date', 'Authorization']
+          exposed_headers: ['X-Auth-Token']
+          credentials: true
+          max_age: 3600
+      - name: rate-limiting
+        config:
+          minute: 60
+          policy: local
+
+  - name: doctor-service
+    url: http://doctor-service:3002
+    routes:
+      - name: doctor-route
+        paths:
+          - /api/doctors
+        strip_path: false
+    plugins:
+      - name: cors
+        config:
+          origins: ['*']
+          methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+          headers: ['Accept', 'Accept-Version', 'Content-Length', 'Content-MD5', 'Content-Type', 'Date', 'Authorization']
+          exposed_headers: ['X-Auth-Token']
+          credentials: true
+          max_age: 3600
+      - name: rate-limiting
+        config:
+          minute: 60
+          policy: local
+
+  - name: appointment-service
+    url: http://appointment-service:3003
+    routes:
+      - name: appointment-route
+        paths:
+          - /api/appointments
+        strip_path: false
+    plugins:
+      - name: cors
+        config:
+          origins: ['*']
+          methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+          headers: ['Accept', 'Accept-Version', 'Content-Length', 'Content-MD5', 'Content-Type', 'Date', 'Authorization']
+          exposed_headers: ['X-Auth-Token']
+          credentials: true
+          max_age: 3600
+      - name: rate-limiting
+        config:
+          minute: 60
+          policy: local
