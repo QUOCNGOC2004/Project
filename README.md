@@ -55,9 +55,11 @@ Hệ thống Đặt lịch Khám bệnh Trực tuyến là một nền tảng we
 
 ### Trang tìm kiếm bác sĩ
 ![Tìm kiếm bác sĩ](./img/search-doctor.png)
+![Tìm kiếm bác sĩ](./img/search-doctor2.png)
 
 ### Trang đặt lịch
 ![Đặt lịch](./img/appointment.png)
+![Đặt lịch](./img/appointment2.png)
 
 ### Trang quản lý lịch hẹn
 ![Quản lý lịch hẹn](./img/manage-appointment.png)
