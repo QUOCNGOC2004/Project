@@ -111,7 +111,7 @@ const DatLich: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/appointments`, {
+      const response = await fetch(`${process.env.REACT_APP_APPOINTMENT_API_URL}/appointments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

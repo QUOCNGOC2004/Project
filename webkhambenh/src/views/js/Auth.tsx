@@ -34,7 +34,7 @@ const Auth: React.FC = () => {
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, {
+            const response = await axios.post(`${process.env.REACT_APP_AUTH_API_URL}/auth/register`, {
                 username: formData.username,
                 email: formData.email,
                 password: formData.password
@@ -66,7 +66,7 @@ const Auth: React.FC = () => {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, {
+            const response = await axios.post(`${process.env.REACT_APP_AUTH_API_URL}/auth/login`, {
                 email: formData.email,
                 password: formData.password
             });

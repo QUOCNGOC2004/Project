@@ -229,14 +229,14 @@ ListAnh.defaultProps = {
   image5Alt: 'Hero Image',
   image1Alt: 'Doctor with patient',
   image7Src:
-    'https://phenikaamec.com/_next/image?url=https%3A%2F%2Fcdn.phenikaamec.com%2Fphenikaa%2Finsert-editor-image%2F10-11-2024%2F1c1299ce-d11c-42c3-8c52-016503389762-Nguyen-Duy-Tuan.png&w=640&q=75',
+    'https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/6/26/2-1719369319067948038979.jpg',
   image7Alt: 'Hero Image',
   image12Alt: 'Hero Image',
   image2Alt: 'Calendar',
   image6Src:
     'https://phenikaa-uni.edu.vn:3600/pu/vi/posts/dsc00085.jpg',
   image12Src:
-    'https://phenikaamec.com/_next/image?url=https%3A%2F%2Fcdn.phenikaamec.com%2Fphenikaa%2Finsert-editor-image%2F10-29-2024%2F23867b59-970f-4bb0-b0d7-cd104b308329-nguyen-van-hung.png&w=640&q=75',
+    'https://giadinh.phenikaa.com/wp-content/uploads/2023/10/394411851_783911837077925_858415320901022008_n.jpg',
   image3Alt: 'Hero Image',
   image9Src:
     'https://giadinh.mediacdn.vn/zoom/700_438/296230595582509056/2025/2/26/avatar1740538920502-1740538920957236578117.jpg',

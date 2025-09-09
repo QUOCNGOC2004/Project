@@ -56,7 +56,7 @@ const DanhSachBs: React.FC = () => {
           return;
         }
 
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/doctors/search?name=${encodeURIComponent(query)}`);
+        const response = await fetch(`${process.env.REACT_APP_DOCTOR_API_URL}/doctors/search?name=${encodeURIComponent(query)}`);
         
         if (!response.ok) {
           const errorData = await response.json().catch(() => null);
@@ -86,7 +86,7 @@ const DanhSachBs: React.FC = () => {
 
   const fetchDoctors = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/doctors`);
+      const response = await fetch(`${process.env.REACT_APP_DOCTOR_API_URL}/doctors`);
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
         throw new Error(errorData?.error || `HTTP error! status: ${response.status}`);
@@ -127,7 +127,7 @@ const DanhSachBs: React.FC = () => {
       }
 
       // Gọi API lọc
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/doctors/filter?${queryParams.toString()}`);
+      const response = await fetch(`${process.env.REACT_APP_DOCTOR_API_URL}/doctors/filter?${queryParams.toString()}`);
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
         throw new Error(errorData?.error || `HTTP error! status: ${response.status}`);
@@ -162,7 +162,7 @@ const DanhSachBs: React.FC = () => {
       }
 
       // Gọi API lọc với facility mới
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/doctors/filter?${queryParams.toString()}`);
+      const response = await fetch(`${process.env.REACT_APP_DOCTOR_API_URL}/doctors/filter?${queryParams.toString()}`);
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
         throw new Error(errorData?.error || `HTTP error! status: ${response.status}`);

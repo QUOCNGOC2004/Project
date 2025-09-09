@@ -107,9 +107,9 @@ const LienHe  = (props) => {
 LienHe.defaultProps = {
   noiDung1: undefined,
   anhChiNhanhSrc:
-    'https://lh3.googleusercontent.com/gps-cs-s/AC9h4npK7Je1tEbooa3tEGt0S5OoQC71ZhjfJRBvnfqcVCm2hWUAwqutag0-euSeVmBVKVkTn2EbzHsl9tS74lDyo4Su9nHnBmgekSJiDNJ_FnMKqEn9pClu0mGpEXRt7v_ow8VkufL_=w408-h306-k-no',
+    'https://phenikaa-uni.edu.vn:3600/pu/vi/posts/nhung-buoc-phat-trien-vung-chac-cua-truong-dai-hoc-phenikaa.jpg',
   anhTruSoChinhSrc:
-    'https://phenikaamec.com/_next/image?url=https%3A%2F%2Fcdn.phenikaamec.com%2Fphenikaa-mec%2Fgioi-thieu%2F10-2-2024%2F741ab769-024d-4998-89ba-51e77e8e143c-a%C2%BA%C2%A2nh-gia%C2%BB%C2%9Bi-thia%C2%BB%C2%87u-chung-(1).webp&w=1200&q=75',
+    'https://phenikaa-uni.edu.vn:3600/hs/vi/posts/djifly202407020912041801719891290906photo.jpg',
   moTaTruSoChinh: undefined,
   anhChiNhanh: 'Ảnh Chi Nhánh',
   tieuDe1: undefined,

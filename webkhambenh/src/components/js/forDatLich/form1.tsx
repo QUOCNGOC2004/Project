@@ -59,7 +59,7 @@ const Form1: React.FC<PropsForm1> = ({ duLieuForm, xuLyThayDoi }) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/doctors`);
+      const response = await fetch(`${process.env.REACT_APP_DOCTOR_API_URL}/doctors`);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
