@@ -29,12 +29,12 @@ const ListAnh = (props) => {
           </p>
         </div>
         <div className="hero17-actions">
-          <a href={props.lienKetDatLich}>
+          <a href={props.lienKetChatBot}>
             <button className="thq-button-filled hero17-button1">
               <span className="thq-body-small">
                 {props.nutChinh ?? (
                   <Fragment>
-                    <span className="hero17-text6">Đặt lịch ngay</span>
+                    <span className="hero17-text6">Hỏi Chat bot</span>
                   </Fragment>
                 )}
               </span>
@@ -262,7 +262,7 @@ ListAnh.defaultProps = {
   nutChinh: undefined,
   tieuDe: undefined,
   noiDung: undefined,
-  lienKetDatLich: '/dat-lich',
+  lienKetChatBot: '/chat',
   lienKetTimBS: '/danh-sach-bs'
 }
 
@@ -299,7 +299,7 @@ ListAnh.propTypes = {
   nutChinh: PropTypes.element,
   tieuDe: PropTypes.element,
   noiDung: PropTypes.element,
-  lienKetDatLich: PropTypes.string,
+  lienKetChatBot: PropTypes.string,
   lienKetTimBS: PropTypes.string
 }
 

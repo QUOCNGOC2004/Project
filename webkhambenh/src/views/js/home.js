@@ -17,7 +17,7 @@ const Home = (props) => {
   return (
     <div className="home-container">
       <Helmet>
-        <title>Web khám bệnh nhóm 13</title>
+        <title>Web khám bệnh nhóm 01</title>
         <meta property="og:title" content="Hệ thống đặt lịch khám bệnh trực tuyến" />
       </Helmet>
       <ListAnh
@@ -28,7 +28,7 @@ const Home = (props) => {
         }
         nutChinh={
           <Fragment>
-            <span className="home-text115">Đặt lịch ngay</span>
+            <span className="home-text115">Hỏi Chat bot</span>
           </Fragment>
         }
         tieuDe={
