@@ -3,7 +3,7 @@ import '../css/ChatBot.css';
 
 const API_URL =
   'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=';
-const apiKey = 'AIzaSyDeJ7d8GsTTt3u2NHXn7VCLCwa6W-DcVz4'; 
+const apiKey = process.env.REACT_APP_GEMINI_API_KEY; 
 
 const ChatBot = () => {
   const [messages, setMessages] = useState([
