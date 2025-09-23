@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../../views/css/profile.css";
 
-const API_URL = process.env.REACT_APP_AUTH_API_URL;
-
 const Profile: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -13,7 +11,7 @@ const Profile: React.FC = () => {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      const res = await fetch(`${API_URL}/auth/profile`, {
+      const res = await fetch(`${process.env.REACT_APP_AUTH_API_URL}/auth/profile`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -39,7 +37,7 @@ const Profile: React.FC = () => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    const res = await fetch(`${API_URL}/auth/profile`, {
+    const res = await fetch(`${process.env.REACT_APP_AUTH_API_URL}/auth/profile`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -52,6 +50,15 @@ const Profile: React.FC = () => {
     if (data.user) {
       setUser(data.user);
       setIsEditing(false);
+
+      // Lưu thống tín với localStorage
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      //  Phát sự kiện để Navbar8 lắng nghe và cập nhật username
+      const event = new CustomEvent("loginStatusChanged", {
+        detail: { isLoggedIn: true, username: data.user.username },
+      });
+      document.dispatchEvent(event);
     }
   };
 
@@ -59,21 +66,13 @@ const Profile: React.FC = () => {
 
   return (
     <div className="profile-page">
-      <h2 className="profile-page-title">Hồ sơ cá nhân</h2>
-
       <div className="profile-layout">
         {/* Sidebar */}
         <div className="profile-sidebar">
           <div className="sidebar-header">Menu</div>
-          <div className="sidebar-item">
-            <h3>Thông tin tài khoản</h3>
-          </div>
-          <div className="sidebar-item">
-            <h3>Đổi mật khẩu</h3>
-          </div>
-          <div className="sidebar-item">
-            <h3>Cài đặt</h3>
-          </div>
+          <div className="sidebar-item"><h3>Thông tin tài khoản</h3></div>
+          <div className="sidebar-item"><h3>Đổi mật khẩu</h3></div>
+          <div className="sidebar-item"><h3>Cài đặt</h3></div>
         </div>
 
         {/* Profile content */}
@@ -91,6 +90,7 @@ const Profile: React.FC = () => {
             </div>
 
             <div className="profile-body">
+              {/* Username */}
               <div className="profile-username-container">
                 {isEditing ? (
                   <input
@@ -101,7 +101,7 @@ const Profile: React.FC = () => {
                     className="info-value-input"
                   />
                 ) : (
-                  <h3 className="profile-username">{user.username}</h3>
+                  <h3 className="profile-username">{user.username ?? "null"}</h3>
                 )}
                 {!isEditing && (
                   <span
@@ -113,11 +113,13 @@ const Profile: React.FC = () => {
                 )}
               </div>
 
+              {/* Email */}
               <div className="profile-info-item">
                 <span className="info-label">Email:</span>
-                <span className="info-value">{user.email}</span>
+                <span className="info-value">{user.email ?? "null"}</span>
               </div>
 
+              {/* Số điện thoại */}
               <div className="profile-info-item">
                 <span className="info-label">Số điện thoại:</span>
                 {isEditing ? (
@@ -129,10 +131,11 @@ const Profile: React.FC = () => {
                     className="info-value-input"
                   />
                 ) : (
-                  <span className="info-value">{user.so_dien_thoai}</span>
+                  <span className="info-value">{user.so_dien_thoai ?? "null"}</span>
                 )}
               </div>
 
+              {/* Giới tính */}
               <div className="profile-info-item">
                 <span className="info-label">Giới tính:</span>
                 {isEditing ? (
@@ -147,12 +150,11 @@ const Profile: React.FC = () => {
                     <option value="Nữ">Nữ</option>
                   </select>
                 ) : (
-                  <span className="info-value">
-                    {user.gioi_tinh || "Không xác định"}
-                  </span>
+                  <span className="info-value">{user.gioi_tinh ?? "null"}</span>
                 )}
               </div>
 
+              {/* Ngày sinh */}
               <div className="profile-info-item">
                 <span className="info-label">Ngày sinh:</span>
                 {isEditing ? (
@@ -164,30 +166,19 @@ const Profile: React.FC = () => {
                     className="info-value-input"
                   />
                 ) : (
-                  <span className="info-value">{user.ngay_sinh}</span>
+                  <span className="info-value">{user.ngay_sinh ?? "null"}</span>
                 )}
               </div>
 
+              {/* Buttons */}
               {isEditing ? (
                 <div className="edit-buttons">
-                  <button className="save-btn" onClick={handleSave}>
-                    Lưu
-                  </button>
-                  <button
-                    className="cancel-btn"
-                    onClick={() => setIsEditing(false)}
-                  >
-                    Hủy
-                  </button>
+                  <button className="save-btn" onClick={handleSave}>Lưu</button>
+                  <button className="cancel-btn" onClick={() => setIsEditing(false)}>Hủy</button>
                 </div>
               ) : (
                 <div className="edit-buttons">
-                  <button
-                    className="save-btn"
-                    onClick={() => setIsEditing(true)}
-                  >
-                    Chỉnh sửa hồ sơ
-                  </button>
+                  <button className="save-btn" onClick={() => setIsEditing(true)}>Chỉnh sửa hồ sơ</button>
                 </div>
               )}
             </div>
