@@ -8,9 +8,10 @@ import NotFound from './views/js/not-found';
 import Auth from './views/js/Auth';
 import Navbar8 from './components/js/forHome/navbar8';
 import ChatBot from './views/js/ChatBot';
+import Profile from './views/js/Profile';
 import { Fragment } from 'react';
 
-// 👇 Tạo wrapper để dùng useLocation
+// Tạo wrapper để dùng useLocation
 function AppContent() {
   const location = useLocation();
 
@@ -46,6 +47,7 @@ function AppContent() {
         <Route path="/danh-sach-bs" component={DanhSachBs} />
         <Route path="/quan-ly-lich" component={QuanLyLich} />
         <Route path="/dang-nhap-dang-ky" component={Auth} />
+        <Route path="/profile" component={Profile} />
         <Route path="/chat" component={ChatBot} />
         <Route path="*" component={NotFound} />
       </Switch>

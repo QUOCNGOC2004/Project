@@ -8,7 +8,7 @@ const Navbar8 = (props) => {
   const [link5DropdownVisible, setLink5DropdownVisible] = useState(false)
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false)
   const [username, setUsername] = useState('')
-  const history = useHistory() 
+  const history = useHistory()
 
   useEffect(() => {
     // Kiểm tra trạng thái đăng nhập khi component mount
@@ -51,6 +51,12 @@ const Navbar8 = (props) => {
     }
   };
 
+  const handleProfileClick = () => {
+    if (isUserLoggedIn) {
+      history.push('/profile');
+    }
+  };
+
   return (
     <header className="navbar8-container1">
       <header data-thq="thq-navbar" className="navbar8-navbar-interactive">
@@ -65,14 +71,14 @@ const Navbar8 = (props) => {
               href={props.trangChuUrl}
               className="navbar8-link11 thq-link thq-body-small"
             >
-              {props.trangChu ?? ( 
+              {props.trangChu ?? (
                 <Fragment>
                   <span className="navbar8-text18">Trang chủ</span>
                 </Fragment>
               )}
             </a>
-            <a 
-              href={props.tinTucUrl} 
+            <a
+              href={props.tinTucUrl}
               className="thq-link thq-body-small"
             >
               {props.tinTuc ?? (
@@ -115,7 +121,7 @@ const Navbar8 = (props) => {
                 {!link5DropdownVisible && (
                   <div className="navbar8-container3">
                     <svg viewBox="0 0 1024 1024" className="navbar8-icon12">
-                      <path d="M426 726v-428l214 214z"></path> {/*icon mũi tên lên*/} 
+                      <path d="M426 726v-428l214 214z"></path> {/*icon mũi tên lên*/}
                     </svg>
                   </div>
                 )}
@@ -123,7 +129,9 @@ const Navbar8 = (props) => {
             </div>
           </nav>
           <div className="navbar8-buttons1">
-            <button className="navbar8-action11 thq-button-animated thq-button-filled">
+            <button
+              onClick={handleProfileClick}
+              className="navbar8-action11 thq-button-animated thq-button-filled">
               <span>
                 {isUserLoggedIn ? (
                   <Fragment>
@@ -136,7 +144,7 @@ const Navbar8 = (props) => {
                 )}
               </span>
             </button>
-            <button 
+            <button
               onClick={handleDangNhapDangKyClick}
               className="navbar8-action21 thq-button-outline thq-button-animated"
             >
