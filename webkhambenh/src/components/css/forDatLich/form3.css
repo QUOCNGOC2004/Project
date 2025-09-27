@@ -91,35 +91,42 @@
 
 /* Modal styles */
 .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
 }
 
 .modal-content {
-  background-color: white;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  animation: modalFadeIn 0.3s ease-out;
+    background: #ffffff;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
 }
 
 .modal-header {
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    background-color: #f7f7f7; 
+    border-bottom: 1px solid #eeeeee;
 }
 
+.header-title {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #007bff; 
+    font-weight: 600;
+}
 .modal-header h3 {
   margin: 0;
   color: #2d3748;
@@ -127,14 +134,13 @@
 }
 
 .modal-close {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: #718096;
-  cursor: pointer;
-  padding: 0.5rem;
-  line-height: 1;
-  transition: color 0.2s ease;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #333;
+    padding: 5px 10px;
+    transition: color 0.2s;
 }
 
 .modal-close:hover {
@@ -142,9 +148,109 @@
 }
 
 .modal-body {
-  padding: 1.5rem;
-  color: #4a5568;
-  line-height: 1.6;
+   padding: 25px;
+}
+
+.appointment-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Chia thành 2 cột */
+    gap: 15px 20px; /* Khoảng cách giữa các mục */
+    margin-bottom: 20px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-full-row {
+    grid-column: span 2; /* Kéo dài full hàng */
+}
+
+.info-label {
+    font-weight: 500;
+    color: #6c757d;
+    font-size: 0.85rem;
+    margin-bottom: 3px;
+    text-transform: uppercase;
+}
+
+.info-value {
+    font-weight: 600;
+    color: #333;
+    font-size: 1rem;
+    word-break: break-word; /* Xử lý nội dung dài */
+}
+
+/* --- 3. SEPARATORS & TITLES --- */
+.divider {
+    height: 1px;
+    background-color: #e9ecef;
+    margin: 20px 0;
+}
+
+.info-section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #007bff;
+    margin-bottom: 15px;
+    border-left: 4px solid #007bff;
+    padding-left: 10px;
+}
+
+
+/* --- 4. STATUS & REASON --- */
+.status-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: white;
+    text-transform: capitalize;
+}
+
+/* Các màu sắc cho trạng thái  */
+.status-chờ-xác-nhận { 
+    background-color: #ffc107; /* Vàng */
+    color: #333;
+}
+.status-đã-xác-nhận { 
+    background-color: #28a745; /* Xanh lá */
+}
+.status-cancelled, .status-hủy { 
+    background-color: #dc3545; /* Đỏ */
+}
+.status-pending { 
+    background-color: #007bff; /* Xanh dương */
+}
+
+
+
+.reason-box {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    min-height: 80px;
+}
+
+.reason-text {
+    margin: 0;
+    color: #495057;
+    line-height: 1.6;
+    white-space: pre-wrap; /* Giữ định dạng xuống dòng của người dùng */
 }
 
 @keyframes modalFadeIn {

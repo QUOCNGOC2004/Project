@@ -96,6 +96,8 @@ const Form2: React.FC<PropsForm2> = ({ duLieuForm, xuLyThayDoi }) => {
           type="tel"
           className="form-input"
           placeholder="Số điện thoại"
+          pattern="[0-9]{8,15}" 
+          inputMode="numeric" 
           value={duLieuForm.soDienThoai}
           onChange={(e) => xuLyThayDoi("soDienThoai", e.target.value)}
         />

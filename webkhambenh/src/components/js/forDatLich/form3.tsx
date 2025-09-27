@@ -141,8 +141,8 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
           <button className="edit-button" onClick={handleEditClick}>
             Sửa
           </button>
-          <button 
-            className="cancel-button" 
+          <button
+            className="cancel-button"
             onClick={handleCancelClick}
             disabled={isCancelling}
           >
@@ -155,12 +155,61 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="modal-header">
-              <h3>Chi tiết lý do khám</h3>
+              <h3 className="header-title"> Chi tiết Lịch hẹn</h3>
               <button className="modal-close" onClick={handleCloseModal}>×</button>
             </div>
+
             <div className="modal-body">
-              <p>{appointment.ly_do_kham}</p>
+              <div className="info-section-title">Thông tin Cá nhân</div>
+              <div className="appointment-info-grid">
+
+                {/* Hàng 1 */}
+                <div className="info-item">
+                  <span className="info-label">Bệnh nhân:</span>
+                  <span className="info-value">{appointment.ten_benh_nhan}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Ngày sinh:</span>
+                  {/* Định dạng ngày sinh nếu cần */}
+                  <span className="info-value">{appointment.ngay_sinh}</span>
+                </div>
+
+                {/* Hàng 2 */}
+                <div className="info-item">
+                  <span className="info-label">Giới tính:</span>
+                  <span className="info-value">{appointment.gioi_tinh}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Điện thoại:</span>
+                  <span className="info-value">{appointment.so_dien_thoai}</span>
+                </div>
+
+                {/* Hàng 3 */}
+                <div className="info-item info-full-row">
+                  <span className="info-label">Email:</span>
+                  <span className="info-value">{appointment.email}</span>
+                </div>
+
+              </div>
+
+              <div className="divider"></div>
+
+              
+              <div className="status-container">
+                <span className="status-label">Trạng thái:</span>
+                <span className={`status-badge status-${appointment.trang_thai.toLowerCase().replace(/ /g, '-')}`}>
+                  {appointment.trang_thai}
+                </span>
+              </div>
+
+              <div className="divider"></div>
+
+              <div className="info-section-title">Lý do Khám</div>
+              <div className="reason-box">
+                <p className="reason-text">{appointment.ly_do_kham || 'Không có lý do khám chi tiết được cung cấp.'}</p>
+              </div>
             </div>
+
           </div>
         </div>
       )}

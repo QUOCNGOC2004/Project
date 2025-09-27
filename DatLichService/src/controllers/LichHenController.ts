@@ -129,35 +129,48 @@ export const createLichHen = async (req: Request, res: Response): Promise<void> 
 };
 
 // Cập nhật lịch hẹn
+// Cập nhật lịch hẹn
 export const updateLichHen = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const {
-      ngay_dat_lich,
-      gio_dat_lich,
-      ten_benh_nhan,
-      email,
-      gioi_tinh,
-      ngay_sinh,
-      so_dien_thoai,
-      ly_do_kham,
-      trang_thai
-    } = req.body;
+    const updateFields: string[] = [];
+    const updateValues: any[] = [];
+    let paramIndex = 1;
 
-    const result = await AppDataSource.query(
-      `UPDATE appointments SET 
-        ngay_dat_lich = $1, gio_dat_lich = $2,
-        ten_benh_nhan = $3, email = $4,
-        gioi_tinh = $5, ngay_sinh = $6, so_dien_thoai = $7,
-        ly_do_kham = $8, trang_thai = $9, updated_at = CURRENT_TIMESTAMP
-      WHERE id = $10 RETURNING *`,
-      [
-        ngay_dat_lich, gio_dat_lich,
-        ten_benh_nhan, email,
-        gioi_tinh, ngay_sinh, so_dien_thoai,
-        ly_do_kham, trang_thai, id
-      ]
-    );
+    // Lọc các trường được gửi lên trong body
+    const allowedFields = [
+      'ngay_dat_lich', 'gio_dat_lich', 'ten_benh_nhan', 'email',
+      'gioi_tinh', 'ngay_sinh', 'so_dien_thoai', 'ly_do_kham', 'trang_thai'
+    ];
+    
+    // Xây dựng câu lệnh UPDATE động
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        updateFields.push(`${field} = $${paramIndex}`);
+        updateValues.push(req.body[field]);
+        paramIndex++;
+      }
+    }
+
+    // Luôn thêm updated_at
+    updateFields.push(`updated_at = CURRENT_TIMESTAMP`);
+
+    // Kiểm tra nếu không có trường nào để cập nhật
+    if (updateFields.length === 1 && updateFields[0] === 'updated_at = CURRENT_TIMESTAMP') {
+      res.status(400).json({ error: 'Không có thông tin nào để cập nhật' });
+      return;
+    }
+
+    // Thêm ID vào cuối danh sách tham số
+    updateValues.push(id);
+    
+    const updateQuery = `
+      UPDATE appointments SET 
+        ${updateFields.join(', ')} 
+      WHERE id = $${paramIndex} RETURNING *
+    `;
+
+    const result = await AppDataSource.query(updateQuery, updateValues);
 
     if (result.length === 0) {
       res.status(404).json({ error: 'Không tìm thấy lịch hẹn' });
