@@ -1,42 +1,71 @@
 import React, { useState, useEffect } from "react";
-import "../../views/css/profile.css";
+import "../../views/css/profile.css"; // We will use the new CSS file
+
+// Mock data for appointment history
+const mockAppointmentHistory = [
+  {
+    id: 1,
+    date: "2025-09-26",
+    doctor: "GS.TS. BS. Đỗ Quyết",
+    amount: 550000,
+    status: "pending_payment", // 'pending_payment' or 'paid'
+  },
+  {
+    id: 2,
+    date: "2025-08-15",
+    doctor: "TS. BS Nguyễn Văn A",
+    amount: 300000,
+    status: "paid",
+  },
+  {
+    id: 3,
+    date: "2025-07-02",
+    doctor: "ThS. BS Trần Thị B",
+    amount: 1200000,
+    status: "paid",
+  },
+];
 
 const Profile: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  // Gọi API lấy profile khi load
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      const res = await fetch(`${process.env.REACT_APP_AUTH_API_URL}/auth/profile`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
-      if (data.user) {
-        setUser(data.user);
+      try {
+        const res = await fetch(`${process.env.REACT_APP_AUTH_API_URL}/auth/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (data.user) {
+          // Initialize new fields if they don't exist
+          setUser({
+            ...data.user,
+            bank_name: data.user.bank_name || "",
+            account_holder: data.user.account_holder || "",
+            account_number: data.user.account_number || "",
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
       }
     };
 
     fetchProfile();
   }, []);
 
-  const handleEditChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setUser({ ...user, [name]: value });
+  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setUser({ ...user, [e.target.name]: e.target.value });
   };
 
   const handleSave = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
+    // The 'user' object now includes bank details
     const res = await fetch(`${process.env.REACT_APP_AUTH_API_URL}/auth/profile`, {
       method: "PUT",
       headers: {
@@ -50,11 +79,8 @@ const Profile: React.FC = () => {
     if (data.user) {
       setUser(data.user);
       setIsEditing(false);
-
-      // Lưu thống tín với localStorage
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      //  Phát sự kiện để Navbar8 lắng nghe và cập nhật username
       const event = new CustomEvent("loginStatusChanged", {
         detail: { isLoggedIn: true, username: data.user.username },
       });
@@ -62,126 +88,130 @@ const Profile: React.FC = () => {
     }
   };
 
-  if (!user) return <p>Đang tải...</p>;
+  if (!user) return <div className="loading-container">Đang tải...</div>;
 
   return (
-    <div className="profile-page">
-      <div className="profile-layout">
-        {/* Sidebar */}
-        <div className="profile-sidebar">
-          <div className="sidebar-header">Menu</div>
-          <div className="sidebar-item"><h3>Thông tin tài khoản</h3></div>
-          <div className="sidebar-item"><h3>Đổi mật khẩu</h3></div>
-          <div className="sidebar-item"><h3>Cài đặt</h3></div>
+    <div className="profile-page-v2">
+      {/* User Profile Card */}
+      <div className="profile-card-v2">
+        <div className="profile-header-v2">
+          <img
+            src="https://placehold.co/120x120/E65103/white?text=User"
+            alt="Ảnh đại diện"
+            className="profile-avatar-v2"
+          />
+          <h2 className="profile-name-v2">{user.username ?? "N/A"}</h2>
+          <p className="profile-email-v2">{user.email ?? "N/A"}</p>
         </div>
 
-        {/* Profile content */}
-        <div className="profile-content">
-          <div className="profile-card">
-            <div className="profile-header">
-              <h2 className="profile-title">Thông tin tài khoản</h2>
-              <div className="profile-image-container">
-                <img
-                  src="https://placehold.co/100x100/E65103/white?text=User"
-                  alt="Ảnh đại diện"
-                  className="profile-image"
-                />
-              </div>
+        <div className="profile-body-v2">
+          {/* Section: Personal Info */}
+          <div className="profile-section">
+            <div className="section-header">
+              <h4>Thông tin cá nhân</h4>
+              {!isEditing && (
+                <button className="edit-btn" onClick={() => setIsEditing(true)}>Chỉnh sửa</button>
+              )}
             </div>
-
-            <div className="profile-body">
-              {/* Username */}
-              <div className="profile-username-container">
+            <div className="info-grid">
+              <div className="info-item">
+                <label>Số điện thoại</label>
                 {isEditing ? (
-                  <input
-                    type="text"
-                    name="username"
-                    value={user.username || ""}
-                    onChange={handleEditChange}
-                    className="info-value-input"
-                  />
+                  <input type="text" name="so_dien_thoai" value={user.so_dien_thoai || ""} onChange={handleEditChange} />
                 ) : (
-                  <h3 className="profile-username">{user.username ?? "null"}</h3>
-                )}
-                {!isEditing && (
-                  <span
-                    className="edit-icon"
-                    onClick={() => setIsEditing(true)}
-                  >
-                    &#9998;
-                  </span>
+                  <span>{user.so_dien_thoai || "Chưa cập nhật"}</span>
                 )}
               </div>
-
-              {/* Email */}
-              <div className="profile-info-item">
-                <span className="info-label">Email:</span>
-                <span className="info-value">{user.email ?? "null"}</span>
-              </div>
-
-              {/* Số điện thoại */}
-              <div className="profile-info-item">
-                <span className="info-label">Số điện thoại:</span>
+              <div className="info-item">
+                <label>Giới tính</label>
                 {isEditing ? (
-                  <input
-                    type="text"
-                    name="so_dien_thoai"
-                    value={user.so_dien_thoai || ""}
-                    onChange={handleEditChange}
-                    className="info-value-input"
-                  />
-                ) : (
-                  <span className="info-value">{user.so_dien_thoai ?? "null"}</span>
-                )}
-              </div>
-
-              {/* Giới tính */}
-              <div className="profile-info-item">
-                <span className="info-label">Giới tính:</span>
-                {isEditing ? (
-                  <select
-                    name="gioi_tinh"
-                    value={user.gioi_tinh || ""}
-                    onChange={handleEditChange}
-                    className="info-value-input"
-                  >
+                  <select name="gioi_tinh" value={user.gioi_tinh || ""} onChange={handleEditChange}>
                     <option value="">Không xác định</option>
                     <option value="Nam">Nam</option>
                     <option value="Nữ">Nữ</option>
                   </select>
                 ) : (
-                  <span className="info-value">{user.gioi_tinh ?? "null"}</span>
+                  <span>{user.gioi_tinh || "Chưa cập nhật"}</span>
                 )}
               </div>
-
-              {/* Ngày sinh */}
-              <div className="profile-info-item">
-                <span className="info-label">Ngày sinh:</span>
+              <div className="info-item">
+                <label>Ngày sinh</label>
                 {isEditing ? (
-                  <input
-                    type="date"
-                    name="ngay_sinh"
-                    value={user.ngay_sinh || ""}
-                    onChange={handleEditChange}
-                    className="info-value-input"
-                  />
+                  <input type="date" name="ngay_sinh" value={user.ngay_sinh || ""} onChange={handleEditChange} />
                 ) : (
-                  <span className="info-value">{user.ngay_sinh ?? "null"}</span>
+                  <span>{user.ngay_sinh || "Chưa cập nhật"}</span>
                 )}
               </div>
-
-              {/* Buttons */}
-              {isEditing ? (
-                <div className="edit-buttons">
-                  <button className="save-btn" onClick={handleSave}>Lưu</button>
-                  <button className="cancel-btn" onClick={() => setIsEditing(false)}>Hủy</button>
-                </div>
-              ) : (
-                <div className="edit-buttons">
-                  <button className="save-btn" onClick={() => setIsEditing(true)}>Chỉnh sửa hồ sơ</button>
-                </div>
-              )}
             </div>
+          </div>
+
+          {/* Section: Payment Info */}
+          <div className="profile-section">
+            <div className="section-header">
+              <h4>Thông tin thanh toán (Mô phỏng)</h4>
+            </div>
+            <div className="info-grid">
+              <div className="info-item">
+                <label>Tên ngân hàng</label>
+                {isEditing ? (
+                  <input type="text" name="bank_name" value={user.bank_name || ""} onChange={handleEditChange} />
+                ) : (
+                  <span>{user.bank_name || "Chưa liên kết"}</span>
+                )}
+              </div>
+              <div className="info-item">
+                <label>Chủ tài khoản</label>
+                {isEditing ? (
+                  <input type="text" name="account_holder" value={user.account_holder || ""} onChange={handleEditChange} />
+                ) : (
+                  <span>{user.account_holder || "Chưa liên kết"}</span>
+                )}
+              </div>
+              <div className="info-item">
+                <label>Số tài khoản</label>
+                {isEditing ? (
+                  <input type="text" name="account_number" value={user.account_number || ""} onChange={handleEditChange} />
+                ) : (
+                  <span>{user.account_number || "Chưa liên kết"}</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {isEditing && (
+            <div className="action-buttons">
+              <button className="cancel-btn" onClick={() => setIsEditing(false)}>Hủy</button>
+              <button className="save-btn" onClick={handleSave}>Lưu thay đổi</button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Appointment and Payment History Card */}
+      <div className="profile-card-v2">
+        <div className="profile-body-v2">
+          <div className="profile-section">
+            <div className="section-header">
+              <h4>Lịch sử khám & Thanh toán</h4>
+            </div>
+            <ul className="history-list">
+              {mockAppointmentHistory.map((item) => (
+                <li key={item.id} className="history-item">
+                  <div className="history-info">
+                    <span className="history-date">{item.date}</span>
+                    <span className="history-doctor">BS. {item.doctor}</span>
+                    <span className="history-amount">{item.amount.toLocaleString('vi-VN')} VNĐ</span>
+                  </div>
+                  <div className="history-action">
+                    {item.status === 'pending_payment' ? (
+                      <button className="pay-now-btn">Thanh toán ngay</button>
+                    ) : (
+                      <span className="status-paid">Đã thanh toán</span>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
