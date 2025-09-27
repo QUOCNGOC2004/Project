@@ -5,9 +5,9 @@ const CACHE_TTL = 3600;
 
 // Các key prefix cho cache
 const CACHE_KEYS = {
-  ALL_APPOINTMENTS: 'all_appointments',
-  APPOINTMENT: 'appointment',
-  USER_APPOINTMENTS: 'user_appointments'
+  ALL_THANHTOANS: 'all_thanh_toans',
+  THANHTOAN: 'thanh_toan',
+  USER_THANHTOANS: 'user_thanh_toans'
 };
 
 // Hàm helper để xử lý cache an toàn
@@ -43,55 +43,55 @@ export const deleteMultipleCache = async (keys: string[]): Promise<void> => {
   await safeCacheOperation(() => redisClient.del(...keys));
 };
 
-// Cache cho danh sách lịch hẹn
-export const cacheAppointments = {
+// Cache cho danh sách thanh toán
+export const cacheThanhToans = {
   getAll: async (): Promise<any> => {
-    return await getCache(CACHE_KEYS.ALL_APPOINTMENTS);
+    return await getCache(CACHE_KEYS.ALL_THANHTOANS);
   },
   setAll: async (data: any): Promise<void> => {
-    await setCache(CACHE_KEYS.ALL_APPOINTMENTS, data);
+    await setCache(CACHE_KEYS.ALL_THANHTOANS, data);
   },
   deleteAll: async (): Promise<void> => {
-    await deleteCache(CACHE_KEYS.ALL_APPOINTMENTS);
+    await deleteCache(CACHE_KEYS.ALL_THANHTOANS);
   }
 };
 
-// Cache cho một lịch hẹn
-export const cacheAppointment = {
+// Cache cho một thanh toán
+export const cacheThanhToan = {
   get: async (id: string): Promise<any> => {
-    return await getCache(`${CACHE_KEYS.APPOINTMENT}:${id}`);
+    return await getCache(`${CACHE_KEYS.THANHTOAN}:${id}`);
   },
   set: async (id: string, data: any): Promise<void> => {
-    await setCache(`${CACHE_KEYS.APPOINTMENT}:${id}`, data);
+    await setCache(`${CACHE_KEYS.THANHTOAN}:${id}`, data);
   },
   delete: async (id: string): Promise<void> => {
-    await deleteCache(`${CACHE_KEYS.APPOINTMENT}:${id}`);
+    await deleteCache(`${CACHE_KEYS.THANHTOAN}:${id}`);
   }
 };
 
-// Cache cho lịch hẹn của user
-export const cacheUserAppointments = {
+// Cache cho thanh toán của user
+export const cacheUserThanhToans = {
   get: async (userId: string): Promise<any> => {
-    return await getCache(`${CACHE_KEYS.USER_APPOINTMENTS}:${userId}`);
+    return await getCache(`${CACHE_KEYS.USER_THANHTOANS}:${userId}`);
   },
   set: async (userId: string, data: any): Promise<void> => {
-    await setCache(`${CACHE_KEYS.USER_APPOINTMENTS}:${userId}`, data);
+    await setCache(`${CACHE_KEYS.USER_THANHTOANS}:${userId}`, data);
   },
   delete: async (userId: string): Promise<void> => {
-    await deleteCache(`${CACHE_KEYS.USER_APPOINTMENTS}:${userId}`);
+    await deleteCache(`${CACHE_KEYS.USER_THANHTOANS}:${userId}`);
   }
 };
 
-// Xóa tất cả cache liên quan đến một lịch hẹn
-export const invalidateAppointmentCache = async (id: string, userId?: string): Promise<void> => {
+// Xóa tất cả cache liên quan đến một thanh toán
+export const invalidateThanhToanCache = async (id: string, userId?: string): Promise<void> => {
   const keysToDelete = [
-    CACHE_KEYS.ALL_APPOINTMENTS,
-    `${CACHE_KEYS.APPOINTMENT}:${id}`
+    CACHE_KEYS.ALL_THANHTOANS,
+    `${CACHE_KEYS.THANHTOAN}:${id}`
   ];
   
   if (userId) {
-    keysToDelete.push(`${CACHE_KEYS.USER_APPOINTMENTS}:${userId}`);
+    keysToDelete.push(`${CACHE_KEYS.USER_THANHTOANS}:${userId}`);
   }
   
   await deleteMultipleCache(keysToDelete);
-}; 
+};

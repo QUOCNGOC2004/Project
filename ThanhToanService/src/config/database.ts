@@ -16,4 +16,4 @@ export const AppDataSource = new DataSource({
     entities: [ThanhToan],
     subscribers: [],
     migrations: [],
-}); 
+});

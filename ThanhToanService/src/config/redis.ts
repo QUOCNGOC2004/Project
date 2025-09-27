@@ -36,4 +36,4 @@ redisClient.on('end', () => {
   console.warn('Redis Client Connection Ended');
 });
 
-export default redisClient; 
+export default redisClient;
