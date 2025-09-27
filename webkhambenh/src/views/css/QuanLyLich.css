@@ -202,3 +202,36 @@
     padding: 1.5rem;
   }
 }
+
+
+
+.management-section {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #E65103;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 3px solid #E65103;
+}
+
+.section-divider {
+  border: 0;
+  height: 1px;
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+  margin: 3rem 0;
+}
+
+.no-appointments-paid {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #dc3545; /* Màu đỏ nổi bật */
+  padding: 1.5rem;
+  background-color: #fff5f5; /* Nền hồng nhạt */
+  border-radius: 8px;
+  border: 1px dashed #dc3545;
+  margin: 1rem 0;
+}

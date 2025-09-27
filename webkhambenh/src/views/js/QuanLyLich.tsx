@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../../views/css/QuanLyLich.css';
-import Form3 from '../../components/js/forDatLich/form3';
+import Form3 from '../../components/js/forQuanLyLich/form3';
 import { isLoggedIn, getCurrentUser } from '../../ktraLogin';
 
 interface Appointment {
@@ -95,6 +95,11 @@ const QuanLyLich: React.FC = () => {
     }
     return color;
   };
+  
+  // Lọc danh sách lịch hẹn theo trạng thái
+  const pendingAppointments = appointments.filter(a => a.trang_thai === 'chờ xác nhận');
+  const paidAppointments = appointments.filter(a => a.trang_thai === 'đã thanh toán');
+  const otherAppointments = appointments.filter(a => a.trang_thai !== 'chờ xác nhận' && a.trang_thai !== 'đã thanh toán');
 
   if (loading) {
     return (
@@ -119,24 +124,71 @@ const QuanLyLich: React.FC = () => {
         <p className="management-title-description">Kiểm tra thông tin đặt lịch hẹn</p>
       </div>
       
-      {appointments.length === 0 ? (
-        <div className="no-appointments">Không có lịch khám</div>
-      ) : (
-        <div className="appointment-grid">
-          {appointments.map((appointment) => {
-            const cardColor = getRandomColor();
-            return (
+      {/* Phần Lịch hẹn Chờ xác nhận */}
+      <div className="management-section">
+        <h2 className="section-title">Chờ xác nhận</h2>
+        {pendingAppointments.length === 0 ? (
+          <div className="no-appointments">Không có lịch khám nào đang chờ xác nhận.</div>
+        ) : (
+          <div className="appointment-grid">
+            {pendingAppointments.map((appointment) => (
               <Form3 
                 key={appointment.id} 
                 appointment={appointment} 
-                cardColor={cardColor}
+                cardColor={getRandomColor()}
                 onCancel={handleCancelAppointment}
                 onUpdate={handleUpdateAppointment}
               />
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <hr className="section-divider" />
+
+      {/* Phần Lịch hẹn Đã thanh toán */}
+      <div className="management-section">
+        <h2 className="section-title">Đã thanh toán</h2>
+        {paidAppointments.length === 0 ? (
+          <div className="no-appointments-paid">
+            Chưa có lịch hẹn nào đã thanh toán, vui lòng kiểm tra mục thanh toán.
+          </div>
+        ) : (
+          <div className="appointment-grid">
+            {paidAppointments.map((appointment) => (
+              <Form3 
+                key={appointment.id} 
+                appointment={appointment} 
+                cardColor={getRandomColor()}
+                onCancel={handleCancelAppointment}
+                onUpdate={handleUpdateAppointment}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Các lịch hẹn có trạng thái khác (nếu có) */}
+      {otherAppointments.length > 0 && (
+        <>
+          <hr className="section-divider" />
+          <div className="management-section">
+            <h2 className="section-title">Các lịch hẹn khác</h2>
+            <div className="appointment-grid">
+              {otherAppointments.map((appointment) => (
+                <Form3 
+                  key={appointment.id} 
+                  appointment={appointment} 
+                  cardColor={getRandomColor()}
+                  onCancel={handleCancelAppointment}
+                  onUpdate={handleUpdateAppointment}
+                />
+              ))}
+            </div>
+          </div>
+        </>
       )}
+
     </div>
   );
 };
