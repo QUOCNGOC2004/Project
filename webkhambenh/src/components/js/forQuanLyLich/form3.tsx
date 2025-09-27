@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import '../../css/forQuanLyLich/form3.css';
 
+const CheckIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-check-lg" viewBox="0 0 16 16">
+    <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z" />
+  </svg>
+);
+
+
 interface Appointment {
   id: number;
   ngay_dat_lich: string;
@@ -15,6 +22,10 @@ interface Appointment {
   ngay_sinh: string;
   so_dien_thoai: string;
   trang_thai: string;
+  // Giả lập dữ liệu mới, sau này sẽ lấy từ API
+  gia_tien?: number;
+  benh_ly?: string;
+  loi_khuyen?: string;
 }
 
 interface Form3Props {
@@ -40,6 +51,19 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
     ly_do_kham: appointment.ly_do_kham,
   });
 
+  // Dữ liệu mẫu cho lịch hẹn đã thanh toán
+  const mockPaidData = {
+    gia_tien: 500000,
+    benh_ly: "Viêm họng cấp",
+    loi_khuyen: "Uống nhiều nước ấm, tránh đồ lạnh và cay nóng. Súc họng bằng nước muối sinh lý 2-3 lần/ngày. Uống thuốc theo đơn và tái khám sau 5 ngày nếu không đỡ."
+  };
+
+  const currentAppointmentData = {
+    ...appointment,
+    ...(appointment.trang_thai === 'đã thanh toán' ? mockPaidData : {})
+  };
+
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('vi-VN', {
@@ -49,28 +73,18 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
     });
   };
 
-  const handleDetailClick = () => {
-    setShowModal(true);
-  };
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+  }
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
-
-  const handleEditClick = () => {
-    setShowEditModal(true);
-  };
-
-  const handleCloseEditModal = () => {
-    setShowEditModal(false);
-  };
+  const handleDetailClick = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
+  const handleEditClick = () => setShowEditModal(true);
+  const handleCloseEditModal = () => setShowEditModal(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setEditData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setEditData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleUpdateSubmit = async (e: React.FormEvent) => {
@@ -79,16 +93,10 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
     try {
       const response = await fetch(`${process.env.REACT_APP_APPOINTMENT_API_URL}/appointments/${appointment.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editData),
       });
-
-      if (!response.ok) {
-        throw new Error('Không thể cập nhật lịch hẹn');
-      }
-
+      if (!response.ok) throw new Error('Không thể cập nhật lịch hẹn');
       onUpdate();
       setShowEditModal(false);
     } catch (error) {
@@ -106,11 +114,7 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
         const response = await fetch(`${process.env.REACT_APP_APPOINTMENT_API_URL}/appointments/${appointment.id}`, {
           method: 'DELETE',
         });
-
-        if (!response.ok) {
-          throw new Error('Không thể hủy lịch hẹn');
-        }
-
+        if (!response.ok) throw new Error('Không thể hủy lịch hẹn');
         onCancel(appointment.id);
       } catch (error) {
         console.error('Lỗi khi hủy lịch hẹn:', error);
@@ -135,19 +139,32 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
           <p><strong>SĐT bác sĩ:</strong> {appointment.doctor_phone}</p>
         </div>
         <div className="appointment-actions">
-          <button className="detail-button" onClick={handleDetailClick}>
-            Chi tiết
-          </button>
-          <button className="edit-button" onClick={handleEditClick}>
-            Sửa
-          </button>
-          <button
-            className="cancel-button"
-            onClick={handleCancelClick}
-            disabled={isCancelling}
-          >
-            {isCancelling ? 'Đang hủy...' : 'Hủy'}
-          </button>
+          {appointment.trang_thai === 'đã thanh toán' ? (
+            <>
+              <button className="detail-button" onClick={handleDetailClick}>
+                Chi tiết
+              </button>
+              <button className="consulted-button">
+                <CheckIcon /> Đã khám
+              </button>
+            </>
+          ) : (
+            <>
+              <button className="detail-button" onClick={handleDetailClick}>
+                Chi tiết
+              </button>
+              <button className="edit-button" onClick={handleEditClick}>
+                Sửa
+              </button>
+              <button
+                className="cancel-button"
+                onClick={handleCancelClick}
+                disabled={isCancelling}
+              >
+                {isCancelling ? 'Đang hủy...' : 'Hủy'}
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -160,10 +177,25 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
             </div>
 
             <div className="modal-body">
+              <div className="status-and-price-container">
+                <div className="status-container">
+                  <span className="status-label">Trạng thái:</span>
+                  <span className={`status-badge status-${appointment.trang_thai.toLowerCase().replace(/ /g, '-')}`}>
+                    {appointment.trang_thai}
+                  </span>
+                </div>
+                {currentAppointmentData.gia_tien && (
+                  <div className="price-container">
+                    <span className="info-label">Chi phí:</span>
+                    <span className="price-value">{formatCurrency(currentAppointmentData.gia_tien)}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="divider"></div>
+
               <div className="info-section-title">Thông tin Cá nhân</div>
               <div className="appointment-info-grid">
-
-                {/* Hàng 1 */}
                 <div className="info-item">
                   <span className="info-label">Bệnh nhân:</span>
                   <span className="info-value">{appointment.ten_benh_nhan}</span>
@@ -172,8 +204,6 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
                   <span className="info-label">Ngày sinh:</span>
                   <span className="info-value">{formatDate(appointment.ngay_sinh)}</span>
                 </div>
-
-                {/* Hàng 2 */}
                 <div className="info-item">
                   <span className="info-label">Giới tính:</span>
                   <span className="info-value">{appointment.gioi_tinh}</span>
@@ -182,36 +212,41 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
                   <span className="info-label">Điện thoại:</span>
                   <span className="info-value">{appointment.so_dien_thoai}</span>
                 </div>
-
-                {/* Hàng 3 */}
                 <div className="info-item info-full-row">
                   <span className="info-label">Email:</span>
                   <span className="info-value">{appointment.email}</span>
                 </div>
-
-              </div>
-
-              <div className="divider"></div>
-
-              
-              <div className="status-container">
-                <span className="status-label">Trạng thái:</span>
-                <span className={`status-badge status-${appointment.trang_thai.toLowerCase().replace(/ /g, '-')}`}>
-                  {appointment.trang_thai}
-                </span>
               </div>
 
               <div className="divider"></div>
 
               <div className="info-section-title">Lý do Khám</div>
               <div className="reason-box">
-                <p className="reason-text">{appointment.ly_do_kham || 'Không có lý do khám chi tiết được cung cấp.'}</p>
+                <p className="reason-text">{appointment.ly_do_kham || 'Không có lý do khám chi tiết.'}</p>
               </div>
-            </div>
 
+              {/* Chỉ hiển thị phần này cho lịch đã thanh toán */}
+              {appointment.trang_thai === 'đã thanh toán' && (
+                <>
+                  <div className="divider"></div>
+                  <div className="info-section-title">Bệnh lý sau khi khám</div>
+                  <div className="reason-box">
+                    <p className="reason-text">{currentAppointmentData.benh_ly}</p>
+                  </div>
+
+                  <div className="divider"></div>
+
+                  <div className="info-section-title">Lời khuyên của Bác sĩ</div>
+                  <div className="reason-box">
+                    <p className="reason-text">{currentAppointmentData.loi_khuyen}</p>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}
+
 
       {showEditModal && (
         <div className="modal-overlay">
