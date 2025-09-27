@@ -170,7 +170,6 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
                 </div>
                 <div className="info-item">
                   <span className="info-label">Ngày sinh:</span>
-                  {/* Định dạng ngày sinh nếu cần */}
                   <span className="info-value">{formatDate(appointment.ngay_sinh)}</span>
                 </div>
 

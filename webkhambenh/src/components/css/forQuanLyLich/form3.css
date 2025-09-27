@@ -226,7 +226,7 @@
     background-color: #ffc107; /* Vàng */
     color: #333;
 }
-.status-đã-xác-nhận { 
+.status-đã-thanh-toán { 
     background-color: #28a745; /* Xanh lá */
 }
 .status-cancelled, .status-hủy { 
