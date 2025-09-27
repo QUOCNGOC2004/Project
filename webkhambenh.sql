@@ -70,3 +70,31 @@ INSERT INTO doctors (name, email, phone, co_so_kham, chuyen_khoa, mo_ta_chuc_vu,
 ('Sinh viên Lê Thị Hoa', 'lethihoa@example.com', '0922334456', 'Bệnh viện Đại học Phenikaa', 'Ngoại tổng hợp', 'Sinh viên thực tập tại khoa Ngoại', 'Sinh viên thực tập', 2, 'https://nhakhoadelia.vn/wp-content/uploads/2024/04/28-1713601052.jpg', 'Sinh viên thực tập'),
 ('Sinh viên Hannibal Lecter', 'phamquocviet@example.com', '0933445567', 'Phòng khám Đa khoa Đại học Phenikaa', 'Tim mạch', 'Sinh viên thực tập tại khoa Tim mạch', 'Sinh viên thực tập', 1, 'https://thanhbinhpsy.com/wp-content/uploads/2019/06/hannibal-lecter-1.jpg', 'Sinh viên thực tập'),
 ('Sinh viên Nguyễn Thị Lan', 'nguyenthilan@example.com', '0944556678', 'Phòng khám Đa khoa Đại học Phenikaa', 'Khoa sản', 'Sinh viên thực tập tại khoa Sản', 'Sinh viên thực tập', 2, 'https://nhakhoadelia.vn/wp-content/uploads/2024/04/25-1713601052.jpg', 'Sinh viên thực tập');
+
+CREATE TABLE user_bank_accounts (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL UNIQUE, 
+    bank_name VARCHAR(255) NOT NULL, 
+    account_holder VARCHAR(255) NOT NULL,
+    account_number VARCHAR(50) NOT NULL,
+    is_default BOOLEAN DEFAULT true, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+
+    -- Tạo khóa ngoại liên kết với bảng users
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE 
+);
+
+CREATE TABLE invoices (
+    id SERIAL PRIMARY KEY,
+    appointment_id INTEGER NOT NULL UNIQUE, 
+    invoice_code VARCHAR(50) NOT NULL UNIQUE, 
+    total_amount DECIMAL(12, 2) NOT NULL, 
+    service_details JSONB, -- Lưu chi tiết các dịch vụ dưới dạng JSON
+    payment_date TIMESTAMP WITH TIME ZONE, 
+    transaction_id VARCHAR(255), 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+
+    -- Tạo khóa ngoại liên kết với bảng appointments
+    FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE RESTRICT
+);
