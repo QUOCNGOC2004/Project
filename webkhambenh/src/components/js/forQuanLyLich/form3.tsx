@@ -327,6 +327,8 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
                   value={editData.so_dien_thoai}
                   onChange={handleInputChange}
                   required
+                  pattern="[0-9]{8,13}"
+                  inputMode="numeric"
                 />
               </div>
               <div className="form-group">
