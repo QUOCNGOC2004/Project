@@ -2,7 +2,7 @@ import "reflect-metadata";
 import express from "express";
 import cors from "cors";
 import { AppDataSource } from "./config/database";
-import lichHenRoutes from "./routes/LichHenRoutes";
+import thanhToanRoutes from "./routes/ThanhToanRoutes";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -19,15 +19,15 @@ app.use(cors({
 app.use(express.json());
 
 // Routes
-app.use('/api/appointments', lichHenRoutes);
+app.use('/api/payments', thanhToanRoutes);
 
 // Kết nối database và khởi chạy server
 AppDataSource.initialize()
     .then(() => {
         console.log("Kết nối database thành công");
-        const PORT = process.env.PORT || 3003;
+        const PORT = process.env.PORT || 3004;
         app.listen(PORT, () => {
-            console.log(`DatLichService đang chạy trên cổng ${PORT}`);
+            console.log(`ThanhToanService đang chạy trên cổng ${PORT}`);
         });
     })
-    .catch((error: Error) => console.log("Lỗi kết nối database: ", error)); 
+    .catch((error: Error) => console.log("Lỗi kết nối database: ", error));
