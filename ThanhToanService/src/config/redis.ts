@@ -21,19 +21,19 @@ const redisClient = new Redis({
 });
 
 redisClient.on('error', (err) => {
-  console.warn('Redis Client Error:', err.message);
+  console.warn('Redis Client Error (Payment Service):', err.message);
 });
 
 redisClient.on('connect', () => {
-  console.log('Redis Client Connected');
+  console.log('Redis Client Connected (Payment Service)');
 });
 
 redisClient.on('close', () => {
-  console.warn('Redis Client Connection Closed');
+  console.warn('Redis Client Connection Closed (Payment Service)');
 });
 
 redisClient.on('end', () => {
-  console.warn('Redis Client Connection Ended');
+  console.warn('Redis Client Connection Ended (Payment Service)');
 });
 
 export default redisClient;
