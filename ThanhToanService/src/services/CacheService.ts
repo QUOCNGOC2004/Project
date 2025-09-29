@@ -1,97 +1,51 @@
-import redisClient from '../config/redis';
+import redisClient from '../config/redis'; 
 
-// Cache TTL (Time To Live) - 1 giờ
+// Thời gian cache mặc định: 1 giờ
 const CACHE_TTL = 3600;
 
-// Các key prefix cho cache
+// Định nghĩa các key prefix mới cho rõ ràng
 const CACHE_KEYS = {
-  ALL_THANHTOANS: 'all_thanh_toans',
-  THANHTOAN: 'thanh_toan',
-  USER_THANHTOANS: 'user_thanh_toans'
+    USER_BANK_ACCOUNT: 'bank_account:user', // Key: bank_account:user:123
+    USER_INVOICES: 'invoices:user',       // Key: invoices:user:123
 };
 
-// Hàm helper để xử lý cache an toàn
-const safeCacheOperation = async (operation: () => Promise<any>) => {
-  try {
-    return await operation();
-  } catch (error) {
-    console.warn('Redis operation failed:', error);
-    return null;
-  }
+// Hàm cơ bản để thao tác với Redis
+const getCache = async (key: string): Promise<any | null> => {
+    try {
+        const data = await redisClient.get(key);
+        return data ? JSON.parse(data) : null;
+    } catch (error) {
+        console.error(`Lỗi khi lấy cache cho key "${key}":`, error);
+        return null;
+    }
 };
 
-// Lấy cache
-export const getCache = async (key: string): Promise<any> => {
-  const data = await safeCacheOperation(() => redisClient.get(key));
-  return data ? JSON.parse(data) : null;
+const setCache = async (key: string, data: any): Promise<void> => {
+    try {
+        await redisClient.setex(key, CACHE_TTL, JSON.stringify(data));
+    } catch (error) {
+        console.error(`Lỗi khi đặt cache cho key "${key}":`, error);
+    }
 };
 
-// Lưu cache
-export const setCache = async (key: string, data: any): Promise<void> => {
-  await safeCacheOperation(() => 
-    redisClient.setex(key, CACHE_TTL, JSON.stringify(data))
-  );
+const deleteCache = async (key: string): Promise<void> => {
+    try {
+        await redisClient.del(key);
+    } catch (error) {
+        console.error(`Lỗi khi xóa cache cho key "${key}":`, error);
+    }
 };
 
-// Xóa cache
-export const deleteCache = async (key: string): Promise<void> => {
-  await safeCacheOperation(() => redisClient.del(key));
+// === Chiến lược Cache cho Bank Account ===
+export const cacheUserBankAccount = {
+    get: (userId: string) => getCache(`${CACHE_KEYS.USER_BANK_ACCOUNT}:${userId}`),
+    set: (userId: string, data: any) => setCache(`${CACHE_KEYS.USER_BANK_ACCOUNT}:${userId}`, data),
+    invalidate: (userId: string) => deleteCache(`${CACHE_KEYS.USER_BANK_ACCOUNT}:${userId}`),
 };
 
-// Xóa nhiều cache
-export const deleteMultipleCache = async (keys: string[]): Promise<void> => {
-  await safeCacheOperation(() => redisClient.del(...keys));
-};
-
-// Cache cho danh sách thanh toán
-export const cacheThanhToans = {
-  getAll: async (): Promise<any> => {
-    return await getCache(CACHE_KEYS.ALL_THANHTOANS);
-  },
-  setAll: async (data: any): Promise<void> => {
-    await setCache(CACHE_KEYS.ALL_THANHTOANS, data);
-  },
-  deleteAll: async (): Promise<void> => {
-    await deleteCache(CACHE_KEYS.ALL_THANHTOANS);
-  }
-};
-
-// Cache cho một thanh toán
-export const cacheThanhToan = {
-  get: async (id: string): Promise<any> => {
-    return await getCache(`${CACHE_KEYS.THANHTOAN}:${id}`);
-  },
-  set: async (id: string, data: any): Promise<void> => {
-    await setCache(`${CACHE_KEYS.THANHTOAN}:${id}`, data);
-  },
-  delete: async (id: string): Promise<void> => {
-    await deleteCache(`${CACHE_KEYS.THANHTOAN}:${id}`);
-  }
-};
-
-// Cache cho thanh toán của user
-export const cacheUserThanhToans = {
-  get: async (userId: string): Promise<any> => {
-    return await getCache(`${CACHE_KEYS.USER_THANHTOANS}:${userId}`);
-  },
-  set: async (userId: string, data: any): Promise<void> => {
-    await setCache(`${CACHE_KEYS.USER_THANHTOANS}:${userId}`, data);
-  },
-  delete: async (userId: string): Promise<void> => {
-    await deleteCache(`${CACHE_KEYS.USER_THANHTOANS}:${userId}`);
-  }
-};
-
-// Xóa tất cả cache liên quan đến một thanh toán
-export const invalidateThanhToanCache = async (id: string, userId?: string): Promise<void> => {
-  const keysToDelete = [
-    CACHE_KEYS.ALL_THANHTOANS,
-    `${CACHE_KEYS.THANHTOAN}:${id}`
-  ];
-  
-  if (userId) {
-    keysToDelete.push(`${CACHE_KEYS.USER_THANHTOANS}:${userId}`);
-  }
-  
-  await deleteMultipleCache(keysToDelete);
+// === Chiến lược Cache cho Invoices ===
+export const cacheUserInvoices = {
+    get: (userId: string) => getCache(`${CACHE_KEYS.USER_INVOICES}:${userId}`),
+    set: (userId: string, data: any) => setCache(`${CACHE_KEYS.USER_INVOICES}:${userId}`, data),
+    invalidate: (userId: string) => deleteCache(`${CACHE_KEYS.USER_INVOICES}:${userId}`),
 };
