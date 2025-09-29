@@ -3,6 +3,7 @@ import "../../css/forProfile/users.css";
 
 const Users: React.FC = () => {
   const [user, setUser] = useState<any>(null);
+  const [originalUser, setOriginalUser] = useState<any>(null); // Lưu trữ dữ liệu gốc
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
@@ -15,12 +16,14 @@ const Users: React.FC = () => {
         });
         const data = await res.json();
         if (data.user) {
-          setUser({
+          const userData = {
             ...data.user,
             bank_name: data.user.bank_name || "",
             account_holder: data.user.account_holder || "",
             account_number: data.user.account_number || "",
-          });
+          };
+          setUser(userData);
+          setOriginalUser(userData); // Lưu dữ liệu gốc
         }
       } catch (error) {
         console.error("Failed to fetch profile:", error);
@@ -50,6 +53,7 @@ const Users: React.FC = () => {
     const data = await res.json();
     if (data.user) {
       setUser(data.user);
+      setOriginalUser(data.user); // Cập nhật dữ liệu gốc sau khi lưu
       setIsEditing(false);
       localStorage.setItem("user", JSON.stringify(data.user));
       const event = new CustomEvent("loginStatusChanged", {
@@ -57,6 +61,11 @@ const Users: React.FC = () => {
       });
       document.dispatchEvent(event);
     }
+  };
+
+  const handleCancel = () => {
+    setUser(originalUser); // Khôi phục dữ liệu gốc
+    setIsEditing(false);
   };
 
   if (!user) return <div className="loading-container">Đang tải...</div>;
@@ -177,7 +186,7 @@ const Users: React.FC = () => {
                 <button
                   type="button"
                   className="cancel-btn"
-                  onClick={() => setIsEditing(false)}
+                  onClick={handleCancel}
                 >
                   Hủy
                 </button>
