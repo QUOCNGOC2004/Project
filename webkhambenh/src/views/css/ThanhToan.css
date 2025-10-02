@@ -1,40 +1,380 @@
-.thanh-toan-container {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.app-container {
+  
   min-height: 100vh;
-  background-color: #f5f5f5;
-  padding: 20px;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-.thanh-toan-content {
+.payment-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1400px;
   background-color: white;
-  padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  max-width: 600px;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  border-bottom: 2px solid #d1d5db;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+/* Appointment List Styles */
+.appointment-list {
+  flex: 1;
+  min-width: 350px;
+}
+
+.appointment-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.appointment-item {
+  padding: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  background-color: white;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.appointment-item:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.appointment-item.active {
+  border-color: #E65103;
+  box-shadow: 0 0 0 2px #E65103;
+  background-color: #eff6ff;
+  transform: scale(1.01);
+}
+
+.patient-name {
+  font-weight: 600;
+  color: #111827;
+  font-size: 1.125rem;
+  margin-bottom: 0.25rem;
+}
+
+.appointment-info {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin-bottom: 0.125rem;
+}
+
+.status-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-badge.pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.paid {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+/* Payment Details Styles */
+.payment-details {
+  flex: 2;
   width: 100%;
 }
 
-.thanh-toan-content h1 {
-  color: #333;
-  margin-bottom: 20px;
+.empty-state {
+  text-align: center;
+  padding: 4rem;
+  color: #6b7280;
+  border: 2px dashed #d1d5db;
+  border-radius: 0.75rem;
 }
 
+.empty-state-title {
+  font-size: 1.125rem;
+  margin-bottom: 0.5rem;
+}
 
-.thanh-toan-button {
-  background-color: #007bff;
+.empty-state-subtitle {
+  font-size: 0.875rem;
+}
+
+/* Invoice Details */
+.invoice-details {
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.invoice-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1f2937;
+}
+
+.service-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+}
+
+.service-item strong {
+  color: #111827;
+}
+
+.total-amount {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 2px solid #1f2937;
+}
+
+.total-price {
+  color: #dc2626;
+}
+
+/* Payment Form */
+.payment-form {
+  padding: 1.5rem;
+  border: 1px solid #dbeafe;
+  background-color: #eff6ff;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.form-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #E65103;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: all 0.15s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #E65103;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background-color: #E65103;
   color: white;
+  font-weight: 600;
   border: none;
-  padding: 12px 24px;
-  border-radius: 5px;
+  border-radius: 0.75rem;
   cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1rem;
 }
 
-.thanh-toan-button:hover {
-  background-color: #0056b3;
-} 
+.submit-btn:hover:not(:disabled) {
+  background-color: #ec8c59;
+  transform: translateY(-1px);
+  box-shadow: 0 15px 20px -5px rgba(37, 99, 235, 0.4);
+}
+
+.submit-btn:disabled {
+  background-color: #6b7280;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.btn-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.btn-icon.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Payment Success */
+.payment-success {
+  text-align: center;
+  padding: 2rem;
+  border: 1px solid #10b981;
+  background-color: #ecfdf5;
+  border-radius: 0.75rem;
+  color: #065f46;
+  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+}
+
+.success-icon {
+  width: 3rem;
+  height: 3rem;
+  color: #059669;
+  margin: 0 auto 1rem;
+}
+
+.success-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #064e3b;
+}
+
+.success-message {
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.transaction-id {
+  font-size: 0.75rem;
+  margin: 1rem 0 0.5rem;
+  background-color: #a7f3d0;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  display: inline-block;
+}
+
+.transaction-id strong {
+  font-family: monospace;
+}
+
+.payment-date {
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.download-btn {
+  width: auto;
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #059669;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 15px -3px rgba(5, 150, 105, 0.3);
+}
+
+.download-btn:hover {
+  background-color: #047857;
+  transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+  .app-container {
+    padding: 2rem;
+  }
+
+  .payment-container {
+    flex-direction: row;
+    padding: 2rem;
+  }
+
+  .appointment-items {
+    max-height: 80vh;
+  }
+}
+
+/* Scrollbar Styling */
+.appointment-items::-webkit-scrollbar {
+  width: 6px;
+}
+
+.appointment-items::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 10px;
+}
+
+.appointment-items::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 10px;
+}
+
+.appointment-items::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
