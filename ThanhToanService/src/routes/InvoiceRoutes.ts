@@ -1,9 +1,10 @@
 import { Router } from 'express';
-import { getUserInvoices, processMockPayment } from '../controllers/InvoiceController';
+import { getInvoiceByAppointmentId, upsertInvoiceByAppointmentId } from '../controllers/InvoiceController';
 
 const router = Router();
 
-router.get('/', getUserInvoices);
-router.post('/:invoiceId/pay', processMockPayment);
+// Mounted at /api/invoices in index.ts
+router.get('/appointment/:appointmentId', getInvoiceByAppointmentId);
+router.put('/appointment/:appointmentId', upsertInvoiceByAppointmentId);
 
 export default router;

@@ -4,52 +4,68 @@ import { Invoice } from '../entity/Invoice';
 
 const invoiceRepo = AppDataSource.getRepository(Invoice);
 
-// Lấy danh sách hóa đơn của user đang đăng nhập
-export const getUserInvoices = async (req: Request, res: Response) => {
-    const userId = (req as any).user.id;
+// [GET] /api/invoices/appointment/:appointmentId
+export const getInvoiceByAppointmentId = async (req: Request, res: Response) => {
+    const { appointmentId } = req.params;
+
+    if (!appointmentId || isNaN(Number(appointmentId))) {
+        return res.status(400).json({ success: false, message: 'Invalid appointmentId' });
+    }
 
     try {
-        const invoices = await invoiceRepo.find({
-            where: { user_id: userId },
-            order: { created_at: 'DESC' }
-        });
-        return res.status(200).json(invoices);
+        const invoice = await invoiceRepo.findOne({ where: { appointment_id: parseInt(appointmentId, 10) } });
+        if (!invoice) return res.status(404).json({ success: false, message: 'Invoice not found' });
+        return res.status(200).json({ success: true, data: invoice });
     } catch (error) {
-        return res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
+        console.error('Error fetching invoice by appointment id:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
 
-// Xử lý thanh toán mô phỏng
-export const processMockPayment = async (req: Request, res: Response) => {
-    const userId = (req as any).user.id;
-    const { invoiceId } = req.params; // Lấy ID của hóa đơn cần thanh toán
+// [PUT] /api/invoices/appointment/:appointmentId  (create or update invoice for appointment)
+export const upsertInvoiceByAppointmentId = async (req: Request, res: Response) => {
+    const { appointmentId } = req.params;
+    const { invoice_code, total_amount, service_details, payment_date, transaction_id } = req.body;
+
+    if (!appointmentId || isNaN(Number(appointmentId))) {
+        return res.status(400).json({ success: false, message: 'Invalid appointmentId' });
+    }
+
+    if (!invoice_code || total_amount === undefined) {
+        return res.status(400).json({ success: false, message: 'invoice_code and total_amount are required' });
+    }
 
     try {
-        const invoice = await invoiceRepo.findOne({ 
-            where: { id: parseInt(invoiceId), user_id: userId } 
-        });
+        let invoice = await invoiceRepo.findOne({ where: { appointment_id: parseInt(appointmentId, 10) } });
 
-        if (!invoice) {
-            return res.status(404).json({ error: 'Không tìm thấy hóa đơn hoặc bạn không có quyền.' });
+            if (!invoice) {
+                // create instance and assign fields to satisfy TypeScript types
+                const newInv = new Invoice();
+                newInv.appointment_id = parseInt(appointmentId, 10);
+                newInv.invoice_code = invoice_code;
+                newInv.total_amount = total_amount;
+                newInv.service_details = service_details || undefined;
+                newInv.payment_date = payment_date ? new Date(payment_date) : undefined;
+                newInv.transaction_id = transaction_id || undefined;
+
+                const newInvoice = await invoiceRepo.save(newInv);
+            return res.status(201).json({ success: true, message: 'Invoice created', data: newInvoice });
         }
 
-        if (invoice.status === 'paid') {
-            return res.status(400).json({ error: 'Hóa đơn này đã được thanh toán rồi.' });
-        }
+        // update existing invoice
+        invoice.invoice_code = invoice_code;
+        invoice.total_amount = total_amount;
+        invoice.service_details = service_details || invoice.service_details;
+        invoice.payment_date = payment_date ? new Date(payment_date) : invoice.payment_date;
+        invoice.transaction_id = transaction_id || invoice.transaction_id;
 
-        // Đây là bước "Mô phỏng": chỉ cần cập nhật trạng thái
-        invoice.status = 'paid';
-        invoice.payment_date = new Date();
-        // Bạn có thể tạo một mã giao dịch giả ở đây
-        // invoice.transaction_id = `MOCK_${...}`
-
-        await invoiceRepo.save(invoice);
-
-        // TODO: Xóa cache liên quan nếu có
-
-        return res.status(200).json({ message: 'Thanh toán thành công!', invoice });
+        const updated = await invoiceRepo.save(invoice);
+        return res.status(200).json({ success: true, message: 'Invoice updated', data: updated });
     } catch (error) {
-        return res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
+        console.error('Error upserting invoice:', error);
+        // Handle unique constraint violation on invoice_code or appointment_id
+        const errMsg = (error as any)?.message || 'Internal server error';
+        return res.status(500).json({ success: false, message: errMsg });
     }
 };
 

@@ -7,9 +7,6 @@ export class Invoice {
 
     @Column({ type: 'integer', unique: true })
     appointment_id!: number;
-    
-    @Column({ type: 'integer' })
-    user_id!: number;
 
     @Column({ type: "varchar", length: 50, unique: true })
     invoice_code!: string;
@@ -26,7 +23,11 @@ export class Invoice {
     @Column({ type: "timestamptz", nullable: true })
     payment_date?: Date;
     
+    @Column({ type: "varchar", length: 255, nullable: true })
+    transaction_id?: string;
+    
     
     @CreateDateColumn({ type: "timestamptz" })
     created_at!: Date;
+
 }
