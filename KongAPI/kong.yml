@@ -64,3 +64,28 @@ services:
         config:
           minute: 60
           policy: local
+
+  - name: payment-service
+    url: http://payment-service:3004
+    routes:
+      - name: payment-invoices-route
+        paths:
+          - /api/invoices
+        strip_path: false
+      - name: payment-bankaccounts-route
+        paths:
+          - /api/bank-accounts
+        strip_path: false
+    plugins:
+      - name: cors
+        config:
+          origins: ['*']
+          methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+          headers: ['Accept', 'Accept-Version', 'Content-Length', 'Content-MD5', 'Content-Type', 'Date', 'Authorization']
+          exposed_headers: ['X-Auth-Token']
+          credentials: true
+          max_age: 3600
+      - name: rate-limiting
+        config:
+          minute: 60
+          policy: local

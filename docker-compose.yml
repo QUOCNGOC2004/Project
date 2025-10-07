@@ -128,6 +128,24 @@ services:
     networks:
       - webkhambenh-network
 
+  # Payment Service
+  payment-service:
+    build: ./ThanhToanService
+    container_name: payment-service
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=webkhambenh
+    ports:
+      - "3004:3004"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - webkhambenh-network
+
 volumes:
   postgres_data:
 
