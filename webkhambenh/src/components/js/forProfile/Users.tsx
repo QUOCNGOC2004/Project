@@ -5,6 +5,9 @@ const Users: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [originalUser, setOriginalUser] = useState<any>(null); // Lưu trữ dữ liệu gốc
   const [isEditing, setIsEditing] = useState(false);
+  const [paymentLinked, setPaymentLinked] = useState<boolean | null>(null);
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -24,6 +27,8 @@ const Users: React.FC = () => {
           };
           setUser(userData);
           setOriginalUser(userData); // Lưu dữ liệu gốc
+            // After getting profile, try to fetch payment (bank account) info from payment API
+            fetchPaymentInfo(userData.id, token);
         }
       } catch (error) {
         console.error("Failed to fetch profile:", error);
@@ -31,6 +36,38 @@ const Users: React.FC = () => {
     };
     fetchProfile();
   }, []);
+
+  const fetchPaymentInfo = async (userId: number, token: string | null) => {
+    if (!userId || !token) return;
+    setPaymentLoading(true);
+    setPaymentError(null);
+    try {
+      const url = `${process.env.REACT_APP_PAYMENT_API_URL}/bank-accounts/${userId}`;
+      const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+      if (res.status === 200) {
+        const json = await res.json();
+        // Expecting { success: true, data: { bank_name, account_holder, account_number } }
+        if (json && json.success && json.data) {
+          setUser((prev: any) => ({ ...prev, bank_name: json.data.bank_name || '', account_holder: json.data.account_holder || '', account_number: json.data.account_number || '' }));
+          setOriginalUser((prev: any) => ({ ...prev, bank_name: json.data.bank_name || '', account_holder: json.data.account_holder || '', account_number: json.data.account_number || '' }));
+          setPaymentLinked(true);
+        } else {
+          setPaymentLinked(false);
+        }
+      } else if (res.status === 404) {
+        setPaymentLinked(false);
+      } else {
+        setPaymentLinked(false);
+        setPaymentError(`Payment API error: ${res.status}`);
+      }
+    } catch (err) {
+      console.error('Failed to fetch payment info', err);
+      setPaymentError('Failed to fetch payment info');
+      setPaymentLinked(false);
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
 
   const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setUser({ ...user, [e.target.name]: e.target.value });
@@ -40,26 +77,62 @@ const Users: React.FC = () => {
     e.preventDefault();
     const token = localStorage.getItem("token");
     if (!token) return;
-
-    const res = await fetch(`${process.env.REACT_APP_AUTH_API_URL}/auth/profile`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(user),
-    });
-
-    const data = await res.json();
-    if (data.user) {
-      setUser(data.user);
-      setOriginalUser(data.user); // Cập nhật dữ liệu gốc sau khi lưu
-      setIsEditing(false);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      const event = new CustomEvent("loginStatusChanged", {
-        detail: { isLoggedIn: true, username: data.user.username },
+    // 1) Update profile via Auth service
+    try {
+      const res = await fetch(`${process.env.REACT_APP_AUTH_API_URL}/auth/profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(user),
       });
-      document.dispatchEvent(event);
+
+      const data = await res.json();
+      if (data.user) {
+        setUser(data.user);
+        setOriginalUser(data.user); // Cập nhật dữ liệu gốc sau khi lưu
+        setIsEditing(false);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        const event = new CustomEvent("loginStatusChanged", {
+          detail: { isLoggedIn: true, username: data.user.username },
+        });
+        document.dispatchEvent(event);
+      }
+    } catch (err) {
+      console.error('Failed to update profile', err);
+      // proceed to try payment update anyway
+    }
+
+    // 2) Update or create bank account via Payment service
+    try {
+      const paymentUrl = `${process.env.REACT_APP_PAYMENT_API_URL}/bank-accounts/${user.id}`;
+      const body = {
+        bank_name: user.bank_name || "",
+        account_holder: user.account_holder || "",
+        account_number: user.account_number || "",
+      };
+      const pres = await fetch(paymentUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (pres.ok) {
+        const pj = await pres.json();
+        if (pj && pj.success && pj.data) {
+          setUser((prev: any) => ({ ...prev, bank_name: pj.data.bank_name || '', account_holder: pj.data.account_holder || '', account_number: pj.data.account_number || '' }));
+          setOriginalUser((prev: any) => ({ ...prev, bank_name: pj.data.bank_name || '', account_holder: pj.data.account_holder || '', account_number: pj.data.account_number || '' }));
+          setPaymentLinked(true);
+        }
+      } else {
+        console.warn('Payment upsert failed', pres.status);
+      }
+    } catch (err) {
+      console.error('Failed to upsert payment info', err);
     }
   };
 
@@ -159,7 +232,7 @@ const Users: React.FC = () => {
                   {isEditing ? (
                     <input type="text" name="bank_name" value={user.bank_name || ""} onChange={handleEditChange} />
                   ) : (
-                    <span>{user.bank_name || "Chưa liên kết"}</span>
+                    <span>{paymentLoading ? 'Đang tải...' : (user.bank_name || "Chưa liên kết")}</span>
                   )}
                 </div>
                 <div className="info-item">
@@ -167,7 +240,7 @@ const Users: React.FC = () => {
                   {isEditing ? (
                     <input type="text" name="account_holder" value={user.account_holder || ""} onChange={handleEditChange} />
                   ) : (
-                    <span>{user.account_holder || "Chưa liên kết"}</span>
+                    <span>{paymentLoading ? 'Đang tải...' : (user.account_holder || "Chưa liên kết")}</span>
                   )}
                 </div>
                 <div className="info-item">
@@ -175,11 +248,13 @@ const Users: React.FC = () => {
                   {isEditing ? (
                     <input type="text" name="account_number" value={user.account_number || ""} onChange={handleEditChange} />
                   ) : (
-                    <span>{user.account_number || "Chưa liên kết"}</span>
+                    <span>{paymentLoading ? 'Đang tải...' : (user.account_number || "Chưa liên kết")}</span>
                   )}
                 </div>
               </div>
             </div>
+
+            {paymentError && <div className="payment-error">Lỗi kết nối thanh toán: {paymentError}</div>}
 
             {isEditing && (
               <div className="action-buttons">
