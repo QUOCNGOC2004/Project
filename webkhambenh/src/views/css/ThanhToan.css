@@ -13,7 +13,7 @@
   --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
   font-family: 'Inter', sans-serif;
-  background-color: var(--light-color);
+  
   color: var(--text-color);
   margin: 0;
   padding: 2rem;
@@ -42,7 +42,7 @@
 }
 
 .payment-page-wrapper .appointment-list h2 {
-  color: var(--dark-color);
+  color: #E65103;
   border-bottom: 2px solid var(--border-color);
   padding-bottom: 0.75rem;
   margin-top: 0;
@@ -51,17 +51,16 @@
 
 .payment-page-wrapper #appointments-ul {
   list-style: none;
-  padding: 0;
+  padding: 5px;
   margin: 0;
   max-height: 70vh;
   overflow-y: auto;
 }
 
-/* --- YÊU CẦU: Thẻ nhỏ gọn hơn và hiển thị giá tiền --- */
+
 .payment-page-wrapper .appointment-item {
   padding: 1rem;
-  /* Giảm padding để thẻ nhỏ gọn hơn */
-  border: 1px solid var(--border-color);
+  border: 1.5px solid var(--primary-color);
   border-radius: 8px;
   margin-bottom: 1rem;
   cursor: pointer;
@@ -71,15 +70,16 @@
 
 .payment-page-wrapper .appointment-item:hover,
 .payment-page-wrapper .appointment-item.active {
-  border-color: var(--primary-color);
+  border-color: #E65103;
   box-shadow: 0 4px 8px rgba(0, 123, 255, 0.1);
   transform: translateY(-2px);
+  background-color: #f4d6c6;
 }
 
 /* Class mới cho giá tiền */
 .payment-page-wrapper .appointment-item .appointment-price {
   font-weight: 700;
-  color: var(--danger-color);
+  color: var(--success-color);
   font-size: 1.2rem;
   margin-bottom: 0.5rem;
 }
@@ -88,6 +88,8 @@
   font-size: 0.85rem;
   margin-bottom: 0.25rem;
   color: #6c757d;
+  background-color: #f4d6c600 ;
+  padding: 0.1rem 0.8rem;
 }
 
 .payment-page-wrapper .status-badge {
@@ -117,7 +119,7 @@
 }
 
 .payment-page-wrapper .payment-details h2 {
-  color: var(--dark-color);
+  color: #E65103;
   border-bottom: 2px solid var(--border-color);
   padding-bottom: 0.75rem;
   margin-top: 0;
@@ -172,7 +174,7 @@
 }
 
 .payment-page-wrapper .total-amount .amount {
-  color: var(--danger-color);
+  color: var(--success-color);
 }
 
 /* --- Payment Form --- */
@@ -224,7 +226,7 @@
 }
 
 .payment-page-wrapper .btn-primary {
-  background-color: var(--primary-color);
+  background-color: #E65103;
   color: white;
 }
 
