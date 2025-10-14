@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import '../../css/forQuanLyLich/form3.css';
+import { logout } from '../../../ktraLogin'; 
+import { useHistory } from 'react-router-dom'; 
 
 const CheckIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-check-lg" viewBox="0 0 16 16">
@@ -22,7 +24,6 @@ interface Appointment {
   ngay_sinh: string;
   so_dien_thoai: string;
   trang_thai: string;
-  // Giả lập dữ liệu mới, sau này sẽ lấy từ API
   gia_tien?: number;
   benh_ly?: string;
   loi_khuyen?: string;
@@ -50,8 +51,8 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
     so_dien_thoai: appointment.so_dien_thoai,
     ly_do_kham: appointment.ly_do_kham,
   });
+  const history = useHistory();
 
-  // Dữ liệu mẫu cho lịch hẹn đã thanh toán
   const mockPaidData = {
     gia_tien: 500000,
     benh_ly: "Viêm họng cấp",
@@ -90,13 +91,31 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
   const handleUpdateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsUpdating(true);
+    const token = localStorage.getItem('token');
+    if (!token) {
+        alert('Vui lòng đăng nhập lại.');
+        setIsUpdating(false);
+        return;
+    }
+    
     try {
-      const response = await fetch(`${process.env.REACT_APP_APPOINTMENT_API_URL}/appointments/${appointment.id}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/appointments/${appointment.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+        },
         body: JSON.stringify(editData),
       });
-      if (!response.ok) throw new Error('Không thể cập nhật lịch hẹn');
+
+      if (!response.ok) {
+        if (response.status === 401) {
+            logout();
+            history.push('/dang-nhap-dang-ky');
+        }
+        throw new Error('Không thể cập nhật lịch hẹn');
+      }
+
       onUpdate();
       setShowEditModal(false);
     } catch (error) {
@@ -110,11 +129,27 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
   const handleCancelClick = async () => {
     if (window.confirm('Bạn có chắc chắn muốn hủy lịch hẹn này?')) {
       setIsCancelling(true);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Vui lòng đăng nhập lại.');
+        setIsCancelling(false);
+        return;
+      }
+
       try {
-        const response = await fetch(`${process.env.REACT_APP_APPOINTMENT_API_URL}/appointments/${appointment.id}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/appointments/${appointment.id}`, {
           method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}` 
+          }
         });
-        if (!response.ok) throw new Error('Không thể hủy lịch hẹn');
+        if (!response.ok) {
+            if (response.status === 401) {
+                logout();
+                history.push('/dang-nhap-dang-ky');
+            }
+            throw new Error('Không thể hủy lịch hẹn');
+        }
         onCancel(appointment.id);
       } catch (error) {
         console.error('Lỗi khi hủy lịch hẹn:', error);

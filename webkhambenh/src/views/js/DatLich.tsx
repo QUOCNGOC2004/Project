@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import '../../views/css/DatLich.css';
 import Form1 from '../../components/js/forDatLich/form1';
 import Form2 from '../../components/js/forDatLich/form2';
-import { isLoggedIn, getCurrentUser } from '../../ktraLogin';
+import { isLoggedIn, getCurrentUser, logout } from '../../ktraLogin';
 
 interface DuLieuChiTietLichHen {
   benhVien: string;
@@ -24,7 +24,7 @@ interface DuLieuBenhNhan {
   dongYDieuKhoan: boolean;
 }
 
-interface DuLieuForm extends DuLieuChiTietLichHen, DuLieuBenhNhan {}
+interface DuLieuForm extends DuLieuChiTietLichHen, DuLieuBenhNhan { }
 
 const DatLich: React.FC = () => {
   const location = useLocation();
@@ -91,7 +91,7 @@ const DatLich: React.FC = () => {
 
   const xuLyGuiForm = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!isLoggedIn()) {
       alert('Vui lòng đăng nhập để đặt lịch khám bệnh!');
       return;
@@ -102,19 +102,24 @@ const DatLich: React.FC = () => {
       alert('Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại!');
       return;
     }
-    
+
     if (!kiemTraForm()) {
       return;
     }
+
+    // Lấy token từ localStorage
+    const token = localStorage.getItem('token');
 
     try {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`${process.env.REACT_APP_APPOINTMENT_API_URL}/appointments`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/appointments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          // Thêm Authorization header vào đây
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           doctor_id: duLieuForm.bacSiId,
@@ -132,6 +137,10 @@ const DatLich: React.FC = () => {
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          logout();
+          alert('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+        }
         const errorData = await response.json().catch(() => null);
         throw new Error(errorData?.error || `HTTP error! status: ${response.status}`);
       }
@@ -139,13 +148,13 @@ const DatLich: React.FC = () => {
       const data = await response.json();
       console.log('Đặt lịch thành công:', data);
       alert('Đã gửi thông tin đặt lịch thành công!');
-      
+
       // Reset form sau khi gửi thành công
       setDuLieuForm({
         benhVien: "",
         chuyenKhoa: "",
         bacSi: "",
-        bacSiId:0,
+        bacSiId: 0,
         ngayHen: "",
         gioHen: "",
         hoTen: "",
@@ -174,17 +183,17 @@ const DatLich: React.FC = () => {
       </div>
       {error && <div className="error-message">{error}</div>}
       <form onSubmit={xuLyGuiForm} className="appointment-form">
-        <Form1 
+        <Form1
           duLieuForm={duLieuForm}
           xuLyThayDoi={xuLyThayDoi}
         />
-        <Form2 
+        <Form2
           duLieuForm={duLieuForm}
           xuLyThayDoi={xuLyThayDoi}
         />
         <div className="submit-section">
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="submit-button"
             disabled={loading}
           >

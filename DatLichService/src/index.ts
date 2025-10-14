@@ -16,7 +16,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use(express.json());
+app.use(express.json()); // Phân tích JSON
 
 // Routes
 app.use('/api/appointments', lichHenRoutes);

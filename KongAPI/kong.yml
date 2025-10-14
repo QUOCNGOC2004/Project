@@ -2,13 +2,25 @@ _format_version: "3.0"
 _transform: true
 
 services:
+  # AuthService
   - name: auth-service
-    url: http://auth-service:3001
+    url: http://host.docker.internal:3001
     routes:
-      - name: auth-route
+      # Route công khai cho đăng nhập và đăng ký
+      - name: auth-public-route
         paths:
-          - /api/auth
+          - /api/auth/login
+          - /api/auth/register
         strip_path: false
+        methods: [POST, OPTIONS]
+      # Route cần xác thực để lấy thông tin người dùng
+      - name: auth-protected-route
+        paths:
+          - /api/auth/profile
+        strip_path: false
+        methods: [GET, PUT , OPTIONS]
+        plugins:
+          - name: jwt 
     plugins:
       - name: cors
         config:
@@ -18,13 +30,10 @@ services:
           exposed_headers: ['X-Auth-Token']
           credentials: true
           max_age: 3600
-      - name: rate-limiting
-        config:
-          minute: 60
-          policy: local
 
+  # DoctorService
   - name: doctor-service
-    url: http://doctor-service:3002
+    url: http://host.docker.internal:3002
     routes:
       - name: doctor-route
         paths:
@@ -39,19 +48,17 @@ services:
           exposed_headers: ['X-Auth-Token']
           credentials: true
           max_age: 3600
-      - name: rate-limiting
-        config:
-          minute: 60
-          policy: local
 
+  # AppointmentService
   - name: appointment-service
-    url: http://appointment-service:3003
+    url: http://host.docker.internal:3003
     routes:
       - name: appointment-route
         paths:
           - /api/appointments
         strip_path: false
     plugins:
+      - name: jwt 
       - name: cors
         config:
           origins: ['*']
@@ -60,23 +67,18 @@ services:
           exposed_headers: ['X-Auth-Token']
           credentials: true
           max_age: 3600
-      - name: rate-limiting
-        config:
-          minute: 60
-          policy: local
 
+  # PaymentService
   - name: payment-service
-    url: http://payment-service:3004
+    url: http://host.docker.internal:3004
     routes:
-      - name: payment-invoices-route
+      - name: payment-route
         paths:
           - /api/invoices
-        strip_path: false
-      - name: payment-bankaccounts-route
-        paths:
           - /api/bank-accounts
         strip_path: false
     plugins:
+      - name: jwt 
       - name: cors
         config:
           origins: ['*']
@@ -85,7 +87,14 @@ services:
           exposed_headers: ['X-Auth-Token']
           credentials: true
           max_age: 3600
-      - name: rate-limiting
-        config:
-          minute: 60
-          policy: local
+
+
+consumers:
+  - username: web-user
+
+
+jwt_secrets:
+  - consumer: web-user
+    key: web-user
+    algorithm: HS256
+    secret: haha

@@ -1,0 +1,13 @@
+Sửa url trong file Kong để chạy full trong Docker
+# AuthService
+  - name: auth-service
+    url: http://auth-service:3001
+# DoctorService
+  - name: doctor-service
+    url: http://doctor-service:3002
+# AppointmentService
+  - name: appointment-service
+    url: http://appointment-service:3003
+# PaymentService
+  - name: payment-service
+    url: http://payment-service:3004

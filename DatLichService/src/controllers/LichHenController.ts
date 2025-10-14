@@ -1,16 +1,18 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../config/database';
 import { LichHen } from '../entity/LichHen';
-
+import { logActivity } from '../utils/logger'; 
 
 // Lấy danh sách lịch hẹn
-export const getAllLichHen = async (_req: Request, res: Response): Promise<void> => {
+export const getAllLichHen = async (req: Request, res: Response): Promise<void> => {
   try {
     const result = await AppDataSource.query('SELECT * FROM appointments ORDER BY ngay_dat_lich, gio_dat_lich');
     const lichHen: LichHen[] = result;
+    logActivity(req, req.user?.id || null, 'lấy tất cả lịch hẹn', { count: lichHen.length });
     res.json(lichHen);
   } catch (error) {
     console.error('Lỗi khi lấy danh sách lịch hẹn:', error);
+    logActivity(req, req.user?.id || null, 'GET_ALL_APPOINTMENTS_ERROR', { error: (error as Error).message });
     res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
   }
 };
@@ -19,19 +21,29 @@ export const getAllLichHen = async (_req: Request, res: Response): Promise<void>
 export const getLichHenById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    const user_id = req.user?.id; 
+
+    if (!user_id) { 
+      res.status(401).json({ error: 'Xác thực không hợp lệ.' });
+      return;
+    }
     
-    const result = await AppDataSource.query('SELECT * FROM appointments WHERE id = $1', [id]);
+    
+    const result = await AppDataSource.query('SELECT * FROM appointments WHERE id = $1 AND user_id = $2', [id, user_id]);
     
     if (result.length === 0) {
-      res.status(404).json({ error: 'Không tìm thấy lịch hẹn' });
+      logActivity(req, user_id, 'GET_APPOINTMENT_BY_ID_NOT_FOUND', { appointmentId: id });
+      res.status(404).json({ error: 'Không tìm thấy lịch hẹn hoặc bạn không có quyền truy cập.' });
       return;
     }
 
     const lichHen: LichHen = result[0];
     
+    logActivity(req, user_id, 'GET_APPOINTMENT_BY_ID_SUCCESS', { appointmentId: id });
     res.json(lichHen);
   } catch (error) {
     console.error('Lỗi khi lấy thông tin lịch hẹn:', error);
+    logActivity(req, req.user?.id || null, 'GET_APPOINTMENT_BY_ID_ERROR', { appointmentId: req.params.id, error: (error as Error).message });
     res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
   }
 };
@@ -39,9 +51,16 @@ export const getLichHenById = async (req: Request, res: Response): Promise<void>
 // Tạo lịch hẹn mới
 export const createLichHen = async (req: Request, res: Response): Promise<void> => {
   try {
+    const user_id = req.user?.id; 
+
+    if (!user_id) {
+      logActivity(req, null, 'tạo lịch hẹn thất bại', { reason: 'Không có thông tin người dùng từ token' });
+      res.status(401).json({ error: 'Xác thực không hợp lệ.' });
+      return;
+    }
+
     const {
       doctor_id,
-      user_id,
       ngay_dat_lich,
       gio_dat_lich,
       ten_benh_nhan,
@@ -54,6 +73,8 @@ export const createLichHen = async (req: Request, res: Response): Promise<void> 
 
     // Kiểm tra dữ liệu đầu vào
     if (!doctor_id || !ngay_dat_lich || !gio_dat_lich || !ten_benh_nhan || !email || !so_dien_thoai) {
+      // Log cho hành động tạo lịch hẹn thất bại do thiếu thông tin
+      logActivity(req, user_id, 'tạo lịch hẹn thất bại', { reason: 'Thiếu thông tin bắt buộc' });
       res.status(400).json({ error: 'Thiếu thông tin bắt buộc' });
       return;
     }
@@ -65,6 +86,8 @@ export const createLichHen = async (req: Request, res: Response): Promise<void> 
     );
 
     if (doctorExists.length === 0) {
+      // Log cho hành động tạo lịch hẹn thất bại do bác sĩ không tồn tại
+      logActivity(req, user_id, 'tạo lịch hẹn thất bại', { reason: 'Không tìm thấy bác sĩ', doctorId: doctor_id });
       res.status(400).json({ error: 'Không tìm thấy bác sĩ' });
       return;
     }
@@ -77,7 +100,7 @@ export const createLichHen = async (req: Request, res: Response): Promise<void> 
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
       [
         doctor_id,
-        user_id || null,
+        user_id, 
         ngay_dat_lich,
         gio_dat_lich,
         ten_benh_nhan,
@@ -92,18 +115,26 @@ export const createLichHen = async (req: Request, res: Response): Promise<void> 
 
     const lichHen: LichHen = result[0];
  
-    
+    // Log cho hành động tạo lịch hẹn thành công
+    logActivity(req, user_id, 'tạo lịch hẹn thành công', { appointmentId: lichHen.id, doctorId: doctor_id });
     res.status(201).json(lichHen);
   } catch (error) {
     console.error('Lỗi khi tạo lịch hẹn mới:', error);
+    logActivity(req, req.user?.id || null, 'CREATE_APPOINTMENT_ERROR', { error: (error as Error).message });
     res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
   }
 };
 
-
 export const updateLichHen = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    const user_id = req.user?.id; 
+
+    if (!user_id) {
+      res.status(401).json({ error: 'Xác thực không hợp lệ.' });
+      return;
+    }
+
     const updateFields: string[] = [];
     const updateValues: any[] = [];
     let paramIndex = 1;
@@ -132,27 +163,30 @@ export const updateLichHen = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
-    // Thêm ID vào cuối danh sách tham số
-    updateValues.push(id);
+    // Thêm id và user_id vào cuối mảng giá trị cho mệnh đề WHERE
+    updateValues.push(id, user_id);
     
     const updateQuery = `
       UPDATE appointments SET 
         ${updateFields.join(', ')} 
-      WHERE id = $${paramIndex} RETURNING *
+      WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1} RETURNING *
     `;
 
     const result = await AppDataSource.query(updateQuery, updateValues);
 
     if (result.length === 0) {
-      res.status(404).json({ error: 'Không tìm thấy lịch hẹn' });
+      logActivity(req, user_id, 'UPDATE_APPOINTMENT_NOT_FOUND', { appointmentId: id });
+      res.status(404).json({ error: 'Không tìm thấy lịch hẹn hoặc bạn không có quyền sửa.' });
       return;
     }
 
     const lichHen: LichHen = result[0];
     
+    logActivity(req, user_id, 'UPDATE_APPOINTMENT_SUCCESS', { appointmentId: id, updatedFields: Object.keys(req.body) });
     res.json(lichHen);
   } catch (error) {
     console.error('Lỗi khi cập nhật lịch hẹn:', error);
+    logActivity(req, req.user?.id || null, 'UPDATE_APPOINTMENT_ERROR', { appointmentId: req.params.id, error: (error as Error).message });
     res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
   }
 };
@@ -161,24 +195,41 @@ export const updateLichHen = async (req: Request, res: Response): Promise<void> 
 export const deleteLichHen = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    const user_id = req.user?.id; 
+
+    if (!user_id) {
+        res.status(401).json({ error: 'Xác thực không hợp lệ.' });
+        return;
+    }
     
-  const result = await AppDataSource.query('DELETE FROM appointments WHERE id = $1 RETURNING *', [id]);
+  
+    const result = await AppDataSource.query('DELETE FROM appointments WHERE id = $1 AND user_id = $2 RETURNING *', [id, user_id]);
 
     if (result.length === 0) {
-      res.status(404).json({ error: 'Không tìm thấy lịch hẹn' });
+      logActivity(req, user_id, 'DELETE_APPOINTMENT_NOT_FOUND', { appointmentId: id });
+      res.status(404).json({ error: 'Không tìm thấy lịch hẹn hoặc bạn không có quyền xóa.' });
       return;
     }
 
+    
+    logActivity(req, user_id, 'xóa lịch hẹn thành công', {});
     res.json({ message: 'Xóa lịch hẹn thành công' });
   } catch (error) {
     console.error('Lỗi khi xóa lịch hẹn:', error);
+    logActivity(req, req.user?.id || null, 'DELETE_APPOINTMENT_ERROR', { appointmentId: req.params.id, error: (error as Error).message });
     res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
   }
 };
 
 export const getLichHenByUserId = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { userId } = req.params;
+    
+    const user_id = req.user?.id;
+
+    if (!user_id) {
+        res.status(401).json({ error: 'Xác thực không hợp lệ.' });
+        return;
+    }
     
     const result = await AppDataSource.query(
       `SELECT 
@@ -190,8 +241,10 @@ export const getLichHenByUserId = async (req: Request, res: Response): Promise<v
       LEFT JOIN doctors d ON a.doctor_id = d.id 
       WHERE a.user_id = $1
       ORDER BY a.ngay_dat_lich DESC, a.gio_dat_lich DESC`,
-      [userId]
+      [user_id] 
     );
+    
+    logActivity(req, user_id, 'lấy lịch hẹn theo user_id', { count: result.length });
     
     if (result.length === 0) {
       res.json([]);
@@ -201,6 +254,7 @@ export const getLichHenByUserId = async (req: Request, res: Response): Promise<v
     res.json(result);
   } catch (error) {
     console.error('Lỗi khi lấy danh sách lịch hẹn theo user:', error);
+    logActivity(req, req.user?.id || null, 'GET_APPOINTMENTS_BY_USER_ID_ERROR', { error: (error as Error).message });
     res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
   }
-}; 
+};

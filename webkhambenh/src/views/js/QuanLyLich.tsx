@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../../views/css/QuanLyLich.css';
 import Form3 from '../../components/js/forQuanLyLich/form3';
-import { isLoggedIn, getCurrentUser } from '../../ktraLogin';
+import { isLoggedIn, getCurrentUser,logout } from '../../ktraLogin';
 
 interface Appointment {
   id: number;
@@ -40,10 +40,24 @@ const QuanLyLich: React.FC = () => {
       return;
     }
 
+    // Lấy token từ localStorage
+    const token = localStorage.getItem('token');
+
     try {
-      const response = await fetch(`${process.env.REACT_APP_APPOINTMENT_API_URL}/appointments/user/${currentUser.id}`);
-      
+      // Thêm Authorization header vào yêu cầu fetch
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/appointments/user/${currentUser.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
       if (!response.ok) {
+        // Nếu nhận được lỗi 401, có thể token đã hết hạn
+        if (response.status === 401) {
+          logout(); // Đăng xuất người dùng
+          setError('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+          return;
+        }
         throw new Error('Không thể lấy danh sách lịch hẹn');
       }
 
@@ -59,7 +73,7 @@ const QuanLyLich: React.FC = () => {
   };
 
   const handleCancelAppointment = (id: number) => {
-    setAppointments(prevAppointments => 
+    setAppointments(prevAppointments =>
       prevAppointments.filter(appointment => appointment.id !== id)
     );
   };
@@ -95,7 +109,7 @@ const QuanLyLich: React.FC = () => {
     }
     return color;
   };
-  
+
   // Lọc danh sách lịch hẹn theo trạng thái
   const pendingAppointments = appointments.filter(a => a.trang_thai === 'chờ xác nhận');
   const paidAppointments = appointments.filter(a => a.trang_thai === 'đã thanh toán');
@@ -123,7 +137,7 @@ const QuanLyLich: React.FC = () => {
         <h1 className="management-title-heading">Quản Lý Lịch Hẹn</h1>
         <p className="management-title-description">Kiểm tra thông tin đặt lịch hẹn</p>
       </div>
-      
+
       {/* Phần Lịch hẹn Chờ xác nhận */}
       <div className="management-section">
         <h2 className="section-title">Chờ xác nhận</h2>
@@ -132,9 +146,9 @@ const QuanLyLich: React.FC = () => {
         ) : (
           <div className="appointment-grid">
             {pendingAppointments.map((appointment) => (
-              <Form3 
-                key={appointment.id} 
-                appointment={appointment} 
+              <Form3
+                key={appointment.id}
+                appointment={appointment}
                 cardColor={getRandomColor()}
                 onCancel={handleCancelAppointment}
                 onUpdate={handleUpdateAppointment}
@@ -156,9 +170,9 @@ const QuanLyLich: React.FC = () => {
         ) : (
           <div className="appointment-grid">
             {paidAppointments.map((appointment) => (
-              <Form3 
-                key={appointment.id} 
-                appointment={appointment} 
+              <Form3
+                key={appointment.id}
+                appointment={appointment}
                 cardColor={getRandomColor()}
                 onCancel={handleCancelAppointment}
                 onUpdate={handleUpdateAppointment}
@@ -168,7 +182,7 @@ const QuanLyLich: React.FC = () => {
         )}
       </div>
 
-      {/* Các lịch hẹn có trạng thái khác (nếu có) */}
+      {/* Các lịch hẹn có trạng thái khác (chưa phát triển) */}
       {otherAppointments.length > 0 && (
         <>
           <hr className="section-divider" />
@@ -176,9 +190,9 @@ const QuanLyLich: React.FC = () => {
             <h2 className="section-title">Các lịch hẹn khác</h2>
             <div className="appointment-grid">
               {otherAppointments.map((appointment) => (
-                <Form3 
-                  key={appointment.id} 
-                  appointment={appointment} 
+                <Form3
+                  key={appointment.id}
+                  appointment={appointment}
                   cardColor={getRandomColor()}
                   onCancel={handleCancelAppointment}
                   onUpdate={handleUpdateAppointment}

@@ -40,95 +40,100 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+  # Bỏ comment nếu muốn full trong docker
+  # # Auth Service
+  # auth-service:
+  #   build: ./AuthService
+  #   container_name: auth-service
+  #   environment:
+  #     - DB_HOST=db
+  #     - DB_PORT=5432
+  #     - DB_USERNAME=postgres
+  #     - DB_PASSWORD=postgres
+  #     - DB_NAME=webkhambenh
+  #     - JWT_SECRET=haha
+  #     - JWT_EXPIRES_IN=24h
+  #   ports:
+  #     - "3001:3001"
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   networks:
+  #     - webkhambenh-network
 
-  # Auth Service
-  auth-service:
-    build: ./AuthService
-    container_name: auth-service
-    environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=postgres
-      - DB_NAME=webkhambenh
-      - JWT_SECRET=haha
-      - JWT_EXPIRES_IN=24h
-    ports:
-      - "3001:3001"
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - webkhambenh-network
+  # # Doctor Service
+  # doctor-service:
+  #   build: ./DsBsService
+  #   container_name: doctor-service
+  #   environment:
+  #     - DB_HOST=db
+  #     - DB_PORT=5432
+  #     - DB_USERNAME=postgres
+  #     - DB_PASSWORD=postgres
+  #     - DB_NAME=webkhambenh
+  #     - JWT_SECRET=haha
+  #     - JWT_EXPIRES_IN=24h
+  #   ports:
+  #     - "3002:3002"
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   networks:
+  #     - webkhambenh-network
 
-  # Doctor Service
-  doctor-service:
-    build: ./DsBsService
-    container_name: doctor-service
-    environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=postgres
-      - DB_NAME=webkhambenh
-    ports:
-      - "3002:3002"
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - webkhambenh-network
+  # # Appointment Service
+  # appointment-service:
+  #   build: ./DatLichService
+  #   container_name: appointment-service
+  #   environment:
+  #     - DB_HOST=db
+  #     - DB_PORT=5432
+  #     - DB_USERNAME=postgres
+  #     - DB_PASSWORD=postgres
+  #     - DB_NAME=webkhambenh
+  #     - JWT_SECRET=haha
+  #     - JWT_EXPIRES_IN=24h
+  #   ports:
+  #     - "3003:3003"
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   networks:
+  #     - webkhambenh-network
 
-  # Appointment Service
-  appointment-service:
-    build: ./DatLichService
-    container_name: appointment-service
-    environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=postgres
-      - DB_NAME=webkhambenh
-    ports:
-      - "3003:3003"
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - webkhambenh-network
+  # # Frontend
+  # frontend:
+  #   build: ./webkhambenh
+  #   container_name: frontend
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - REACT_APP_API_URL=http://localhost:8000/api
+  #     - REACT_APP_GEMINI_API_KEY=testkey
+  #   depends_on:
+  #     - kong
+  #   networks:
+  #     - webkhambenh-network
 
-  # Frontend
-  frontend:
-    build: ./webkhambenh
-    container_name: frontend
-    ports:
-      - "3000:3000"
-    environment:
-      - REACT_APP_API_URL=http://localhost:8000/api
-    depends_on:
-      - kong
-    networks:
-      - webkhambenh-network
-
-  # Payment Service
-  payment-service:
-    build: ./ThanhToanService
-    container_name: payment-service
-    environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=postgres
-      - DB_NAME=webkhambenh
-    ports:
-      - "3004:3004"
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - webkhambenh-network
+  # # Payment Service
+  # payment-service:
+  #   build: ./ThanhToanService
+  #   container_name: payment-service
+  #   environment:
+  #     - DB_HOST=db
+  #     - DB_PORT=5432
+  #     - DB_USERNAME=postgres
+  #     - DB_PASSWORD=postgres
+  #     - DB_NAME=webkhambenh
+  #     - JWT_SECRET=haha
+  #     - JWT_EXPIRES_IN=24h
+  #   ports:
+  #     - "3004:3004"
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   networks:
+  #     - webkhambenh-network
 
 volumes:
   postgres_data:

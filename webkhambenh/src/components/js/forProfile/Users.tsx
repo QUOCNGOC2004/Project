@@ -14,7 +14,7 @@ const Users: React.FC = () => {
       const token = localStorage.getItem("token");
       if (!token) return;
       try {
-        const res = await fetch(`${process.env.REACT_APP_AUTH_API_URL}/auth/profile`, {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/auth/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -42,7 +42,7 @@ const Users: React.FC = () => {
     setPaymentLoading(true);
     setPaymentError(null);
     try {
-      const url = `${process.env.REACT_APP_PAYMENT_API_URL}/bank-accounts/${userId}`;
+      const url = `${process.env.REACT_APP_API_URL}/bank-accounts/${userId}`;
       const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
       if (res.status === 200) {
         const json = await res.json();
@@ -79,7 +79,7 @@ const Users: React.FC = () => {
     if (!token) return;
     // 1) Update profile via Auth service
     try {
-      const res = await fetch(`${process.env.REACT_APP_AUTH_API_URL}/auth/profile`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/auth/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -106,7 +106,7 @@ const Users: React.FC = () => {
 
     // 2) Update or create bank account via Payment service
     try {
-      const paymentUrl = `${process.env.REACT_APP_PAYMENT_API_URL}/bank-accounts/${user.id}`;
+      const paymentUrl = `${process.env.REACT_APP_API_URL}/bank-accounts/${user.id}`;
       const body = {
         bank_name: user.bank_name || "",
         account_holder: user.account_holder || "",
