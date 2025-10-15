@@ -1,14 +1,14 @@
 import { BrowserRouter as Router, Switch, Route, useLocation } from 'react-router-dom';
-import Home from './views/js/home'; 
-import ThanhToan from './views/js/ThanhToan';
-import DatLich from './views/js/DatLich';
-import DanhSachBs from './views/js/DanhSachBs';
-import QuanLyLich from './views/js/QuanLyLich';
-import NotFound from './views/js/not-found';
-import Auth from './views/js/Auth';
-import Navbar8 from './components/js/forHome/navbar8';
-import ChatBot from './views/js/ChatBot';
-import Profile from './views/js/Profile';
+import Home from './views/tragChu/home'; 
+import ThanhToan from './views/thanhToann/ThanhToan';
+import DatLich from './views/datLichh/DatLich';
+import DanhSachBs from './views/bacSi/DanhSachBs';
+import QuanLyLich from './views/quanLyLich/QuanLyLich';
+import NotFound from './views/tragChu/not-found';
+import Auth from './views/login/Auth';
+import Navbar8 from './components/forHome/navbar8';
+import ChatBot from './views/chatBott/ChatBot';
+import Profile from './views/caNhann/Profile';
 import { Fragment } from 'react';
 
 // Tạo wrapper để dùng useLocation
