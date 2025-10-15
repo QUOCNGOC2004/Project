@@ -1,0 +1,190 @@
+/* General Container */
+.sm-container {
+    font-family: Arial, sans-serif;
+}
+
+.sm-container h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+}
+
+/* Form Container */
+.sm-form-container {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    margin-bottom: 1.5rem;
+}
+
+.sm-form-container h3 {
+    font-size: 1.125rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+/* Form Styles */
+.sm-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.sm-form-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+@media (min-width: 1024px) {
+    .sm-form-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+.sm-form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.sm-form-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #4a5568;
+    margin-bottom: 0.25rem;
+}
+
+.sm-form-group input,
+.sm-form-group select {
+    margin-top: 0.25rem;
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 0.25rem;
+}
+
+.sm-form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.sm-shift-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.sm-shift-buttons label {
+     font-size: 0.875rem;
+    font-weight: 500;
+    color: #4a5568;
+}
+
+.sm-shift-btn {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.sm-shift-morning { background-color: #feebc8; }
+.sm-shift-morning:hover { background-color: #fbd38d; }
+.sm-shift-afternoon { background-color: #bee3f8; }
+.sm-shift-afternoon:hover { background-color: #90cdf4; }
+.sm-shift-evening { background-color: #e9d8fd; }
+.sm-shift-evening:hover { background-color: #d6bcfa; }
+
+.sm-button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.375rem;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    height: fit-content;
+}
+
+.sm-button-add {
+    background-color: #E65103;
+    margin-left: auto; /* Push to the right */
+}
+
+.sm-button-add:hover {
+    background-color: #c64502;
+}
+
+/* Calendar Styles */
+.sm-calendar-container {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.sm-calendar-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.sm-calendar-nav h3 {
+    font-weight: bold;
+    font-size: 1.125rem;
+}
+.sm-calendar-nav button {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.25rem;
+    background-color: white;
+    cursor: pointer;
+}
+.sm-calendar-nav button:hover {
+    background-color: #f7fafc;
+}
+
+.sm-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.25rem;
+    text-align: center;
+    font-size: 0.75rem;
+}
+
+.sm-calendar-header {
+    font-weight: bold;
+    padding: 0.5rem;
+    background-color: #f7fafc;
+    border-radius: 0.25rem 0.25rem 0 0;
+}
+
+.sm-calendar-day {
+    border: 1px solid #e2e8f0;
+    padding: 0.5rem;
+    min-height: 100px;
+    background-color: #f7fafc;
+}
+
+.sm-schedule-item {
+    background-color: #ebf8ff;
+    color: #2c5282;
+    padding: 0.25rem;
+    margin: 0.25rem 0;
+    border-radius: 0.25rem;
+    text-align: left;
+}
+
+.sm-schedule-doctor {
+    font-weight: bold;
+    font-size: 0.75rem;
+}
+
+.sm-schedule-time {
+    font-size: 0.75rem;
+}
