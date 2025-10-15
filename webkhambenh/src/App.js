@@ -10,6 +10,7 @@ import Navbar8 from './components/forHome/navbar8';
 import ChatBot from './views/chatBott/ChatBot';
 import Profile from './views/caNhann/Profile';
 import AdminPage from './views/admin/Admin';
+import AdminLogin from './views/admin/AdminLogin';
 import { Fragment } from 'react';
 
 // Tạo wrapper để dùng useLocation
@@ -50,7 +51,8 @@ function AppContent() {
         <Route path="/dang-nhap-dang-ky" component={Auth} />
         <Route path="/profile" component={Profile} />
         <Route path="/chat" component={ChatBot} />
-        <Route path="/admin" component={AdminPage} />
+        <Route path="/admin" component={AdminLogin} />
+        <Route path="/adminPanel" component={AdminPage} />
         <Route path="*" component={NotFound} />
       </Switch>
     </>

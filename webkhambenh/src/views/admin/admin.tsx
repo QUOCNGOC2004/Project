@@ -1,12 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
+import { useHistory } from 'react-router-dom';
 import './Admin.css';
 import DoctorManagement from '../../components/forAdmin/DoctorManagement';
 import ScheduleManagement from '../../components/forAdmin/ScheduleManagement';
 import AppointmentManagement from '../../components/forAdmin/AppointmentManagement';
 import UserManagement from '../../components/forAdmin/UserManagement';
 
+
+const isAdminLoggedIn = (): boolean => {
+    const token = localStorage.getItem('adminToken');
+    return !!token; 
+};
+
 const AdminPage: React.FC = () => {
-  
+    
+    const history = useHistory();
+
+    useEffect(() => {
+        if (!isAdminLoggedIn()) {
+            history.push('/admin'); 
+            return;
+        }
+    }, [history]);
+
     type Page = 'doctors' | 'schedules' | 'appointments' | 'users';
     const [activePage, setActivePage] = useState<Page>('doctors');
     const renderPage = () => {
