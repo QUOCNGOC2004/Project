@@ -9,6 +9,7 @@ import Auth from './views/login/Auth';
 import Navbar8 from './components/forHome/navbar8';
 import ChatBot from './views/chatBott/ChatBot';
 import Profile from './views/caNhann/Profile';
+import AdminPage from './views/admin/Admin';
 import { Fragment } from 'react';
 
 // Tạo wrapper để dùng useLocation
@@ -16,7 +17,7 @@ function AppContent() {
   const location = useLocation();
 
   // Ẩn Navbar ở các path nhất định
-  const hiddenNavbarPaths = ['/dang-nhap-dang-ky'];
+  const hiddenNavbarPaths = ['/dang-nhap-dang-ky', '/admin'];
   const hideNavbar = hiddenNavbarPaths.includes(location.pathname);
 
   return (
@@ -49,6 +50,7 @@ function AppContent() {
         <Route path="/dang-nhap-dang-ky" component={Auth} />
         <Route path="/profile" component={Profile} />
         <Route path="/chat" component={ChatBot} />
+        <Route path="/admin" component={AdminPage} />
         <Route path="*" component={NotFound} />
       </Switch>
     </>

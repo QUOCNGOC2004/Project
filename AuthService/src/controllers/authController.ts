@@ -51,7 +51,7 @@ export const register = async (req: Request, res: Response): Promise<Response> =
         await logActivity(req, user.id, 'đăng ký thành công', { username: user.username, email: user.email });
 
         // tạo token
-        const payload = { id: user.id };
+        const payload = { id: user.id , role: 'user'};
         const secret = process.env.JWT_SECRET || "secret";
         const options = { expiresIn: "24h" as const, issuer: "web-user" };
         const token = jwt.sign(payload, secret, options);
@@ -93,7 +93,7 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
         }
 
         // tạo token
-        const payload = { id: user.id };
+        const payload = { id: user.id , role: 'user'};
         const secret = process.env.JWT_SECRET || "secret";
         const options = { expiresIn: "24h" as const, issuer: "web-user" };
         const token = jwt.sign(payload, secret, options);

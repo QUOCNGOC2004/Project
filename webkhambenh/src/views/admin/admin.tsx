@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './admin.css';
+import './Admin.css';
 import DoctorManagement from '../../components/forAdmin/DoctorManagement';
 import ScheduleManagement from '../../components/forAdmin/ScheduleManagement';
 import AppointmentManagement from '../../components/forAdmin/AppointmentManagement';
