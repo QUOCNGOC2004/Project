@@ -18,7 +18,7 @@ function AppContent() {
   const location = useLocation();
 
   // Ẩn Navbar ở các path nhất định
-  const hiddenNavbarPaths = ['/dang-nhap-dang-ky', '/admin'];
+  const hiddenNavbarPaths = ['/dang-nhap-dang-ky', '/adminPanel', '/admin'];
   const hideNavbar = hiddenNavbarPaths.includes(location.pathname);
 
   return (

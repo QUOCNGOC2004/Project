@@ -23,7 +23,7 @@ const AdminPage: React.FC = () => {
         }
     }, [history]);
 
-    type Page = 'doctors' | 'schedules' | 'appointments' | 'users';
+    type Page = 'doctors' | 'schedules' | 'appointments' | 'users' | 'Logout';
     const [activePage, setActivePage] = useState<Page>('doctors');
     const renderPage = () => {
         switch (activePage) {
@@ -35,6 +35,11 @@ const AdminPage: React.FC = () => {
                 return <AppointmentManagement />;
             case 'users':
                 return <UserManagement />;
+            case 'Logout':
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminUser');
+                history.push('/admin');
+                return null;
             default:
                 return <DoctorManagement />;
         }
@@ -60,6 +65,7 @@ const AdminPage: React.FC = () => {
                     <NavLink page="schedules">Quản lý Lịch làm việc</NavLink>
                     <NavLink page="appointments">Quản lý Lịch hẹn</NavLink>
                     <NavLink page="users">Quản lý Người dùng</NavLink>
+                    <NavLink page="Logout">Đăng xuất</NavLink>
                 </nav>
             </aside>
             <main className="admin-main-content">

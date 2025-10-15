@@ -123,4 +123,4 @@ CREATE TABLE admins (
 
 -- Them mot tai khoan admin co san
 -- Mat khau la: admin123
-INSERT INTO admins (username, password) VALUES ('admin', '$2b$10$f/3p.yp8y.1rA.x7O/b0Pua7n2REFcOMtT.2vT0PNaVjA2oU29l5S');
+INSERT INTO admins (username, password) VALUES ('admin', '$2a$10$13JO24QaAbQd5/gm/d8k1eOifimFWTnNDb.1aCTWKk5Fw0.32qoA6');
