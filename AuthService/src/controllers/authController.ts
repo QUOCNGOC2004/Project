@@ -125,6 +125,9 @@ export const getProfile = async (req: Request, res: Response): Promise<Response>
         
         // Ghi log hành động xem thông tin cá nhân
         await logActivity(req, user.id, 'xem thông tin cá nhân', {});
+        if (!(user instanceof User)) {
+            return res.status(403).json({ error: "Từ chối : Không phải người dùng hợp lệ" });
+        }
 
         return res.json({
             user: {

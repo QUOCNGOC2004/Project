@@ -11,6 +11,7 @@ services:
         paths:
           - /api/auth/login
           - /api/auth/register
+          - /api/auth/admin/login
         strip_path: false
         methods: [POST, OPTIONS]
       # Route cần xác thực để lấy thông tin người dùng
