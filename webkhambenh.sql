@@ -114,3 +114,13 @@ COMMENT ON COLUMN audit_logs.action_type IS 'Một chuỗi định danh cho hàn
 COMMENT ON COLUMN audit_logs.ip_address IS 'Địa chỉ IP của client.';
 COMMENT ON COLUMN audit_logs.user_agent IS 'Chuỗi User-Agent từ header của request.';
 COMMENT ON COLUMN audit_logs.details IS 'Dữ liệu JSON chứa thông tin bổ sung, vd: { "appointmentId": 123, "changes": "status updated" }.';
+
+CREATE TABLE admins (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL
+);
+
+-- Them mot tai khoan admin co san
+-- Mat khau la: admin123
+INSERT INTO admins (username, password) VALUES ('admin', '$2b$10$f/3p.yp8y.1rA.x7O/b0Pua7n2REFcOMtT.2vT0PNaVjA2oU29l5S');

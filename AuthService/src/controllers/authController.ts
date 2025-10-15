@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { AppDataSource } from "../index";
 import { User } from "../entity/User";
+import { Admin } from "../entity/Admin";
 import { validate } from "class-validator";
 import { logActivity } from "../utils/logger";
 
@@ -209,5 +210,43 @@ export const logout = async (req: Request, res: Response): Promise<Response> => 
     } catch (error) {
         await logActivity(req, req.user?.id || null, 'LOGOUT_ERROR', { error: (error as Error).message });
         return res.status(500).json({ error: "Lỗi máy chủ" });
+    }
+};
+
+export const adminLogin = async (req: Request, res: Response) => {
+    const { username, password } = req.body;
+    const adminRepository = AppDataSource.getRepository(Admin);
+
+    try {
+        const admin = await adminRepository.findOne({ where: { username } });
+
+        if (!admin) {
+            return res.status(401).json({ message: "Tên đăng nhập không tồn tại" });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, admin.password);
+
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: "Mật khẩu không chính xác" });
+        }
+
+        // Tạo JWT token cho admin
+        const payload = { id: admin.id, role: 'admin' };
+        const secret = process.env.JWT_SECRET || "secret";
+        const options = { expiresIn: "24h" as const, issuer: "web-admin" };
+        const token = jwt.sign(payload, secret, options);
+
+        return res.json({
+            user: {
+                id: admin.id,
+                username: admin.username,
+                role: 'admin' 
+            },
+            token
+        });
+
+    } catch (error) {
+        console.error("Lỗi đăng nhập admin:", error);
+        return res.status(500).json({ message: "Lỗi máy chủ nội bộ" });
     }
 };

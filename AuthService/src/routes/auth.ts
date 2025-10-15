@@ -1,12 +1,15 @@
 import { Router } from "express";
-import { register, login, getProfile, updateProfile } from "../controllers/authController";
+import { register, login, getProfile, updateProfile , adminLogin } from "../controllers/authController";
 import { auth } from "../middleware/auth";
 
 const router = Router();
-
+//routes ko đc bảo vệ
+router.post("/admin/login", adminLogin);
 router.post("/register", register);
 router.post("/login", login);
+//routes đc bảo vệ
 router.get("/profile", auth, getProfile);
 router.put("/profile", auth, updateProfile);
+
 
 export default router; 
