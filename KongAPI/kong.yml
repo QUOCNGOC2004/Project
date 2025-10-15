@@ -88,13 +88,16 @@ services:
           credentials: true
           max_age: 3600
 
-
 consumers:
   - username: web-user
-
+  - username: web-admin
 
 jwt_secrets:
   - consumer: web-user
     key: web-user
+    algorithm: HS256
+    secret: haha
+  - consumer: web-admin
+    key: web-admin
     algorithm: HS256
     secret: haha
