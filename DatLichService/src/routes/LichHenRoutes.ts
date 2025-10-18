@@ -11,16 +11,16 @@ import { auth } from '../middleware/auth';
 
 const router = Router();
 
+router.get('/',auth(['admin']) ,getAllLichHen);
 
-router.get('/', getAllLichHen);
+router.post('/', auth(['user']), createLichHen); 
+router.put('/:id', auth(['user']), updateLichHen); 
+router.delete('/:id', auth(['user']), deleteLichHen);
 
-// Các route cần xác thực người dùng
-router.post('/', auth, createLichHen); 
-router.put('/:id', auth, updateLichHen); 
-router.delete('/:id', auth, deleteLichHen); 
-router.get('/user/:userId', auth, getLichHenByUserId);
+router.get('/:id',auth(['admin']), getLichHenById);
+
+router.get('/user/:userId', auth(['user', 'admin']), getLichHenByUserId);
 
 
-router.get('/:id', getLichHenById);
 
 export default router;
