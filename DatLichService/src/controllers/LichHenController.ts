@@ -21,25 +21,33 @@ export const getAllLichHen = async (req: Request, res: Response): Promise<void> 
 export const getLichHenById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const user_id = req.user?.id; 
+    const requestingUser = req.user;
 
-    if (!user_id) { 
+    if (!requestingUser) {
       res.status(401).json({ error: 'Xác thực không hợp lệ.' });
       return;
     }
     
+    let query = 'SELECT * FROM appointments WHERE id = $1';
+    const params: (string | number)[] = [id];
     
-    const result = await AppDataSource.query('SELECT * FROM appointments WHERE id = $1 AND user_id = $2', [id, user_id]);
+    // Nếu không phải admin, chỉ cho phép xem lịch hẹn của chính mình
+    if (requestingUser.role !== 'admin') {
+      query += ' AND user_id = $2';
+      params.push(requestingUser.id);
+    }
+
+    const result = await AppDataSource.query(query, params);
     
     if (result.length === 0) {
-      logActivity(req, user_id, 'GET_APPOINTMENT_BY_ID_NOT_FOUND', { appointmentId: id });
+      logActivity(req, requestingUser.id, 'GET_APPOINTMENT_BY_ID_NOT_FOUND', { appointmentId: id });
       res.status(404).json({ error: 'Không tìm thấy lịch hẹn hoặc bạn không có quyền truy cập.' });
       return;
     }
 
     const lichHen: LichHen = result[0];
     
-    logActivity(req, user_id, 'GET_APPOINTMENT_BY_ID_SUCCESS', { appointmentId: id });
+    logActivity(req, requestingUser.id, 'GET_APPOINTMENT_BY_ID_SUCCESS', { appointmentId: id });
     res.json(lichHen);
   } catch (error) {
     console.error('Lỗi khi lấy thông tin lịch hẹn:', error);
@@ -223,13 +231,23 @@ export const deleteLichHen = async (req: Request, res: Response): Promise<void> 
 
 export const getLichHenByUserId = async (req: Request, res: Response): Promise<void> => {
   try {
-    
-    const user_id = req.user?.id;
+    const { userId } = req.params; // Lấy userId từ URL
+    const requestingUser = req.user;
 
-    if (!user_id) {
+    if (!requestingUser) {
         res.status(401).json({ error: 'Xác thực không hợp lệ.' });
         return;
     }
+
+    // Nếu người yêu cầu là 'user', họ chỉ có thể xem lịch hẹn của chính mình
+    if (requestingUser.role === 'user' && requestingUser.id.toString() !== userId) {
+        logActivity(req, requestingUser.id, 'GET_APPOINTMENTS_BY_USER_ID_FORBIDDEN', { targetUserId: userId });
+        res.status(403).json({ error: 'Bạn không có quyền truy cập tài nguyên này.' });
+        return;
+    }
+    
+    // Admin có thể xem của bất kỳ ai, user có thể xem của chính mình
+    const targetUserId = parseInt(userId, 10);
     
     const result = await AppDataSource.query(
       `SELECT 
@@ -241,10 +259,10 @@ export const getLichHenByUserId = async (req: Request, res: Response): Promise<v
       LEFT JOIN doctors d ON a.doctor_id = d.id 
       WHERE a.user_id = $1
       ORDER BY a.ngay_dat_lich DESC, a.gio_dat_lich DESC`,
-      [user_id] 
+      [targetUserId] // Sử dụng userId từ URL
     );
     
-    logActivity(req, user_id, 'lấy lịch hẹn theo user_id', { count: result.length });
+    logActivity(req, requestingUser.id, 'GET_APPOINTMENTS_BY_USER_ID_SUCCESS', { targetUserId, count: result.length });
     
     if (result.length === 0) {
       res.json([]);

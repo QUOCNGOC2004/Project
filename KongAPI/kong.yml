@@ -36,10 +36,20 @@ services:
   - name: doctor-service
     url: http://host.docker.internal:3002
     routes:
-      - name: doctor-route
+      # Route công khai để lấy thông tin bác sĩ
+      - name: doctor-public-route
         paths:
           - /api/doctors
         strip_path: false
+        methods: [GET, OPTIONS]
+      # Route cần xác thực để tạo, cập nhật, xóa bác sĩ
+      - name: doctor-protected-route
+        paths:
+          - /api/doctors
+        strip_path: false
+        methods: [POST, PUT, DELETE, OPTIONS]
+        plugins:
+          - name: jwt
     plugins:
       - name: cors
         config:
