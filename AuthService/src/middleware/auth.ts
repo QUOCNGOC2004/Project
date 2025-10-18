@@ -26,18 +26,18 @@ export const auth = (roles: Array<'user' | 'admin'> = []) => {
             const token = req.header("Authorization")?.replace("Bearer ", "");
 
             if (!token) {
-                throw new Error("Authentication failed: No token provided");
+                throw new Error("Lỗi xác thực: Thiếu token");
             }
 
             const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret") as JwtPayload;
             
             if (!decoded.id || !decoded.role) {
-                 throw new Error("Authentication failed: Invalid token payload");
+                 throw new Error("Lỗi xác thực: Token không hợp lệ");
             }
             
             // Nếu có yêu cầu về role và role trong token không khớp -> từ chối
             if (roles.length > 0 && !roles.includes(decoded.role)) {
-                throw new Error("Authorization failed: Insufficient permissions");
+                throw new Error("Lỗi xác thực: Không đủ quyền truy cập");
             }
 
             let user: User | Admin | null = null;
@@ -50,14 +50,14 @@ export const auth = (roles: Array<'user' | 'admin'> = []) => {
             }
 
             if (!user) {
-                throw new Error("Authentication failed: User not found");
+                throw new Error("Lỗi xác thực: Người dùng không tồn tại");
             }
 
             req.user = user;
             req.token = token;
             next();
         } catch (error: any) {
-            res.status(401).json({ error: error.message || "Please authenticate." });
+            res.status(401).json({ error: error.message || "Vui lòng đăng nhập" });
         }
     };
 };
