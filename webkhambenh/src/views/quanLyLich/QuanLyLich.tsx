@@ -41,7 +41,7 @@ const QuanLyLich: React.FC = () => {
     }
 
     // Lấy token từ localStorage
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('user_token');
 
     try {
       // Thêm Authorization header vào yêu cầu fetch

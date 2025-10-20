@@ -124,3 +124,35 @@ CREATE TABLE admins (
 -- Them mot tai khoan admin co san
 -- Mat khau la: admin123
 INSERT INTO admins (username, password) VALUES ('admin', '$2a$10$13JO24QaAbQd5/gm/d8k1eOifimFWTnNDb.1aCTWKk5Fw0.32qoA6');
+
+
+-- Tạo bảng để quản lý lịch làm việc (ca làm việc) của bác sĩ
+CREATE TABLE doctor_schedules (
+    id SERIAL PRIMARY KEY,
+    doctor_id INTEGER NOT NULL REFERENCES doctors(id) ON DELETE CASCADE,
+    work_date DATE NOT NULL, -- Ngày làm việc
+    start_time TIME NOT NULL, -- Giờ bắt đầu ca
+    end_time TIME NOT NULL,   -- Giờ kết thúc ca
+    CONSTRAINT unique_doctor_work_schedule UNIQUE (doctor_id, work_date, start_time) -- Đảm bảo mỗi bác sĩ chỉ có 1 ca làm việc tại 1 thời điểm
+);
+
+COMMENT ON TABLE doctor_schedules IS 'Lưu trữ các ca làm việc của bác sĩ.';
+COMMENT ON COLUMN doctor_schedules.work_date IS 'Ngày bác sĩ có lịch làm việc.';
+COMMENT ON COLUMN doctor_schedules.start_time IS 'Thời gian bắt đầu ca làm việc.';
+COMMENT ON COLUMN doctor_schedules.end_time IS 'Thời gian kết thúc ca làm việc.';
+
+
+-- Tạo bảng để quản lý các khung giờ khám bệnh trong mỗi ca
+CREATE TABLE time_slots (
+    id SERIAL PRIMARY KEY,
+    schedule_id INTEGER NOT NULL REFERENCES doctor_schedules(id) ON DELETE CASCADE,
+    slot_time TIME NOT NULL, -- Giờ bắt đầu của khung giờ khám
+    is_available BOOLEAN DEFAULT TRUE, -- Trạng thái: true = còn trống, false = đã được đặt
+    appointment_id INTEGER REFERENCES appointments(id) ON DELETE SET NULL, -- Liên kết với cuộc hẹn nếu đã được đặt
+    CONSTRAINT unique_slot_in_schedule UNIQUE (schedule_id, slot_time) -- Mỗi khung giờ trong 1 ca là duy nhất
+);
+
+COMMENT ON TABLE time_slots IS 'Lưu các khung giờ khám bệnh chi tiết trong một ca làm việc của bác sĩ.';
+COMMENT ON COLUMN time_slots.slot_time IS 'Thời gian bắt đầu của một khung giờ khám (ví dụ: 08:00, 08:30).';
+COMMENT ON COLUMN time_slots.is_available IS 'Cho biết khung giờ này còn trống hay không.';
+COMMENT ON COLUMN time_slots.appointment_id IS 'Liên kết tới lịch hẹn đã đặt cho khung giờ này.';

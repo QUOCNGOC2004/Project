@@ -16,8 +16,8 @@ const AdminLogin: React.FC = () => {
                 username,
                 password
             });
-            localStorage.setItem('adminToken', response.data.token);
-            localStorage.setItem('adminUser', JSON.stringify(response.data.user));
+            localStorage.setItem('admin_token', response.data.token);
+            localStorage.setItem('admin_info', JSON.stringify(response.data.user));
             history.push('/adminPanel');
         } catch (err: any) {
             setError(err.response?.data?.message || 'Đăng nhập thất bại');

@@ -41,8 +41,8 @@ const Auth: React.FC = () => {
             });
 
             // Lưu token và thông tin user vào localStorage
-            localStorage.setItem('token', response.data.token);
-            localStorage.setItem('user', JSON.stringify(response.data.user));
+            localStorage.setItem('user_token', response.data.token);
+            localStorage.setItem('user_info', JSON.stringify(response.data.user));
             
             // Cập nhật trạng thái đăng nhập trong navbar
             const navbar = document.querySelector('.navbar8-navbar-interactive');
@@ -72,8 +72,8 @@ const Auth: React.FC = () => {
             });
 
             // Lưu token và thông tin user vào localStorage
-            localStorage.setItem('token', response.data.token);
-            localStorage.setItem('user', JSON.stringify(response.data.user));
+            localStorage.setItem('user_token', response.data.token);
+            localStorage.setItem('user_info', JSON.stringify(response.data.user));
 
             // Cập nhật trạng thái đăng nhập trong navbar
             const navbar = document.querySelector('.navbar8-navbar-interactive');

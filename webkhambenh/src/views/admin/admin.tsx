@@ -8,7 +8,7 @@ import UserManagement from '../../components/forAdmin/UserManagement';
 
 
 const isAdminLoggedIn = (): boolean => {
-    const token = localStorage.getItem('adminToken');
+    const token = localStorage.getItem('admin_token');
     return !!token; 
 };
 

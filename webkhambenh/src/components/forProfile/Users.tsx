@@ -11,7 +11,7 @@ const Users: React.FC = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("user_token");
       if (!token) return;
       try {
         const res = await fetch(`${process.env.REACT_APP_API_URL}/auth/profile`, {
@@ -75,7 +75,7 @@ const Users: React.FC = () => {
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("user_token");
     if (!token) return;
     // 1) Update profile via Auth service
     try {
@@ -93,7 +93,7 @@ const Users: React.FC = () => {
         setUser(data.user);
         setOriginalUser(data.user); // Cập nhật dữ liệu gốc sau khi lưu
         setIsEditing(false);
-        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("user_info", JSON.stringify(data.user));
         const event = new CustomEvent("loginStatusChanged", {
           detail: { isLoggedIn: true, username: data.user.username },
         });

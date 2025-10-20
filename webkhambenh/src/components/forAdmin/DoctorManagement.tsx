@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './DoctorManagement.css';
 
 // --- TYPE DEFINITIONS ---
@@ -7,23 +7,18 @@ interface Doctor {
   name: string;
   email: string;
   phone: string;
-  coSoKham: string;
-  chuyenKhoa: string;
-  moTaChucVu: string;
-  hocVi: string;
-  kinhNghiem: number;
-  linkAnh: string;
-  chucVu: string;
+  co_so_kham: string;
+  chuyen_khoa: string;
+  mo_ta_chuc_vu: string;
+  hoc_vi: string;
+  kinh_nghiem: number;
+  link_anh: string;
+  chuc_vu: string;
 }
 
-// --- MOCK DATA ---
-const MOCK_DOCTORS: Doctor[] = [
-  { id: 1, name: 'PGS.TS. BS Nguyễn Thanh Hồi', email: 'hoi.nt@phenikaa-uni.edu.vn', phone: '0901234567', coSoKham: 'Bệnh viện Đại học Phenikaa', chuyenKhoa: 'Tim mạch', moTaChucVu: 'Tổng Giám đốc Bệnh viện', hocVi: 'Tiến sĩ', kinhNghiem: 20, linkAnh: 'https://placehold.co/100x100/E65103/white?text=BS', chucVu: 'Tổng giám đốc' },
-  { id: 2, name: 'GS.TS. BS. Đỗ Quyết', email: 'quyet.d@phenikaa-uni.edu.vn', phone: '0987654321', coSoKham: 'Phòng khám Đa khoa', chuyenKhoa: 'Nội tổng hợp', moTaChucVu: 'Phó Tổng Giám Đốc', hocVi: 'Giáo sư', kinhNghiem: 25, linkAnh: 'https://placehold.co/100x100/E65103/white?text=BS', chucVu: 'Phó tổng giám đốc' },
-  { id: 3, name: 'BSNT. Lê Thị Hương', email: 'huong.lt@phenikaa-uni.edu.vn', phone: '0911223344', coSoKham: 'Bệnh viện Đại học Phenikaa', chuyenKhoa: 'Khoa sản', moTaChucVu: 'Trưởng khoa Sản', hocVi: 'Bác sĩ nội trú', kinhNghiem: 12, linkAnh: 'https://placehold.co/100x100/E65103/white?text=BS', chucVu: 'Trưởng Khoa' },
-];
 
-// --- UTILITY COMPONENTS ---
+
+
 const Modal: React.FC<{ children: React.ReactNode; title: string; onClose: () => void }> = ({ children, title, onClose }) => (
     <div className="dm-modal-overlay">
         <div className="dm-modal-content">
@@ -39,14 +34,31 @@ const Modal: React.FC<{ children: React.ReactNode; title: string; onClose: () =>
 );
 
 // --- SUB COMPONENTS ---
+
+// GHI CHÚ: Tối ưu lại Modal chi tiết bác sĩ để hiển thị đẹp hơn
 const DoctorDetailModal: React.FC<{ doctor: Doctor; onClose: () => void; }> = ({ doctor, onClose }) => {
+    // Định nghĩa các trường và nhãn hiển thị tương ứng
+    const doctorDetails: { key: keyof Doctor; label: string }[] = [
+        { key: 'name', label: 'Họ và tên' },
+        { key: 'email', label: 'Email' },
+        { key: 'phone', label: 'Số điện thoại' },
+        { key: 'hoc_vi', label: 'Học vị' },
+        { key: 'chuc_vu', label: 'Chức vụ' },
+        { key: 'chuyen_khoa', label: 'Chuyên khoa' },
+        { key: 'co_so_kham', label: 'Cơ sở khám' },
+        { key: 'kinh_nghiem', label: 'Kinh nghiệm' },
+        { key: 'mo_ta_chuc_vu', label: 'Mô tả' },
+    ];
+
     return (
-        <Modal title={`Chi tiết Bác sĩ: ${doctor.hocVi} ${doctor.name}`} onClose={onClose}>
+        <Modal title={`Chi tiết Bác sĩ: ${doctor.hoc_vi} ${doctor.name}`} onClose={onClose}>
             <div className="dm-detail-grid">
-                {Object.entries(doctor).map(([key, value]) => (
+                {doctorDetails.map(({ key, label }) => (
                     <React.Fragment key={key}>
-                        <strong className="dm-detail-key">{key.replace(/([A-Z])/g, ' $1')}:</strong>
-                        <span className="dm-detail-value">{value}</span>
+                        <strong className="dm-detail-key">{label}:</strong>
+                        <span className="dm-detail-value">
+                            {key === 'kinh_nghiem' ? `${doctor[key]} năm` : doctor[key]}
+                        </span>
                     </React.Fragment>
                 ))}
             </div>
@@ -59,14 +71,15 @@ const DoctorDetailModal: React.FC<{ doctor: Doctor; onClose: () => void; }> = ({
     );
 };
 
-const DoctorFormModal: React.FC<{ doctor: Doctor | null; onClose: () => void; onSave: (doctor: Doctor) => void }> = ({ doctor, onClose, onSave }) => {
-    const [formData, setFormData] = useState<Doctor>(doctor || {
-        id: 0, name: '', email: '', phone: '', coSoKham: '', chuyenKhoa: '', moTaChucVu: '', hocVi: '', kinhNghiem: 0, linkAnh: '', chucVu: ''
+// GHI CHÚ: Cập nhật DoctorFormModal để khớp với CSDL (Không thay đổi nhiều)
+const DoctorFormModal: React.FC<{ doctor: Partial<Doctor> | null; onClose: () => void; onSave: (doctor: Partial<Doctor>) => void }> = ({ doctor, onClose, onSave }) => {
+    const [formData, setFormData] = useState<Partial<Doctor>>(doctor || {
+        name: '', email: '', phone: '', co_so_kham: '', chuyen_khoa: '', mo_ta_chuc_vu: '', hoc_vi: '', kinh_nghiem: 0, link_anh: '', chuc_vu: ''
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: name === 'kinhNghiem' ? parseInt(value) || 0 : value }));
+        setFormData(prev => ({ ...prev, [name]: name === 'kinh_nghiem' ? parseInt(value) || 0 : value }));
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -74,20 +87,31 @@ const DoctorFormModal: React.FC<{ doctor: Doctor | null; onClose: () => void; on
         onSave(formData);
     };
 
-    const fields: (keyof Doctor)[] = ['name', 'email', 'phone', 'coSoKham', 'chuyenKhoa', 'moTaChucVu', 'hocVi', 'kinhNghiem', 'linkAnh', 'chucVu'];
+    const fields: { key: keyof Doctor; label: string; type: string }[] = [
+      { key: 'name', label: 'Họ và tên', type: 'text' },
+      { key: 'email', label: 'Email', type: 'email' },
+      { key: 'phone', label: 'Số điện thoại', type: 'text' },
+      { key: 'hoc_vi', label: 'Học vị', type: 'text' },
+      { key: 'chuc_vu', label: 'Chức vụ', type: 'text' },
+      { key: 'chuyen_khoa', label: 'Chuyên khoa', type: 'text' },
+      { key: 'co_so_kham', label: 'Cơ sở khám', type: 'text' },
+      { key: 'mo_ta_chuc_vu', label: 'Mô tả chức vụ', type: 'text' },
+      { key: 'kinh_nghiem', label: 'Kinh nghiệm (năm)', type: 'number' },
+      { key: 'link_anh', label: 'Link ảnh', type: 'text' },
+    ];
     
     return (
-        <Modal title={doctor ? 'Sửa thông tin Bác sĩ' : 'Thêm Bác sĩ mới'} onClose={onClose}>
+        <Modal title={doctor && doctor.id ? 'Sửa thông tin Bác sĩ' : 'Thêm Bác sĩ mới'} onClose={onClose}>
             <form onSubmit={handleSubmit}>
                 <div className="dm-form-grid">
                     {fields.map(field => (
-                        <div key={field} className="dm-form-group">
-                            <label htmlFor={field}>{field.replace(/([A-Z])/g, ' $1')}</label>
+                        <div key={field.key} className="dm-form-group">
+                            <label htmlFor={field.key}>{field.label}</label>
                             <input
-                                id={field}
-                                name={field}
-                                type={field === 'kinhNghiem' ? 'number' : 'text'}
-                                value={formData[field]}
+                                id={field.key}
+                                name={field.key}
+                                type={field.type}
+                                value={formData[field.key as keyof Doctor] as string || ''}
                                 onChange={handleChange}
                                 required
                             />
@@ -95,12 +119,8 @@ const DoctorFormModal: React.FC<{ doctor: Doctor | null; onClose: () => void; on
                     ))}
                 </div>
                 <div className="dm-modal-actions">
-                    <button type="button" onClick={onClose} className="dm-button dm-button-secondary">
-                        Hủy
-                    </button>
-                    <button type="submit" className="dm-button dm-button-success">
-                        Lưu
-                    </button>
+                    <button type="button" onClick={onClose} className="dm-button dm-button-secondary">Hủy</button>
+                    <button type="submit" className="dm-button dm-button-success">Lưu</button>
                 </div>
             </form>
         </Modal>
@@ -110,11 +130,41 @@ const DoctorFormModal: React.FC<{ doctor: Doctor | null; onClose: () => void; on
 
 // --- MAIN COMPONENT ---
 const DoctorManagement: React.FC = () => {
-    const [doctors, setDoctors] = useState<Doctor[]>(MOCK_DOCTORS);
+    const [doctors, setDoctors] = useState<Doctor[]>([]);
     const [isFormModalOpen, setIsFormModalOpen] = useState(false);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-    const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(null);
+    const [editingDoctor, setEditingDoctor] = useState<Partial<Doctor> | null>(null);
     const [viewingDoctor, setViewingDoctor] = useState<Doctor | null>(null);
+    const [error, setError] = useState<string | null>(null);
+
+    // GHI CHÚ: Hàm để lấy token từ localStorage
+    const getAuthToken = () => {
+        return localStorage.getItem('admin_token'); // Giả sử bạn lưu token với key là 'token'
+    };
+
+    useEffect(() => {
+        fetchDoctors();
+    }, []);
+
+    const fetchDoctors = async () => {
+        try {
+            const token = getAuthToken();
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/doctors`, {
+                headers: {
+                    'Authorization': `Bearer ${token}` // Gửi token
+                }
+            }); 
+            if (!response.ok) {
+                if (response.status === 401) throw new Error('Unauthorized - Vui lòng đăng nhập lại.');
+                throw new Error('Không thể tải dữ liệu bác sĩ');
+            }
+            const data: Doctor[] = await response.json();
+            setDoctors(data);
+        } catch (err: any) {
+            setError(err.message);
+            console.error("Lỗi khi fetch bác sĩ:", err);
+        }
+    };
 
     const openFormModal = (doctor: Doctor | null = null) => {
         setEditingDoctor(doctor ? { ...doctor } : null);
@@ -133,21 +183,71 @@ const DoctorManagement: React.FC = () => {
         setViewingDoctor(null);
     };
 
-    const handleSave = (doctorData: Doctor) => {
-        if (editingDoctor) {
-            setDoctors(doctors.map(d => d.id === doctorData.id ? doctorData : d));
-        } else {
-            const newDoctor = { ...doctorData, id: Date.now() }; // Simple ID generation
-            setDoctors([...doctors, newDoctor]);
+    const handleSave = async (doctorData: Partial<Doctor>) => {
+        const method = doctorData.id ? 'PUT' : 'POST';
+        const url = doctorData.id ? `${process.env.REACT_APP_API_URL}/doctors/${doctorData.id}` : `${process.env.REACT_APP_API_URL}/doctors`;
+        const token = getAuthToken(); // GHI CHÚ: Lấy token
+
+        if (!token) {
+            setError("Lỗi xác thực. Vui lòng đăng nhập lại.");
+            return;
         }
-        closeModal();
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    // GHI CHÚ: Thêm header Authorization vào đây
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify(doctorData),
+            });
+            if (!response.ok) {
+                // GHI CHÚ: Bắt lỗi cụ thể từ server
+                if (response.status === 401) throw new Error('Unauthorized');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Lưu thông tin thất bại');
+            }
+            fetchDoctors(); 
+        } catch (err: any) {
+             setError(err.message);
+             console.error("Lỗi khi lưu bác sĩ:", err);
+        } finally {
+            closeModal();
+        }
     };
 
-    const handleDelete = (id: number) => {
+    const handleDelete = async (id: number) => {
         if (window.confirm('Bạn có chắc chắn muốn xóa bác sĩ này không?')) {
-            setDoctors(doctors.filter(d => d.id !== id));
+            const token = getAuthToken(); // GHI CHÚ: Lấy token
+            if (!token) {
+                setError("Lỗi xác thực. Vui lòng đăng nhập lại.");
+                return;
+            }
+            try {
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/doctors/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                         // GHI CHÚ: Thêm header Authorization
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                 if (!response.ok) {
+                    if (response.status === 401) throw new Error('Unauthorized');
+                    throw new Error('Xóa bác sĩ thất bại');
+                }
+                fetchDoctors();
+            } catch (err: any) {
+                setError(err.message);
+                console.error("Lỗi khi xóa bác sĩ:", err);
+            }
         }
     };
+    
+    if (error) {
+        return <div className="dm-container error-message">Lỗi: {error}</div>;
+    }
 
     return (
         <div className="dm-container">
@@ -170,9 +270,9 @@ const DoctorManagement: React.FC = () => {
                     <tbody>
                         {doctors.map(doctor => (
                             <tr key={doctor.id}>
-                                <td>{doctor.hocVi} {doctor.name}</td>
-                                <td>{doctor.chuyenKhoa}</td>
-                                <td>{doctor.coSoKham}</td>
+                                <td>{doctor.hoc_vi} {doctor.name}</td>
+                                <td>{doctor.chuyen_khoa}</td>
+                                <td>{doctor.co_so_kham}</td>
                                 <td className="dm-table-actions">
                                     <button onClick={() => openDetailModal(doctor)} className="dm-action-link dm-link-detail">Chi tiết</button>
                                     <button onClick={() => openFormModal(doctor)} className="dm-action-link dm-link-edit">Sửa</button>

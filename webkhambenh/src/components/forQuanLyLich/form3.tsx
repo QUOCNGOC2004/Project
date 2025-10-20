@@ -91,7 +91,7 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
   const handleUpdateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsUpdating(true);
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('user_token');
     if (!token) {
         alert('Vui lòng đăng nhập lại.');
         setIsUpdating(false);
@@ -129,7 +129,7 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
   const handleCancelClick = async () => {
     if (window.confirm('Bạn có chắc chắn muốn hủy lịch hẹn này?')) {
       setIsCancelling(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('user_token');
       if (!token) {
         alert('Vui lòng đăng nhập lại.');
         setIsCancelling(false);

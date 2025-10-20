@@ -12,7 +12,7 @@ interface User {
  * @returns boolean
  */
 export const isLoggedIn = (): boolean => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('user_token');
     return !!token;
 };
 
@@ -21,7 +21,7 @@ export const isLoggedIn = (): boolean => {
  * @returns User | null
  */
 export const getCurrentUser = (): User | null => {
-    const userStr = localStorage.getItem('user');
+    const userStr = localStorage.getItem('user_info');
     if (!userStr) return null;
     try {
         return JSON.parse(userStr);
@@ -35,7 +35,7 @@ export const getCurrentUser = (): User | null => {
  * @returns string | null
  */
 export const getAuthToken = (): string | null => {
-    return localStorage.getItem('token');
+    return localStorage.getItem('user_token');
 };
 
 
