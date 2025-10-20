@@ -42,8 +42,8 @@ export const getAuthToken = (): string | null => {
 
 
 export const logout = (): void => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem('user_token');
+    localStorage.removeItem('user_info');
     
     // Dispatch event để cập nhật UI
     const event = new CustomEvent('loginStatusChanged', {

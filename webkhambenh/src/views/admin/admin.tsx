@@ -36,10 +36,12 @@ const AdminPage: React.FC = () => {
             case 'users':
                 return <UserManagement />;
             case 'Logout':
-                localStorage.removeItem('adminToken');
-                localStorage.removeItem('adminUser');
+                if (window.confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                localStorage.removeItem('admin_token');
+                localStorage.removeItem('admin_info');
                 history.push('/admin');
                 return null;
+                }
             default:
                 return <DoctorManagement />;
         }
