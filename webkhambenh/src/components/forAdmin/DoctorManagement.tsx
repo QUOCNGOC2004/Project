@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import './DoctorManagement.css';
 
-// --- TYPE DEFINITIONS ---
+
 interface Doctor {
   id: number;
   name: string;
   email: string;
   phone: string;
-  co_so_kham: string;
-  chuyen_khoa: string;
-  mo_ta_chuc_vu: string;
-  hoc_vi: string;
-  kinh_nghiem: number;
-  link_anh: string;
-  chuc_vu: string;
+  coSoKham: string;
+  chuyenKhoa: string;
+  moTaChucVu: string;
+  hocVi: string;
+  kinhNghiem: number;
+  linkAnh: string;
+  chucVu: string;
 }
 
 interface DoctorSchedule {
@@ -108,14 +108,14 @@ const ScheduleModal: React.FC<{ doctorName: string; schedules: DoctorSchedule[];
   );
 };
 
-// Modal chi tiết bác sĩ với hiển thị ảnh đẹp mắt
+
 const DoctorDetailModal: React.FC<{ doctor: Doctor; onClose: () => void }> = ({ doctor, onClose }) => {
   return (
     <Modal title="Thông tin chi tiết Bác sĩ" onClose={onClose}>
       <div className="dm-detail-container">
         <div className="dm-detail-image">
           <img 
-            src={doctor.link_anh} 
+            src={doctor.linkAnh} 
             alt={doctor.name}
             onError={(e) => {
               (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x300?text=No+Image';
@@ -125,7 +125,7 @@ const DoctorDetailModal: React.FC<{ doctor: Doctor; onClose: () => void }> = ({ 
         <div className="dm-detail-info">
           <div className="dm-detail-grid">
             <strong>Họ và tên:</strong>
-            <span>{doctor.hoc_vi} {doctor.name}</span>
+            <span>{doctor.hocVi} {doctor.name}</span>
             
             <strong>Email:</strong>
             <span>{doctor.email}</span>
@@ -134,26 +134,26 @@ const DoctorDetailModal: React.FC<{ doctor: Doctor; onClose: () => void }> = ({ 
             <span>{doctor.phone}</span>
             
             <strong>Học vị:</strong>
-            <span>{doctor.hoc_vi}</span>
+            <span>{doctor.hocVi}</span>
             
             <strong>Chức vụ:</strong>
-            <span>{doctor.chuc_vu}</span>
+            <span>{doctor.chucVu}</span>
             
             <strong>Chuyên khoa:</strong>
-            <span>{doctor.chuyen_khoa}</span>
+            <span>{doctor.chuyenKhoa}</span>
             
             <strong>Cơ sở khám:</strong>
-            <span>{doctor.co_so_kham}</span>
+            <span>{doctor.coSoKham}</span>
             
             <strong>Kinh nghiệm:</strong>
-            <span>{doctor.kinh_nghiem} năm</span>
+            <span>{doctor.kinhNghiem} năm</span>
             
             <strong>Mô tả:</strong>
-            <span>{doctor.mo_ta_chuc_vu}</span>
+            <span>{doctor.moTaChucVu}</span>
             
             <strong>Link ảnh:</strong>
             <span className="dm-link-wrap">
-              <a href={doctor.link_anh} target="_blank" rel="noopener noreferrer">{doctor.link_anh}</a>
+              <a href={doctor.linkAnh} target="_blank" rel="noopener noreferrer">{doctor.linkAnh}</a>
             </span>
           </div>
         </div>
@@ -168,7 +168,7 @@ const DoctorDetailModal: React.FC<{ doctor: Doctor; onClose: () => void }> = ({ 
   );
 };
 
-// Modal form thêm/sửa với dropdown
+
 const DoctorFormModal: React.FC<{ 
   doctor: Partial<Doctor> | null; 
   onClose: () => void; 
@@ -178,20 +178,20 @@ const DoctorFormModal: React.FC<{
     name: '', 
     email: '', 
     phone: '', 
-    co_so_kham: '', 
-    chuyen_khoa: CHUYEN_KHOA_OPTIONS[0], 
-    mo_ta_chuc_vu: '', 
-    hoc_vi: HOC_VI_OPTIONS[0], 
-    kinh_nghiem: 0, 
-    link_anh: '', 
-    chuc_vu: CHUC_VU_OPTIONS[0]
+    coSoKham: '', 
+    chuyenKhoa: CHUYEN_KHOA_OPTIONS[0], 
+    moTaChucVu: '', 
+    hocVi: HOC_VI_OPTIONS[0], 
+    kinhNghiem: 0, 
+    linkAnh: '', 
+    chucVu: CHUC_VU_OPTIONS[0]
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ 
       ...prev, 
-      [name]: name === 'kinh_nghiem' ? parseInt(value) || 0 : value 
+      [name]: name === 'kinhNghiem' ? parseInt(value) || 0 : value 
     }));
   };
 
@@ -241,11 +241,11 @@ const DoctorFormModal: React.FC<{
           </div>
           
           <div className="dm-form-group">
-            <label htmlFor="hoc_vi">Học vị *</label>
+            <label htmlFor="hocVi">Học vị *</label>
             <select
-              id="hoc_vi"
-              name="hoc_vi"
-              value={formData.hoc_vi || ''}
+              id="hocVi"
+              name="hocVi"
+              value={formData.hocVi || ''}
               onChange={handleChange}
               required
             >
@@ -256,11 +256,11 @@ const DoctorFormModal: React.FC<{
           </div>
           
           <div className="dm-form-group">
-            <label htmlFor="chuc_vu">Chức vụ *</label>
+            <label htmlFor="chucVu">Chức vụ *</label>
             <select
-              id="chuc_vu"
-              name="chuc_vu"
-              value={formData.chuc_vu || ''}
+              id="chucVu"
+              name="chucVu"
+              value={formData.chucVu || ''}
               onChange={handleChange}
               required
             >
@@ -271,11 +271,11 @@ const DoctorFormModal: React.FC<{
           </div>
           
           <div className="dm-form-group">
-            <label htmlFor="chuyen_khoa">Chuyên khoa *</label>
+            <label htmlFor="chuyenKhoa">Chuyên khoa *</label>
             <select
-              id="chuyen_khoa"
-              name="chuyen_khoa"
-              value={formData.chuyen_khoa || ''}
+              id="chuyenKhoa"
+              name="chuyenKhoa"
+              value={formData.chuyenKhoa || ''}
               onChange={handleChange}
               required
             >
@@ -286,24 +286,24 @@ const DoctorFormModal: React.FC<{
           </div>
           
           <div className="dm-form-group">
-            <label htmlFor="co_so_kham">Cơ sở khám *</label>
+            <label htmlFor="coSoKham">Cơ sở khám *</label>
             <input
-              id="co_so_kham"
-              name="co_so_kham"
+              id="coSoKham"
+              name="coSoKham"
               type="text"
-              value={formData.co_so_kham || ''}
+              value={formData.coSoKham || ''}
               onChange={handleChange}
               required
             />
           </div>
           
           <div className="dm-form-group">
-            <label htmlFor="kinh_nghiem">Kinh nghiệm (năm) *</label>
+            <label htmlFor="kinhNghiem">Kinh nghiệm (năm) *</label>
             <input
-              id="kinh_nghiem"
-              name="kinh_nghiem"
+              id="kinhNghiem"
+              name="kinhNghiem"
               type="number"
-              value={formData.kinh_nghiem || 0}
+              value={formData.kinhNghiem || 0}
               onChange={handleChange}
               required
               min="0"
@@ -311,11 +311,11 @@ const DoctorFormModal: React.FC<{
           </div>
           
           <div className="dm-form-group dm-full-width">
-            <label htmlFor="mo_ta_chuc_vu">Mô tả chức vụ *</label>
+            <label htmlFor="moTaChucVu">Mô tả chức vụ *</label>
             <textarea
-              id="mo_ta_chuc_vu"
-              name="mo_ta_chuc_vu"
-              value={formData.mo_ta_chuc_vu || ''}
+              id="moTaChucVu"
+              name="moTaChucVu"
+              value={formData.moTaChucVu || ''}
               onChange={handleChange}
               required
               rows={3}
@@ -323,12 +323,12 @@ const DoctorFormModal: React.FC<{
           </div>
           
           <div className="dm-form-group dm-full-width">
-            <label htmlFor="link_anh">Link ảnh *</label>
+            <label htmlFor="linkAnh">Link ảnh *</label>
             <input
-              id="link_anh"
-              name="link_anh"
+              id="linkAnh"
+              name="linkAnh"
               type="text"
-              value={formData.link_anh || ''}
+              value={formData.linkAnh || ''}
               onChange={handleChange}
               required
             />
@@ -503,7 +503,7 @@ const DoctorManagement: React.FC = () => {
           <tbody>
             {doctors.map(doctor => (
               <tr key={doctor.id}>
-                <td>{doctor.hoc_vi} {doctor.name}</td>
+                <td>{doctor.hocVi} {doctor.name}</td>
                 <td>{doctor.phone}</td>
                 <td>
                   <button 
@@ -555,3 +555,4 @@ const DoctorManagement: React.FC = () => {
 };
 
 export default DoctorManagement;
+
