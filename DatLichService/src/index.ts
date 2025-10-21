@@ -4,14 +4,17 @@ import cors from "cors";
 import { AppDataSource } from "./config/database";
 import lichHenRoutes from "./routes/LichHenRoutes";
 import dotenv from "dotenv";
+import helmet from "helmet";
 
 dotenv.config();
 
 const app = express();
 
+app.use(helmet()); // Bảo mật HTTP headers
+
 // Cấu hình CORS
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:8000'], // Allow both frontend and Kong Gateway
+    origin: ['http://localhost:3000', 'http://localhost:8000'], 
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));

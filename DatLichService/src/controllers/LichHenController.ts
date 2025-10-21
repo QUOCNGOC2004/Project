@@ -180,17 +180,17 @@ export const updateLichHen = async (req: Request, res: Response): Promise<void> 
       WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1} RETURNING *
     `;
 
-    const result = await AppDataSource.query(updateQuery, updateValues);
+    const [rows, rowCount] = await AppDataSource.query(updateQuery, updateValues);
 
-    if (result.length === 0) {
+    if (rowCount === 0) {
       logActivity(req, user_id, 'UPDATE_APPOINTMENT_NOT_FOUND', { appointmentId: id });
       res.status(404).json({ error: 'Không tìm thấy lịch hẹn hoặc bạn không có quyền sửa.' });
       return;
     }
 
-    const lichHen: LichHen = result[0];
+    const lichHen: LichHen = rows[0]; 
     
-    logActivity(req, user_id, 'UPDATE_APPOINTMENT_SUCCESS', { appointmentId: id, updatedFields: Object.keys(req.body) });
+    logActivity(req, user_id, 'cập nhật lịch hẹn thành công', { appointmentId: id, updatedFields: Object.keys(req.body) });
     res.json(lichHen);
   } catch (error) {
     console.error('Lỗi khi cập nhật lịch hẹn:', error);
@@ -210,10 +210,10 @@ export const deleteLichHen = async (req: Request, res: Response): Promise<void> 
         return;
     }
     
-  
-    const result = await AppDataSource.query('DELETE FROM appointments WHERE id = $1 AND user_id = $2 RETURNING *', [id, user_id]);
 
-    if (result.length === 0) {
+    const [_rows, rowCount] = await AppDataSource.query('DELETE FROM appointments WHERE id = $1 AND user_id = $2 RETURNING *', [id, user_id]);
+
+    if (rowCount === 0) {
       logActivity(req, user_id, 'DELETE_APPOINTMENT_NOT_FOUND', { appointmentId: id });
       res.status(404).json({ error: 'Không tìm thấy lịch hẹn hoặc bạn không có quyền xóa.' });
       return;

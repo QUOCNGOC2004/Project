@@ -14,6 +14,11 @@ services:
           - /api/auth/admin/login
         strip_path: false
         methods: [POST, OPTIONS]
+        plugins:
+          - name: rate-limiting
+            config:
+              minute: 10
+              limit_by: ip
       # Route cần xác thực để lấy thông tin người dùng
       - name: auth-protected-route
         paths:
@@ -22,6 +27,10 @@ services:
         methods: [GET, PUT , OPTIONS]
         plugins:
           - name: jwt 
+          - name: rate-limiting
+            config:
+              minute: 100
+              limit_by: consumer
     plugins:
       - name: cors
         config:
@@ -59,7 +68,11 @@ services:
           exposed_headers: ['X-Auth-Token']
           credentials: true
           max_age: 3600
-
+      - name: rate-limiting
+        config:
+          minute: 200
+          limit_by: consumer
+          
   # AppointmentService
   - name: appointment-service
     url: http://host.docker.internal:3003
@@ -78,6 +91,10 @@ services:
           exposed_headers: ['X-Auth-Token']
           credentials: true
           max_age: 3600
+      - name: rate-limiting
+        config:
+          minute: 100
+          limit_by: consumer
 
   # PaymentService
   - name: payment-service
@@ -98,6 +115,10 @@ services:
           exposed_headers: ['X-Auth-Token']
           credentials: true
           max_age: 3600
+      - name: rate-limiting
+        config:
+          minute: 50
+          limit_by: consumer
 
 consumers:
   - username: web-user

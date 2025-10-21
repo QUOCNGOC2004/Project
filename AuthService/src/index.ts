@@ -2,13 +2,17 @@ import 'reflect-metadata';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import helmet from 'helmet';
 import { AppDataSource } from './config/database';
 import authRoutes from './routes/auth';
 
-// Load environment variables
+// tải cấu hình từ file .env
 dotenv.config();
 
 const app = express();
+
+// Sử dụng helmet để bảo mật HTTP headers
+app.use(helmet());
 
 // Cấu hình CORS
 app.use(cors({
@@ -17,13 +21,13 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Middleware
+// middleware bảo mật
 app.use(express.json()); 
 
 // Routes
 app.use('/api/auth', authRoutes);
 
-// Initialize database connection
+// Kết nối database
 AppDataSource.initialize()
     .then(() => {
         console.log('Database đã kết nối thành công');
