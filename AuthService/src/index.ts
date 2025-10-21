@@ -10,6 +10,7 @@ import authRoutes from './routes/auth';
 dotenv.config();
 
 const app = express();
+app.set('trust proxy', 'loopback');
 
 // Sử dụng helmet để bảo mật HTTP headers
 app.use(helmet());

@@ -60,7 +60,7 @@ const ChanTrang = (props) => {
           <div className="thq-divider-horizontal"></div>
           <div className="footer4-row">
             <div className="footer4-container">
-              <span className="thq-body-small">Nhóm 01 - Đồ án liên ngành</span>
+              <span className="thq-body-small">Trang web đặt lịch khám bệnh</span>
             </div>
             <div className="footer4-footer-links">
               <span className="footer4-text11 thq-body-small">
