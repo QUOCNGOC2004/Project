@@ -10,11 +10,11 @@ interface Doctor {
   name: string;
   email: string;
   phone: string;
-  gioi_tinh: string;
-  mo_ta_bac_si: string;
-  hoc_vi: string;
-  kinh_nghiem: number;
-  link_anh: string;
+  gioiTinh: string; 
+  moTaBacSi: string; 
+  hocVi: string; 
+  kinhNghiem: number;
+  linkAnh: string; 
 }
 
 interface SelectedFilters {
@@ -156,10 +156,10 @@ const DanhSachBs: React.FC = () => {
                 key={doctor.id}
                 id={doctor.id}
                 name={doctor.name}
-                imageUrl={doctor.link_anh}
-                experience={doctor.kinh_nghiem}
-                hocVi={doctor.hoc_vi}
-                moTaBacSi={doctor.mo_ta_bac_si}
+                imageUrl={doctor.linkAnh}
+                experience={doctor.kinhNghiem}
+                hocVi={doctor.hocVi}
+                moTaBacSi={doctor.moTaBacSi}
               />
             ))
           ) : (
