@@ -61,6 +61,7 @@
 }
 
 .search-container {
+  margin-left: 200px;
   position: relative;
   flex-grow: 1;
   max-width: 32rem;

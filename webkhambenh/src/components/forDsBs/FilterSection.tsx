@@ -10,31 +10,16 @@ interface FilterSectionProps {
 const FilterSection: React.FC<FilterSectionProps> = ({ onSearch, onFilterChange }) => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [selectedOptions, setSelectedOptions] = useState({
-    specialty: 'Chuyên khoa',
-    position: 'Chức vụ',
+    gender: 'Giới tính',
     degree: 'Học vị',
     experience: 'Kinh nghiệm'
   });
-
+  
   const filterOptions = {
-    specialty: [
+    gender: [ 
       'Tất cả',
-      'Y học bào thai',
-      'Ung bướu',
-      'Tim mạch',
-      'Khoa sản',
-      'Nội tổng hợp',
-      'Ngoại tổng hợp',
-      'Khoa Dược'
-    ],
-    position: [
-      'Tất cả',
-      'Tổng giám đốc',
-      'Phó tổng giám đốc',
-      'Giám đốc trung tâm',
-      'Phó giám đốc trung tâm',
-      'Trưởng Khoa',
-      'Phó Trưởng Khoa'
+      'Nam',
+      'Nữ',
     ],
     degree: [
       'Tất cả',
@@ -62,36 +47,35 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onSearch, onFilterChange 
   const handleOptionSelect = (filterType: string, value: string) => {
     onFilterChange(filterType, value);
     setActiveDropdown(null);
-    
+
     // Cập nhật nội dung hiển thị trên nút
     setSelectedOptions(prev => ({
       ...prev,
-      [filterType]: value === 'Tất cả' ? 
-        filterType === 'specialty' ? 'Chuyên khoa' :
-        filterType === 'position' ? 'Chức vụ' :
-        filterType === 'degree' ? 'Học vị' :
-        'Kinh nghiệm'
+      [filterType]: value === 'Tất cả' ?
+        filterType === 'specialty' ? 'Giới tính' :
+          filterType === 'degree' ? 'Học vị' :
+            'Kinh nghiệm'
         : value
     }));
   };
 
   return (
     <div className="filter-section">
-      <div className="filter-button-container">
-        <button 
-          className="filter-button" 
-          onClick={() => handleFilterClick('specialty')}
+            <div className="filter-button-container">
+        <button
+          className="filter-button"
+          onClick={() => handleFilterClick('gender')} 
         >
-          {selectedOptions.specialty}
+          {selectedOptions.gender}
           <i className='bx bx-chevron-down'></i>
         </button>
-        {activeDropdown === 'specialty' && (
+        {activeDropdown === 'gender' && ( 
           <div className="dropdown-menu">
-            {filterOptions.specialty.map((option, index) => (
+            {filterOptions.gender.map((option, index) => ( 
               <div
                 key={index}
                 className="dropdown-item"
-                onClick={() => handleOptionSelect('specialty', option)}
+                onClick={() => handleOptionSelect('gender', option)} 
               >
                 {option}
               </div>
@@ -99,33 +83,9 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onSearch, onFilterChange 
           </div>
         )}
       </div>
-
       <div className="filter-button-container">
-        <button 
-          className="filter-button" 
-          onClick={() => handleFilterClick('position')}
-        >
-          {selectedOptions.position}
-          <i className='bx bx-chevron-down'></i>
-        </button>
-        {activeDropdown === 'position' && (
-          <div className="dropdown-menu">
-            {filterOptions.position.map((option, index) => (
-              <div
-                key={index}
-                className="dropdown-item"
-                onClick={() => handleOptionSelect('position', option)}
-              >
-                {option}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="filter-button-container">
-        <button 
-          className="filter-button" 
+        <button
+          className="filter-button"
           onClick={() => handleFilterClick('degree')}
         >
           {selectedOptions.degree}
@@ -147,8 +107,8 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onSearch, onFilterChange 
       </div>
 
       <div className="filter-button-container">
-        <button 
-          className="filter-button" 
+        <button
+          className="filter-button"
           onClick={() => handleFilterClick('experience')}
         >
           {selectedOptions.experience}
@@ -182,4 +142,4 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onSearch, onFilterChange 
   );
 };
 
-export default FilterSection; 
+export default FilterSection;

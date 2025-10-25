@@ -10,24 +10,20 @@ interface Doctor {
   name: string;
   email: string;
   phone: string;
-  coSoKham: string;
-  chuyenKhoa: string;
-  chucVu: string;
-  moTaChucVu: string;
-  hocVi: string;
-  kinhNghiem: number;
-  linkAnh: string;
+  gioi_tinh: string;
+  mo_ta_bac_si: string;
+  hoc_vi: string;
+  kinh_nghiem: number;
+  link_anh: string;
 }
 
 interface SelectedFilters {
-  specialty?: string;
-  position?: string;
+  gender?: string;
   degree?: string;
   experience?: string;
 }
 
 const DanhSachBs: React.FC = () => {
-  const [activeCenter, setActiveCenter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +31,7 @@ const DanhSachBs: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
 
-  // Tạo hàm debounce
+  // Hàm debounce để giới hạn tần suất gọi API khi tìm kiếm
   const debounce = (func: Function, wait: number) => {
     let timeout: NodeJS.Timeout;
     return (...args: any[]) => {
@@ -44,7 +40,7 @@ const DanhSachBs: React.FC = () => {
     };
   };
 
-  // Tạo hàm search với debounce
+  // Hàm tìm kiếm có debounce
   const debouncedSearch = useCallback(
     debounce(async (query: string) => {
       try {
@@ -57,7 +53,6 @@ const DanhSachBs: React.FC = () => {
         }
 
         const response = await fetch(`${process.env.REACT_APP_API_URL}/doctors/search?name=${encodeURIComponent(query)}`);
-        
         if (!response.ok) {
           const errorData = await response.json().catch(() => null);
           throw new Error(errorData?.error || `HTTP error! status: ${response.status}`);
@@ -105,15 +100,13 @@ const DanhSachBs: React.FC = () => {
     try {
       setFilterLoading(true);
       setError(null);
-      
-      // Cập nhật state để lưu giá trị filter hiện tại
+
       const newFilters = {
         ...selectedFilters,
         [filterType]: value
       };
       setSelectedFilters(newFilters);
 
-      // Tạo query params từ tất cả các filter
       const queryParams = new URLSearchParams();
       Object.entries(newFilters).forEach(([key, val]) => {
         if (val && val !== 'Tất cả') {
@@ -121,12 +114,6 @@ const DanhSachBs: React.FC = () => {
         }
       });
 
-      // Thêm facility vào query params nếu có
-      if (activeCenter && activeCenter !== 'Tất cả') {
-        queryParams.append('facility', activeCenter);
-      }
-
-      // Gọi API lọc
       const response = await fetch(`${process.env.REACT_APP_API_URL}/doctors/filter?${queryParams.toString()}`);
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
@@ -142,41 +129,6 @@ const DanhSachBs: React.FC = () => {
     }
   };
 
-  const handleCenterSelect = async (center: string) => {
-    try {
-      setActiveCenter(center);
-      setLoading(true);
-      setError(null);
-
-      // Tạo query params từ các filter hiện tại
-      const queryParams = new URLSearchParams();
-      Object.entries(selectedFilters).forEach(([key, val]) => {
-        if (val && val !== 'Tất cả') {
-          queryParams.append(key, val);
-        }
-      });
-
-      // Thêm facility vào query params
-      if (center && center !== 'Tất cả') {
-        queryParams.append('facility', center);
-      }
-
-      // Gọi API lọc với facility mới
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/doctors/filter?${queryParams.toString()}`);
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.error || `HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      setDoctors(data);
-    } catch (err) {
-      console.error('Lỗi khi lọc bác sĩ theo cơ sở:', err);
-      setError(err instanceof Error ? err.message : 'Đã xảy ra lỗi khi lọc bác sĩ');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="doctor-directory">
       <h1 className="directory-title">ĐỘI NGŨ CHUYÊN GIA BÁC SĨ</h1>
@@ -188,8 +140,7 @@ const DanhSachBs: React.FC = () => {
 
       <div className="content-container">
         <Sidebar
-          activeCenter={activeCenter}
-          onCenterSelect={handleCenterSelect}
+         
         />
 
         <div className="doctor-grid">
@@ -202,13 +153,13 @@ const DanhSachBs: React.FC = () => {
           ) : doctors.length > 0 ? (
             doctors.map((doctor) => (
               <DoctorCard
+                key={doctor.id}
                 id={doctor.id}
                 name={doctor.name}
-                position={doctor.moTaChucVu}
-                imageUrl={doctor.linkAnh}
-                specialty={doctor.chuyenKhoa}
-                experience={doctor.kinhNghiem}
-                hospital={doctor.coSoKham}
+                imageUrl={doctor.link_anh}
+                experience={doctor.kinh_nghiem}
+                hocVi={doctor.hoc_vi}
+                moTaBacSi={doctor.mo_ta_bac_si}
               />
             ))
           ) : (
@@ -220,4 +171,4 @@ const DanhSachBs: React.FC = () => {
   );
 };
 
-export default DanhSachBs; 
+export default DanhSachBs;

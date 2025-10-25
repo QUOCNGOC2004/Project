@@ -14,17 +14,11 @@ export class Doctor {
     @Column({ nullable: true })
     phone!: string;
 
-    @Column({ name: 'co_so_kham' })
-    coSoKham!: string;
+    @Column({name: 'gioi_tinh', nullable: true})
+    gioiTinh!: string;
 
-    @Column({ name: 'chuyen_khoa' })
-    chuyenKhoa!: string;
-
-    @Column({ name: 'mo_ta_chuc_vu' })
-    moTaChucVu!: string;
-
-    @Column({ name: 'chuc_vu' })
-    chucVu!: string;
+    @Column({ name: 'mo_ta_bac_si' })
+    moTaBacSi!: string;
 
     @Column({ name: 'hoc_vi' })
     hocVi!: string;
@@ -39,10 +33,8 @@ export class Doctor {
         this.name = '';
         this.email = '';
         this.phone = '';
-        this.coSoKham = '';
-        this.chuyenKhoa = '';
-        this.chucVu = '';
-        this.moTaChucVu = '';
+        this.gioiTinh = '';
+        this.moTaBacSi = '';
         this.hocVi = '';
         this.kinhNghiem = 0;
         this.linkAnh = '';
