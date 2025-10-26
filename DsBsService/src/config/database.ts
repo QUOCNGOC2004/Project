@@ -1,5 +1,7 @@
 import { DataSource } from "typeorm";
 import { Doctor } from "../entity/Doctor";
+import { DoctorSchedule } from "../entity/DoctorSchedule";
+import { TimeSlot } from "../entity/TimeSlot";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -13,7 +15,7 @@ export const AppDataSource = new DataSource({
     database: process.env.DB_NAME || "webkhambenh",
     synchronize: false,
     logging: true,
-    entities: [Doctor],
+    entities: [Doctor, DoctorSchedule, TimeSlot],
     subscribers: [],
     migrations: [],
 }); 

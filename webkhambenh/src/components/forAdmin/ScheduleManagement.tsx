@@ -1,5 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import './ScheduleManagement.css';
+
+
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+const SCHEDULES_API = `${API_URL}/schedules`;
+const DOCTORS_API = `${API_URL}/doctors`; 
 
 // --- TYPE DEFINITIONS ---
 interface Doctor {
@@ -7,55 +12,77 @@ interface Doctor {
   name: string;
 }
 
+interface TimeSlot {
+  id: number;
+  slotTime: string;
+  isAvailable: boolean;
+  appointmentId: number | null;
+}
+
 interface Schedule {
   id: number;
   doctorId: number;
-  work_date: string;
-  start_time: string;
-  end_time: string;
+  workDate: string;
+  startTime: string;
+  endTime: string;
+  doctor: Doctor;
+  timeSlots: TimeSlot[];
 }
 
-// --- MOCK DATA (Reduced for this component) ---
-const MOCK_DOCTORS: Doctor[] = [
-  { id: 1, name: 'PGS.TS. BS Nguyễn Thanh Hồi' },
-  { id: 2, name: 'GS.TS. BS. Đỗ Quyết' },
-  { id: 3, name: 'BSNT. Lê Thị Hương' },
-];
+type NewScheduleData = Omit<Schedule, 'id' | 'doctor' | 'timeSlots'>;
 
-const MOCK_SCHEDULES: Schedule[] = [
-  { id: 1, doctorId: 1, work_date: '2025-10-20', start_time: '08:00', end_time: '12:00' },
-  { id: 2, doctorId: 2, work_date: '2025-10-20', start_time: '13:00', end_time: '17:00' },
-  { id: 3, doctorId: 1, work_date: '2025-10-21', start_time: '08:00', end_time: '17:00' },
-];
 
-// --- SUB COMPONENTS ---
-const ScheduleForm: React.FC<{ doctors: Doctor[]; onAdd: (schedule: Omit<Schedule, 'id'>) => void }> = ({ doctors, onAdd }) => {
-    const [formData, setFormData] = useState({ doctorId: '', work_date: '', start_time: '', end_time: '' });
+interface ScheduleFormProps {
+  doctors: Doctor[];
+  onAdd: (scheduleData: NewScheduleData) => Promise<void>;
+}
 
-    const handleSubmit = (e: React.FormEvent) => {
+const ScheduleForm: React.FC<ScheduleFormProps> = ({ doctors, onAdd }) => {
+    const [formData, setFormData] = useState({
+        doctorId: '',
+        workDate: '',
+        startTime: '',
+        endTime: ''
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if(!formData.doctorId) {
-            alert('Vui lòng chọn bác sĩ.');
+        if (!formData.doctorId || !formData.workDate || !formData.startTime || !formData.endTime) {
+            alert('Vui lòng điền đầy đủ thông tin.');
             return;
         }
-        onAdd({
-            ...formData,
-            doctorId: parseInt(formData.doctorId),
-        });
-        setFormData({ doctorId: formData.doctorId, work_date: formData.work_date, start_time: '', end_time: '' });
+        
+        setIsSubmitting(true);
+        try {
+            await onAdd({
+                ...formData,
+                doctorId: parseInt(formData.doctorId),
+            });
+            setFormData(prev => ({ 
+                ...prev, 
+                startTime: '', 
+                endTime: '' 
+            }));
+        } catch (error) {
+            console.error('Lỗi khi thêm lịch:', error);
+            alert(`Không thể thêm lịch: ${error instanceof Error ? error.message : String(error)}`);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleShiftSelect = (shift: 'morning' | 'afternoon' | 'evening') => {
         const shifts = {
-            morning: { start_time: '08:00', end_time: '12:00' },
-            afternoon: { start_time: '13:00', end_time: '17:00' },
-            evening: { start_time: '18:00', end_time: '21:00' },
+            morning: { startTime: '08:00', endTime: '12:00' },
+            afternoon: { startTime: '13:00', endTime: '17:00' },
+            evening: { startTime: '18:00', endTime: '21:00' },
         };
         setFormData(prev => ({ ...prev, ...shifts[shift] }));
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
-        setFormData(prev => ({...prev, [e.target.name]: e.target.value}));
+        setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
     }
 
     return (
@@ -70,15 +97,15 @@ const ScheduleForm: React.FC<{ doctors: Doctor[]; onAdd: (schedule: Omit<Schedul
                 </div>
                 <div className="sm-form-group">
                     <label>Ngày</label>
-                    <input type="date" name="work_date" value={formData.work_date} onChange={handleChange} required />
+                    <input type="date" name="workDate" value={formData.workDate} onChange={handleChange} required />
                 </div>
                 <div className="sm-form-group">
                     <label>Giờ bắt đầu</label>
-                    <input type="time" name="start_time" value={formData.start_time} onChange={handleChange} required />
+                    <input type="time" name="startTime" value={formData.startTime} onChange={handleChange} required />
                 </div>
                 <div className="sm-form-group">
                     <label>Giờ kết thúc</label>
-                    <input type="time" name="end_time" value={formData.end_time} onChange={handleChange} required />
+                    <input type="time" name="endTime" value={formData.endTime} onChange={handleChange} required />
                 </div>
             </div>
             <div className="sm-form-actions">
@@ -88,26 +115,112 @@ const ScheduleForm: React.FC<{ doctors: Doctor[]; onAdd: (schedule: Omit<Schedul
                     <button type="button" onClick={() => handleShiftSelect('afternoon')} className="sm-shift-btn sm-shift-afternoon">Ca Chiều</button>
                     <button type="button" onClick={() => handleShiftSelect('evening')} className="sm-shift-btn sm-shift-evening">Ca Tối</button>
                 </div>
-                <button type="submit" className="sm-button sm-button-add">Thêm Lịch</button>
+                <button type="submit" className="sm-button sm-button-add" disabled={isSubmitting}>
+                    {isSubmitting ? 'Đang thêm...' : 'Thêm Lịch'}
+                </button>
             </div>
         </form>
     );
 };
 
+
 // --- MAIN COMPONENT ---
 const ScheduleManagement: React.FC = () => {
-    const [schedules, setSchedules] = useState<Schedule[]>(MOCK_SCHEDULES);
-    const [doctors] = useState<Doctor[]>(MOCK_DOCTORS);
+    const [schedules, setSchedules] = useState<Schedule[]>([]);
+    const [doctors, setDoctors] = useState<Doctor[]>([]);
     const [currentWeek, setCurrentWeek] = useState(new Date());
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleAddSchedule = (schedule: Omit<Schedule, 'id'>) => {
-        setSchedules([...schedules, { ...schedule, id: Date.now() }]);
+    // Hàm fetch dữ liệu
+    const fetchData = async () => {
+        setIsLoading(true);
+        setError(null);
+
+        const token = localStorage.getItem('admin_token'); 
+
+        if (!token) {
+            setError('Không tìm thấy token. Vui lòng đăng nhập lại.');
+            setIsLoading(false);
+            return;
+        }
+
+        const authHeaders = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        };
+        
+
+        try {
+            // 3. Gửi headers trong cả hai yêu cầu
+            const [schedulesResponse, doctorsResponse] = await Promise.all([
+                fetch(SCHEDULES_API, { headers: authHeaders }), 
+                fetch(DOCTORS_API, { headers: authHeaders })  
+            ]);
+
+            if (!schedulesResponse.ok) {
+                if (schedulesResponse.status === 401) throw new Error('Lỗi tải lịch: Token không hợp lệ hoặc đã hết hạn.');
+                throw new Error(`Lỗi tải lịch: ${schedulesResponse.statusText}`);
+            }
+            
+
+            const schedulesData: Schedule[] = await schedulesResponse.json();
+            const doctorsData: Doctor[] = await doctorsResponse.json();
+
+            setSchedules(schedulesData);
+            setDoctors(doctorsData);
+
+        } catch (err) {
+            console.error('Lỗi fetch dữ liệu:', err);
+            setError(err instanceof Error ? err.message : 'Lỗi không xác định');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    
+    const handleAddSchedule = async (scheduleData: NewScheduleData) => {
+        
+        
+        const token = localStorage.getItem('admin_token');
+        if (!token) {
+            throw new Error('Không tìm thấy token. Vui lòng đăng nhập lại.');
+        }
+        
+
+        const response = await fetch(SCHEDULES_API, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(scheduleData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Không thể tạo lịch');
+        }
+
+        const newScheduleApi: Omit<Schedule, 'doctor'> = await response.json();
+        const doctor = doctors.find(d => d.id === newScheduleApi.doctorId);
+        
+        const newSchedule: Schedule = {
+            ...newScheduleApi,
+            doctor: doctor || { id: newScheduleApi.doctorId, name: 'Không rõ' }
+        };
+
+        setSchedules(prevSchedules => [...prevSchedules, newSchedule]);
         alert('Đã thêm lịch làm việc mới!');
     };
 
     const weekDays = useMemo(() => {
         const startOfWeek = new Date(currentWeek);
-        startOfWeek.setDate(startOfWeek.getDate() - (startOfWeek.getDay() || 7) + 1); // Bắt đầu từ thứ 2
+        startOfWeek.setDate(startOfWeek.getDate() - (startOfWeek.getDay() || 7) + 1);
         return Array.from({ length: 7 }).map((_, i) => {
             const date = new Date(startOfWeek);
             date.setDate(date.getDate() + i);
@@ -115,6 +228,15 @@ const ScheduleManagement: React.FC = () => {
         });
     }, [currentWeek]);
 
+    if (isLoading) {
+        return <div className="sm-container"><h2>Quản lý Lịch làm việc</h2><div>Đang tải dữ liệu...</div></div>;
+    }
+
+    if (error) {
+        return <div className="sm-container"><h2>Quản lý Lịch làm việc</h2><div style={{ color: 'red' }}>Lỗi: {error}</div></div>;
+    }
+
+    
     return (
         <div className="sm-container">
             <h2>Quản lý Lịch làm việc</h2>
@@ -131,17 +253,53 @@ const ScheduleManagement: React.FC = () => {
                     <button onClick={() => setCurrentWeek(d => new Date(d.setDate(d.getDate() + 7)))}>Tuần sau &gt;</button>
                 </div>
                 <div className="sm-calendar-grid">
-                    {weekDays.map(day => <div key={day.toISOString()} className="sm-calendar-header">{day.toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit' })}</div>)}
+                    {weekDays.map(day => <div key={day.toISOString()} className="sm-calendar-header">{day.toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit' })}</div>)}                    
                     {weekDays.map(day => {
-                        const daySchedules = schedules.filter(s => new Date(s.work_date).toDateString() === day.toDateString());
+                        const daySchedules = schedules
+                            .filter(s => new Date(s.workDate).toDateString() === day.toDateString())
+                            .sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+                        const groupedSchedules = daySchedules.reduce((acc, schedule) => {
+                            const timeKey = `${schedule.startTime} - ${schedule.endTime}`;
+                            if (!acc[timeKey]) {
+                                acc[timeKey] = [];
+                            }
+                            acc[timeKey].push(schedule);
+                            return acc;
+                        }, {} as Record<string, Schedule[]>);
+
+                        const handleGroupClick = (schedulesInGroup: Schedule[], timeKey: string) => {
+                            const doctorNames = schedulesInGroup
+                                .map(s => s.doctor?.name || 'Không rõ')
+                                .join('\n - ');
+                            alert(`Các bác sĩ làm việc ca ${timeKey}:\n - ${doctorNames}`);
+                        };
+
                         return (
                             <div key={day.toISOString()} className="sm-calendar-day">
-                                {daySchedules.map(schedule => {
-                                    const doctor = doctors.find(d => d.id === schedule.doctorId);
+                                {Object.entries(groupedSchedules).map(([timeKey, schedulesInGroup]) => {
+                                    
+                                    if (schedulesInGroup.length > 1) {
+                                        return (
+                                            <div 
+                                                key={timeKey} 
+                                                className="sm-schedule-item" 
+                                                onClick={() => handleGroupClick(schedulesInGroup, timeKey)}
+                                                style={{ cursor: 'pointer', backgroundColor: '#fed7aa' }}
+                                            >
+                                                <p className="sm-schedule-doctor">Nhiều bác sĩ</p>
+                                                <p className="sm-schedule-time">{timeKey}</p>
+                                            </div>
+                                        );
+                                    }
+
+                                    const schedule = schedulesInGroup[0];
+                                    const doctorName = schedule.doctor?.name || 'Không rõ';
+                                    
                                     return (
                                         <div key={schedule.id} className="sm-schedule-item">
-                                            <p className="sm-schedule-doctor">{doctor?.name}</p>
-                                            <p className="sm-schedule-time">{schedule.start_time} - {schedule.end_time}</p>
+                                            <p className="sm-schedule-doctor">{doctorName}</p>
+                                            <p className="sm-schedule-time">{schedule.startTime} - {schedule.endTime}</p>
                                         </div>
                                     );
                                 })}

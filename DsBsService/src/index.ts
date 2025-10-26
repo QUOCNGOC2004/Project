@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { AppDataSource } from "./config/database";
 import doctorRoutes from "./routes/doctorRoutes";
+import scheduleRoutes from "./routes/scheduleRoutes";
 import dotenv from "dotenv";
 import helmet from "helmet";
 
@@ -24,6 +25,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/doctors', doctorRoutes);
+app.use('/api/schedules', scheduleRoutes);
 
 // Kết nối database và khởi chạy server
 AppDataSource.initialize()

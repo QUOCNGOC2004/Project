@@ -55,8 +55,9 @@ services:
       - name: doctor-protected-route
         paths:
           - /api/doctors
+          - /api/schedules
         strip_path: false
-        methods: [POST, PUT, DELETE, OPTIONS]
+        methods: [GET,POST, PUT, DELETE, OPTIONS]
         plugins:
           - name: jwt
     plugins:
