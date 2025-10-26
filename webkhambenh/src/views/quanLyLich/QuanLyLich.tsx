@@ -9,7 +9,7 @@ interface Appointment {
   gio_dat_lich: string;
   doctor_name: string;
   doctor_phone: string;
-  co_so_kham: string;
+  mo_ta_bac_si: string;
   ten_benh_nhan: string;
   email: string;
   gioi_tinh: string;

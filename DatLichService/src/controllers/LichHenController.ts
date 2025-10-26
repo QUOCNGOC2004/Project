@@ -254,7 +254,7 @@ export const getLichHenByUserId = async (req: Request, res: Response): Promise<v
         a.*,
         d.name as doctor_name,
         d.phone as doctor_phone,
-        d.co_so_kham as co_so_kham
+        d.mo_ta_bac_si as mo_ta_bac_si
       FROM appointments a 
       LEFT JOIN doctors d ON a.doctor_id = d.id 
       WHERE a.user_id = $1

@@ -15,7 +15,7 @@ interface Appointment {
   ngay_dat_lich: string;
   gio_dat_lich: string;
   doctor_name: string;
-  co_so_kham: string;
+  mo_ta_bac_si: string;
   doctor_phone: string;
   ly_do_kham: string;
   ten_benh_nhan: string;
@@ -170,7 +170,7 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
           <p><strong>Ngày khám:</strong> {formatDate(appointment.ngay_dat_lich)}</p>
           <p><strong>Giờ khám:</strong> {appointment.gio_dat_lich}</p>
           <p><strong>Bác sĩ:</strong> {appointment.doctor_name}</p>
-          <p><strong>Cơ sở khám:</strong> {appointment.co_so_kham}</p>
+          <p><strong>Cơ sở khám:</strong> Số 10,Yên Nghĩa,Hà Đông,Hà Nội</p>
           <p><strong>SĐT bác sĩ:</strong> {appointment.doctor_phone}</p>
         </div>
         <div className="appointment-actions">

@@ -7,10 +7,8 @@ interface Doctor {
   name: string;
   email: string;
   phone: string;
-  coSoKham: string;
-  chuyenKhoa: string;
-  chucVu: string;
-  moTaChucVu: string;
+  gioiTinh: string;       
+  moTaBacSi: string;    
   hocVi: string;
   kinhNghiem: number;
   linkAnh: string;
@@ -35,24 +33,10 @@ const Form1: React.FC<PropsForm1> = ({ duLieuForm, xuLyThayDoi }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const danhSachBenhVien = [
-    "Chọn cơ sở khám",
-    "Bệnh viện Đại học Phenikaa",
-    "Phòng khám Đa khoa Đại học Phenikaa",
-    "Sinh viên tòa A8"
-  ];
-
-  const danhSachChuyenKhoa = ['Chọn chuyên khoa',
-    'Y học bào thai',
-    'Ung bướu',
-    'Tim mạch',
-    'Khoa sản',
-    'Nội tổng hợp',
-    'Ngoại tổng hợp',
-    'Khoa Dược'];
-
   useEffect(() => {
     fetchDoctors();
+    xuLyThayDoi("benhVien", "Số 11,Yên Nghĩa,Hà Đông,Hà Nội");
+    xuLyThayDoi("chuyenKhoa", "N/A"); 
   }, []);
 
   const fetchDoctors = async () => {
@@ -76,19 +60,15 @@ const Form1: React.FC<PropsForm1> = ({ duLieuForm, xuLyThayDoi }) => {
     }
   };
 
-  // Lọc danh sách bác sĩ theo chuyên khoa và cơ sở khám đã chọn
-  const filteredDoctors = doctors.filter(doctor => {
-    const matchChuyenKhoa = !duLieuForm.chuyenKhoa || doctor.chuyenKhoa === duLieuForm.chuyenKhoa;
-    const matchCoSoKham = !duLieuForm.benhVien || doctor.coSoKham === duLieuForm.benhVien;
-    return matchChuyenKhoa && matchCoSoKham;
-  });
+
+  const filteredDoctors = doctors;
 
   const handleDoctorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedDoctorName = e.target.value;
     const selectedDoctor = doctors.find(doctor => doctor.name === selectedDoctorName);
     
     if (selectedDoctor) {
-      // Cập nhật cả tên và ID bác sĩ
+      // Cập nhật tên và ID bác sĩ
       xuLyThayDoi("bacSi", selectedDoctor.name);
       xuLyThayDoi("bacSiId", selectedDoctor.id);
       console.log("Đã chọn bác sĩ:", selectedDoctor.name, "ID:", selectedDoctor.id);
@@ -107,19 +87,24 @@ const Form1: React.FC<PropsForm1> = ({ duLieuForm, xuLyThayDoi }) => {
           <label className="form-label">
             Bệnh viện/phòng khám <span className="required">*</span>
           </label>
-          <div className="select-wrapper">
-            <select
-              className="form-select"
-              value={duLieuForm.benhVien}
-              onChange={(e) => xuLyThayDoi("benhVien", e.target.value)}
+          <div className="input-wrapper">
+            <a
+              href="https://www.google.com/maps/search/?api=1&query=Số+10,Yên+Nghĩa,Hà+Đông,Hà+Nội"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="form-input"
+              style={{ 
+                textDecoration: 'none', 
+                color: '#d78931ff', 
+                cursor: 'pointer',
+                display: 'flex', 
+                alignItems: 'center', 
+                backgroundColor: 'white',
+                height: '35px'
+              }}
             >
-              {danhSachBenhVien.map((benhVien, index) => (
-                <option key={index} value={index === 0 ? "" : benhVien}>
-                  {benhVien}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="select-icon" />
+              Số 10,Yên Nghĩa,Hà Đông,Hà Nội
+            </a>
           </div>
         </div>
 
@@ -154,29 +139,8 @@ const Form1: React.FC<PropsForm1> = ({ duLieuForm, xuLyThayDoi }) => {
             <Clock className="input-icon" />
           </div>
         </div>
-      </div>
-
-      <div className="form-grid">
-        <div className="form-group">
-          <label className="form-label">
-            Chọn chuyên khoa <span className="required">*</span>
-          </label>
-          <div className="select-wrapper">
-            <select
-              className="form-select"
-              value={duLieuForm.chuyenKhoa}
-              onChange={(e) => xuLyThayDoi("chuyenKhoa", e.target.value)}
-            >
-              {danhSachChuyenKhoa.map((chuyenKhoa, index) => (
-                <option key={index} value={index === 0 ? "" : chuyenKhoa}>
-                  {chuyenKhoa}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="select-icon" />
-          </div>
-        </div>
-
+        
+        
         <div className="form-group">
           <label className="form-label">Chọn bác sĩ <span className="required">*</span></label>
           <div className="select-wrapper">
@@ -184,19 +148,15 @@ const Form1: React.FC<PropsForm1> = ({ duLieuForm, xuLyThayDoi }) => {
               className="form-select"
               value={duLieuForm.bacSi}
               onChange={handleDoctorChange}
-              disabled={loading || !duLieuForm.chuyenKhoa || !duLieuForm.benhVien}
+              disabled={loading}
             >
               <option value="">Chọn bác sĩ</option>
               {loading ? (
                 <option disabled>Đang tải...</option>
               ) : error ? (
                 <option disabled>Lỗi: {error}</option>
-              ) : !duLieuForm.chuyenKhoa ? (
-                <option disabled>Vui lòng chọn chuyên khoa</option>
-              ) : !duLieuForm.benhVien ? (
-                <option disabled>Vui lòng chọn cơ sở khám</option>
               ) : filteredDoctors.length === 0 ? (
-                <option disabled>Không có bác sĩ phù hợp</option>
+                <option disabled>Không có bác sĩ</option>
               ) : (
                 filteredDoctors.map((doctor) => (
                   <option key={doctor.id} value={doctor.name}>
@@ -223,4 +183,4 @@ const Form1: React.FC<PropsForm1> = ({ duLieuForm, xuLyThayDoi }) => {
   );
 };
 
-export default Form1; 
+export default Form1;
