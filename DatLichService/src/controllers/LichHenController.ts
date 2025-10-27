@@ -58,173 +58,326 @@ export const getLichHenById = async (req: Request, res: Response): Promise<void>
 
 // Tạo lịch hẹn mới
 export const createLichHen = async (req: Request, res: Response): Promise<void> => {
+  const user_id = req.user?.id; 
+
+  if (!user_id) {
+    logActivity(req, null, 'tạo lịch hẹn thất bại', { reason: 'Không có thông tin người dùng từ token' });
+    res.status(401).json({ error: 'Xác thực không hợp lệ.' });
+    return;
+  }
+
+  const {
+    doctor_id,
+    ngay_dat_lich,
+    gio_dat_lich,
+    ten_benh_nhan,
+    email,
+    gioi_tinh,
+    ngay_sinh,
+    so_dien_thoai,
+    ly_do_kham
+  } = req.body;
+
+  // Kiểm tra dữ liệu đầu vào
+  if (!doctor_id || !ngay_dat_lich || !gio_dat_lich || !ten_benh_nhan || !email || !so_dien_thoai) {
+    logActivity(req, user_id, 'tạo lịch hẹn thất bại', { reason: 'Thiếu thông tin bắt buộc' });
+    res.status(400).json({ error: 'Thiếu thông tin bắt buộc' });
+    return;
+  }
+
   try {
-    const user_id = req.user?.id; 
+    let newAppointment: LichHen;
+    await AppDataSource.transaction(async transactionalEntityManager => {
+        
+        const findSlotQuery = `
+          SELECT ts.id
+          FROM time_slots ts
+          JOIN doctor_schedules ds ON ts.schedule_id = ds.id
+          WHERE ds.doctor_id = $1
+            AND ds.work_date = $2
+            AND ts.slot_time = $3
+            AND ts.is_available = TRUE
+          FOR UPDATE;
+        `;
+        const slotResult = await transactionalEntityManager.query(findSlotQuery, [
+          doctor_id,
+          ngay_dat_lich,
+          gio_dat_lich
+        ]);
 
-    if (!user_id) {
-      logActivity(req, null, 'tạo lịch hẹn thất bại', { reason: 'Không có thông tin người dùng từ token' });
-      res.status(401).json({ error: 'Xác thực không hợp lệ.' });
-      return;
-    }
+        if (slotResult.length === 0) {
+          logActivity(req, user_id, 'tạo lịch hẹn thất bại', { 
+              reason: 'Giờ đã kín hoặc không tồn tại', 
+              doctorId: doctor_id, 
+              date: ngay_dat_lich, 
+              time: gio_dat_lich 
+          });
+          throw new Error('Giờ này đã kín lịch hoặc bác sĩ không có lịch làm việc.');
+        }
 
-    const {
-      doctor_id,
-      ngay_dat_lich,
-      gio_dat_lich,
-      ten_benh_nhan,
-      email,
-      gioi_tinh,
-      ngay_sinh,
-      so_dien_thoai,
-      ly_do_kham
-    } = req.body;
+        const timeSlotId = slotResult[0].id;
 
-    // Kiểm tra dữ liệu đầu vào
-    if (!doctor_id || !ngay_dat_lich || !gio_dat_lich || !ten_benh_nhan || !email || !so_dien_thoai) {
-      // Log cho hành động tạo lịch hẹn thất bại do thiếu thông tin
-      logActivity(req, user_id, 'tạo lịch hẹn thất bại', { reason: 'Thiếu thông tin bắt buộc' });
-      res.status(400).json({ error: 'Thiếu thông tin bắt buộc' });
-      return;
-    }
+        
+        const insertAppointmentQuery = `
+          INSERT INTO appointments (
+            doctor_id, user_id, ngay_dat_lich, gio_dat_lich,
+            ten_benh_nhan, email, gioi_tinh, ngay_sinh,
+            so_dien_thoai, ly_do_kham, trang_thai
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *
+        `;
+        const appointmentResult = await transactionalEntityManager.query(insertAppointmentQuery, [
+          doctor_id,
+          user_id, 
+          ngay_dat_lich,
+          gio_dat_lich,
+          ten_benh_nhan,
+          email,
+          gioi_tinh || null,
+          ngay_sinh || null,
+          so_dien_thoai,
+          ly_do_kham || null,
+          'chờ xác nhận'
+        ]);
 
-    // Kiểm tra xem bác sĩ có tồn tại không
-    const doctorExists = await AppDataSource.query(
-      'SELECT id FROM doctors WHERE id = $1',
-      [doctor_id]
-    );
+        newAppointment = appointmentResult[0];
 
-    if (doctorExists.length === 0) {
-      // Log cho hành động tạo lịch hẹn thất bại do bác sĩ không tồn tại
-      logActivity(req, user_id, 'tạo lịch hẹn thất bại', { reason: 'Không tìm thấy bác sĩ', doctorId: doctor_id });
-      res.status(400).json({ error: 'Không tìm thấy bác sĩ' });
-      return;
-    }
-    
-    const result = await AppDataSource.query(
-      `INSERT INTO appointments (
-        doctor_id, user_id, ngay_dat_lich, gio_dat_lich,
-        ten_benh_nhan, email, gioi_tinh, ngay_sinh,
-        so_dien_thoai, ly_do_kham, trang_thai
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
-      [
-        doctor_id,
-        user_id, 
-        ngay_dat_lich,
-        gio_dat_lich,
-        ten_benh_nhan,
-        email,
-        gioi_tinh || null,
-        ngay_sinh || null,
-        so_dien_thoai,
-        ly_do_kham || null,
-        'chờ xác nhận'
-      ]
-    );
+        
+        const updateSlotQuery = `
+          UPDATE time_slots
+          SET is_available = FALSE,
+              appointment_id = $1
+          WHERE id = $2;
+        `;
+        await transactionalEntityManager.query(updateSlotQuery, [newAppointment.id, timeSlotId]);
+    });
 
-    const lichHen: LichHen = result[0];
- 
-    // Log cho hành động tạo lịch hẹn thành công
-    logActivity(req, user_id, 'tạo lịch hẹn thành công', { appointmentId: lichHen.id, doctorId: doctor_id });
-    res.status(201).json(lichHen);
+    logActivity(req, user_id, 'tạo lịch hẹn thành công', { 
+        appointmentId: newAppointment!.id, 
+        doctorId: doctor_id 
+    });
+    res.status(201).json(newAppointment!);
+
   } catch (error) {
     console.error('Lỗi khi tạo lịch hẹn mới:', error);
+    if (error instanceof Error && error.message.includes('kín lịch')) {
+      res.status(409).json({ error: error.message });
+      return; 
+    }
     logActivity(req, req.user?.id || null, 'CREATE_APPOINTMENT_ERROR', { error: (error as Error).message });
     res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
   }
 };
 
 export const updateLichHen = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+  const user_id = req.user?.id; 
+
+  if (!user_id) {
+    res.status(401).json({ error: 'Xác thực không hợp lệ.' });
+    return;
+  }
+
   try {
-    const { id } = req.params;
-    const user_id = req.user?.id; 
+    let updatedAppointment: LichHen;
 
-    if (!user_id) {
-      res.status(401).json({ error: 'Xác thực không hợp lệ.' });
-      return;
-    }
+    await AppDataSource.transaction(async transactionalEntityManager => {
+      // 1. Lấy và khóa lịch hẹn hiện tại để kiểm tra
+      const currentAppointmentResult = await transactionalEntityManager.query(
+        `SELECT * FROM appointments WHERE id = $1 AND user_id = $2 FOR UPDATE`,
+        [id, user_id]
+      );
 
-    const updateFields: string[] = [];
-    const updateValues: any[] = [];
-    let paramIndex = 1;
-
-    // Lọc các trường được gửi lên trong body
-    const allowedFields = [
-      'ngay_dat_lich', 'gio_dat_lich', 'ten_benh_nhan', 'email',
-      'gioi_tinh', 'ngay_sinh', 'so_dien_thoai', 'ly_do_kham', 'trang_thai'
-    ];
-    
-    // Xây dựng câu lệnh UPDATE động
-    for (const field of allowedFields) {
-      if (req.body[field] !== undefined) {
-        updateFields.push(`${field} = $${paramIndex}`);
-        updateValues.push(req.body[field]);
-        paramIndex++;
+      if (currentAppointmentResult.length === 0) {
+        throw new Error('404'); 
       }
-    }
 
-    // Luôn thêm updated_at
-    updateFields.push(`updated_at = CURRENT_TIMESTAMP`);
+      const currentAppointment: LichHen = currentAppointmentResult[0];
 
-    // Kiểm tra nếu không có trường nào để cập nhật
-    if (updateFields.length === 1 && updateFields[0] === 'updated_at = CURRENT_TIMESTAMP') {
-      res.status(400).json({ error: 'Không có thông tin nào để cập nhật' });
-      return;
-    }
+      
+      const newDoctorId = req.body.doctor_id;
+      const newNgayDatLich = req.body.ngay_dat_lich;
+      const newGioDatLich = req.body.gio_dat_lich;
 
-    // Thêm id và user_id vào cuối mảng giá trị cho mệnh đề WHERE
-    updateValues.push(id, user_id);
-    
-    const updateQuery = `
-      UPDATE appointments SET 
-        ${updateFields.join(', ')} 
-      WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1} RETURNING *
-    `;
+      
+      const isSlotChanging = newDoctorId !== undefined || 
+                             newNgayDatLich !== undefined || 
+                             newGioDatLich !== undefined;
 
-    const [rows, rowCount] = await AppDataSource.query(updateQuery, updateValues);
+      let mustChangeSlot = false;
+      let targetDoctorId = currentAppointment.doctor_id;
+      let targetDate = currentAppointment.ngay_dat_lich;
+      let targetTime = currentAppointment.gio_dat_lich;
 
-    if (rowCount === 0) {
-      logActivity(req, user_id, 'UPDATE_APPOINTMENT_NOT_FOUND', { appointmentId: id });
-      res.status(404).json({ error: 'Không tìm thấy lịch hẹn hoặc bạn không có quyền sửa.' });
-      return;
-    }
+      if (isSlotChanging) {
+        targetDoctorId = newDoctorId || currentAppointment.doctor_id;
+        targetDate = newNgayDatLich || currentAppointment.ngay_dat_lich;
+        targetTime = newGioDatLich || currentAppointment.gio_dat_lich;
 
-    const lichHen: LichHen = rows[0]; 
-    
+        
+        if (targetDoctorId !== currentAppointment.doctor_id || 
+            targetDate !== currentAppointment.ngay_dat_lich || 
+            targetTime !== currentAppointment.gio_dat_lich) {
+          mustChangeSlot = true;
+        }
+      }
+      
+      
+      if (mustChangeSlot) {
+        
+        await transactionalEntityManager.query(
+          `UPDATE time_slots 
+           SET is_available = TRUE, appointment_id = NULL 
+           WHERE appointment_id = $1`,
+          [currentAppointment.id]
+        );
+
+        
+        const findSlotQuery = `
+          SELECT ts.id
+          FROM time_slots ts
+          JOIN doctor_schedules ds ON ts.schedule_id = ds.id
+          WHERE ds.doctor_id = $1
+            AND ds.work_date = $2
+            AND ts.slot_time = $3
+            AND ts.is_available = TRUE
+          FOR UPDATE;
+        `;
+        const slotResult = await transactionalEntityManager.query(findSlotQuery, [
+          targetDoctorId,
+          targetDate,
+          targetTime
+        ]);
+
+        if (slotResult.length === 0) {
+          
+          throw new Error('409'); 
+        }
+
+        const newTimeSlotId = slotResult[0].id;
+
+      
+        await transactionalEntityManager.query(
+          `UPDATE time_slots 
+           SET is_available = FALSE, appointment_id = $1 
+           WHERE id = $2`,
+          [currentAppointment.id, newTimeSlotId]
+        );
+      }
+
+     
+      const updateFields: string[] = [];
+      const updateValues: any[] = [];
+      let paramIndex = 1;
+
+      const allowedFields = [
+        'doctor_id', 'ngay_dat_lich', 'gio_dat_lich', 'ten_benh_nhan', 'email',
+        'gioi_tinh', 'ngay_sinh', 'so_dien_thoai', 'ly_do_kham', 'trang_thai'
+      ];
+      
+      for (const field of allowedFields) {
+        if (req.body[field] !== undefined) {
+          updateFields.push(`${field} = $${paramIndex}`);
+          updateValues.push(req.body[field]);
+          paramIndex++;
+        }
+      }
+
+      if (updateFields.length === 0) {
+        updatedAppointment = currentAppointment;
+        return;
+      }
+
+      // Luôn thêm updated_at
+      updateFields.push(`updated_at = CURRENT_TIMESTAMP`);
+
+      // Thêm id và user_id vào cuối mảng giá trị cho mệnh đề WHERE
+      updateValues.push(id, user_id);
+      
+      const updateQuery = `
+        UPDATE appointments SET 
+          ${updateFields.join(', ')} 
+        WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1} RETURNING *
+      `;
+
+      const updateResult = await transactionalEntityManager.query(updateQuery, updateValues);
+      updatedAppointment = updateResult[0];
+    });
+
     logActivity(req, user_id, 'cập nhật lịch hẹn thành công', { appointmentId: id, updatedFields: Object.keys(req.body) });
-    res.json(lichHen);
+    res.json(updatedAppointment!);
+
   } catch (error) {
     console.error('Lỗi khi cập nhật lịch hẹn:', error);
-    logActivity(req, req.user?.id || null, 'UPDATE_APPOINTMENT_ERROR', { appointmentId: req.params.id, error: (error as Error).message });
+    
+    // Bắt lỗi tùy chỉnh đã ném
+    if (error instanceof Error) {
+      if (error.message === '404') {
+        logActivity(req, user_id, 'UPDATE_APPOINTMENT_NOT_FOUND', { appointmentId: id });
+        res.status(404).json({ error: 'Không tìm thấy lịch hẹn hoặc bạn không có quyền sửa.' });
+        return;
+      }
+      if (error.message === '409') {
+        logActivity(req, user_id, 'UPDATE_APPOINTMENT_SLOT_CONFLICT', { appointmentId: id });
+        res.status(409).json({ error: 'Slot mới bạn chọn đã kín. Vui lòng chọn giờ khác.' });
+        return;
+      }
+    }
+    
+    logActivity(req, user_id, 'UPDATE_APPOINTMENT_ERROR', { appointmentId: id, error: (error as Error).message });
     res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
   }
 };
 
 // Xóa lịch hẹn
 export const deleteLichHen = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+  const user_id = req.user?.id; 
+
+  if (!user_id) {
+      res.status(401).json({ error: 'Xác thực không hợp lệ.' });
+      return;
+  }
+
   try {
-    const { id } = req.params;
-    const user_id = req.user?.id; 
+    await AppDataSource.transaction(async transactionalEntityManager => {
+      const appointmentResult = await transactionalEntityManager.query(
+        `SELECT id FROM appointments 
+         WHERE id = $1 AND user_id = $2 
+         FOR UPDATE`, 
+        [id, user_id]
+      );
 
-    if (!user_id) {
-        res.status(401).json({ error: 'Xác thực không hợp lệ.' });
-        return;
-    }
-    
+      if (appointmentResult.length === 0) {
+        throw new Error('404'); 
+      }
 
-    const [_rows, rowCount] = await AppDataSource.query('DELETE FROM appointments WHERE id = $1 AND user_id = $2 RETURNING *', [id, user_id]);
+      const appointmentId = appointmentResult[0].id;
 
-    if (rowCount === 0) {
+      await transactionalEntityManager.query(
+        `UPDATE time_slots 
+         SET is_available = TRUE, appointment_id = NULL 
+         WHERE appointment_id = $1`,
+        [appointmentId]
+      );
+      await transactionalEntityManager.query(
+        `DELETE FROM appointments 
+         WHERE id = $1`, 
+        [appointmentId]
+      );
+    });
+    logActivity(req, user_id, 'xóa lịch hẹn thành công', { appointmentId: id });
+    res.json({ message: 'Xóa lịch hẹn thành công' });
+
+  } catch (error) {
+    console.error('Lỗi khi xóa lịch hẹn:', error);
+
+    if (error instanceof Error && error.message === '404') {
       logActivity(req, user_id, 'DELETE_APPOINTMENT_NOT_FOUND', { appointmentId: id });
       res.status(404).json({ error: 'Không tìm thấy lịch hẹn hoặc bạn không có quyền xóa.' });
       return;
     }
 
-    
-    logActivity(req, user_id, 'xóa lịch hẹn thành công', {});
-    res.json({ message: 'Xóa lịch hẹn thành công' });
-  } catch (error) {
-    console.error('Lỗi khi xóa lịch hẹn:', error);
-    logActivity(req, req.user?.id || null, 'DELETE_APPOINTMENT_ERROR', { appointmentId: req.params.id, error: (error as Error).message });
+    logActivity(req, user_id, 'DELETE_APPOINTMENT_ERROR', { appointmentId: id, error: (error as Error).message });
     res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
   }
 };

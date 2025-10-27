@@ -112,15 +112,26 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
         if (response.status === 401) {
             logout();
             history.push('/dang-nhap-dang-ky');
+            return; 
         }
-        throw new Error('Không thể cập nhật lịch hẹn');
+
+
+        if (response.status === 409) {
+          const errorData = await response.json().catch(() => ({ error: 'Slot mới bạn chọn đã kín. Vui lòng chọn giờ khác.' }));
+          const apiErrorMessage = errorData.error;
+          alert(apiErrorMessage); 
+          return;
+        }
+        
+        const errorData = await response.json().catch(() => ({ error: 'Không thể cập nhật lịch hẹn' }));
+        throw new Error(errorData.error);
       }
 
       onUpdate();
       setShowEditModal(false);
     } catch (error) {
       console.error('Lỗi khi cập nhật lịch hẹn:', error);
-      alert('Có lỗi xảy ra khi cập nhật lịch hẹn');
+      alert(`Có lỗi xảy ra: ${error instanceof Error ? error.message : 'Vui lòng thử lại.'}`);
     } finally {
       setIsUpdating(false);
     }

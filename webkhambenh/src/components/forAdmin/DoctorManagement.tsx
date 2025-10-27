@@ -15,9 +15,9 @@ interface Doctor {
 
 interface DoctorSchedule {
   id: number;
-  work_date: string;
-  start_time: string;
-  end_time: string;
+  workDate: string;  
+  startTime: string; 
+  endTime: string;  
 }
 
 const GIOI_TINH_OPTIONS = ['Nam', 'Nữ', 'Khác'];
@@ -65,9 +65,9 @@ const ScheduleModal: React.FC<{ doctorName: string; schedules: DoctorSchedule[];
             <tbody>
               {schedules.map((schedule) => (
                 <tr key={schedule.id}>
-                  <td>{new Date(schedule.work_date).toLocaleDateString('vi-VN')}</td>
-                  <td>{schedule.start_time}</td>
-                  <td>{schedule.end_time}</td>
+                  <td>{new Date(schedule.workDate).toLocaleDateString('vi-VN')}</td>
+                  <td>{schedule.startTime}</td>
+                  <td>{schedule.endTime}</td>
                 </tr>
               ))}
             </tbody>
@@ -265,7 +265,7 @@ const DoctorManagement: React.FC = () => {
   const fetchSchedules = async (doctorId: number, doctorName: string) => {
     try {
       const token = getAuthToken();
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/doctors/${doctorId}/schedules`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/schedules/doctor/${doctorId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!response.ok) throw new Error('Không thể tải lịch làm việc');

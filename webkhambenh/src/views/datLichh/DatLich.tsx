@@ -60,8 +60,6 @@ const DatLich: React.FC = () => {
 
   const kiemTraForm = (): boolean => {
     const requiredFields: (keyof DuLieuForm)[] = [
-      'benhVien',
-      'chuyenKhoa',
       'bacSi',
       'bacSiId',
       'ngayHen',
@@ -118,7 +116,6 @@ const DatLich: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // Thêm Authorization header vào đây
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
@@ -140,9 +137,25 @@ const DatLich: React.FC = () => {
         if (response.status === 401) {
           logout();
           alert('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+          return; 
         }
+
+        
+        if (response.status === 409) {
+          const errorData = await response.json().catch(() => ({ error: 'Giờ này đã kín lịch hoặc bác sĩ không có lịch làm việc.' }));
+          const apiErrorMessage = errorData.error;
+          setError(apiErrorMessage); 
+          alert(apiErrorMessage); 
+          return; 
+        }
+   
+
+      
         const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.error || `HTTP error! status: ${response.status}`);
+        const errorMessage = errorData?.error || `HTTP error! status: ${response.status}`;
+        setError(errorMessage);
+        alert(errorMessage);
+        return; 
       }
 
       const data = await response.json();
@@ -168,8 +181,9 @@ const DatLich: React.FC = () => {
 
     } catch (err) {
       console.error('Lỗi khi đặt lịch:', err);
-      setError(err instanceof Error ? err.message : 'Đã xảy ra lỗi khi đặt lịch');
-      alert('Có lỗi xảy ra khi đặt lịch. Vui lòng thử lại sau.');
+      const errorMessage = err instanceof Error ? err.message : 'Đã xảy ra lỗi khi đặt lịch';
+      setError(errorMessage);
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }
