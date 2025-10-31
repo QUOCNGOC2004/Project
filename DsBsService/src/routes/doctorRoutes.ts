@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import {
-    getDoctors, getDoctorById, filterDoctors, searchDoctorsByName, createDoctor,
+    getDoctors, getDoctorById, filterDoctors, createDoctor,
     updateDoctor, deleteDoctor
 } from '../controllers/doctorController';
 import { auth } from '../middleware/auth';
@@ -9,7 +9,6 @@ const router = Router();
 
 // router công khai
 router.get('/filter', filterDoctors);
-router.get('/search', searchDoctorsByName);
 router.get('/', getDoctors);
 // router được bảo vệ
 router.post('/', auth(['admin']), createDoctor);

@@ -1,62 +1,80 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './Sidebar.css';
+import 'boxicons/css/boxicons.min.css'; 
+
+export interface ScheduleFilterState {
+  date: string;
+  shifts: {
+    sang: boolean;
+    chieu: boolean;
+    toi: boolean;
+  };
+  filterAvailable: boolean;
+}
 
 
-const getTodayDate = () => {
-  const today = new Date();
-  return today.toISOString().split('T')[0];
-};
+interface SidebarProps {
+  isScheduleFilterActive: boolean; // Trạng thái BẬT/TẮT của bộ lọc
+  onToggleActive: () => void; // Hàm xử lý khi bấm nút BẬT/TẮT
+  scheduleFilters: ScheduleFilterState; // State hiện tại của các bộ lọc
+  onScheduleChange: (newFilters: ScheduleFilterState) => void; // Hàm cập nhật state
+}
 
-const Sidebar: React.FC = () => {
+const Sidebar: React.FC<SidebarProps> = ({
+  isScheduleFilterActive,
+  onToggleActive,
+  scheduleFilters,
+  onScheduleChange
+}) => {
 
-  const [selectedDate, setSelectedDate] = useState<string>(getTodayDate());
-
-  // 2. State cho các ca
-  const [selectedShifts, setSelectedShifts] = useState({
-    sang: false,
-    chieu: false,
-    toi: false,
-  });
-
-  // 3. State cho nút "Lọc lịch trống"
-  const [filterAvailable, setFilterAvailable] = useState<boolean>(false);
-
-
+  
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedDate(e.target.value);
+    onScheduleChange({ ...scheduleFilters, date: e.target.value });
   };
 
+  
   const handleShiftChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
-    setSelectedShifts(prevShifts => ({
-      ...prevShifts,
-      [name]: checked,
-    }));
+    onScheduleChange({
+      ...scheduleFilters,
+      shifts: {
+        ...scheduleFilters.shifts,
+        [name]: checked,
+      }
+    });
   };
 
+  
   const handleAvailableToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFilterAvailable(e.target.checked);
+    onScheduleChange({ ...scheduleFilters, filterAvailable: e.target.checked });
   };
 
   return (
     <div className="sidebar">
 
-      <div className="sidebar-header">Lịch làm việc</div>
+     
+      <button 
+        className={`sidebar-header-button ${isScheduleFilterActive ? 'active' : ''}`}
+        onClick={onToggleActive}
+      >
+        Lịch làm việc 
+        
+        <i className={`bx ${isScheduleFilterActive ? 'bx-toggle-right' : 'bx-toggle-left'}`}></i>
+      </button>
 
-
-      <div className="sidebar-content">
-
+      
+      <div className={`sidebar-content ${!isScheduleFilterActive ? 'disabled' : ''}`}>
 
         <div className="schedule-filter-group">
           <label htmlFor="schedule-date">Chọn ngày</label>
           <input
             type="date"
             id="schedule-date"
-            value={selectedDate}
+            value={scheduleFilters.date}
             onChange={handleDateChange}
+            disabled={!isScheduleFilterActive} // Vô hiệu hóa khi filter TẮT
           />
         </div>
-
 
         <div className="schedule-filter-group">
           <label>Chọn ca làm việc</label>
@@ -67,8 +85,9 @@ const Sidebar: React.FC = () => {
                 type="checkbox"
                 id="ca-sang"
                 name="sang"
-                checked={selectedShifts.sang}
+                checked={scheduleFilters.shifts.sang}
                 onChange={handleShiftChange}
+                disabled={!isScheduleFilterActive} // Vô hiệu hóa khi filter TẮT
               />
               <label htmlFor="ca-sang">Ca sáng</label>
             </div>
@@ -78,8 +97,9 @@ const Sidebar: React.FC = () => {
                 type="checkbox"
                 id="ca-chieu"
                 name="chieu"
-                checked={selectedShifts.chieu}
+                checked={scheduleFilters.shifts.chieu}
                 onChange={handleShiftChange}
+                disabled={!isScheduleFilterActive} // Vô hiệu hóa khi filter TẮT
               />
               <label htmlFor="ca-chieu">Ca chiều</label>
             </div>
@@ -89,22 +109,23 @@ const Sidebar: React.FC = () => {
                 type="checkbox"
                 id="ca-toi"
                 name="toi"
-                checked={selectedShifts.toi}
+                checked={scheduleFilters.shifts.toi}
                 onChange={handleShiftChange}
+                disabled={!isScheduleFilterActive} // Vô hiệu hóa khi filter TẮT
               />
               <label htmlFor="ca-toi">Ca tối</label>
             </div>
           </div>
         </div>
 
-
         <div className="schedule-filter-group">
           <div className="filter-checkbox highlight">
             <input
               type="checkbox"
               id="filter-available"
-              checked={filterAvailable}
+              checked={scheduleFilters.filterAvailable}
               onChange={handleAvailableToggle}
+              disabled={!isScheduleFilterActive} // Vô hiệu hóa khi filter TẮT
             />
             <label htmlFor="filter-available">Lọc lịch trống</label>
           </div>

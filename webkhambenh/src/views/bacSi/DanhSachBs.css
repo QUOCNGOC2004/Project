@@ -217,3 +217,48 @@
     grid-template-columns: 1fr; /* hiển thị 1 bác sĩ trên 1 hàng */
   }
 } 
+.sidebar-header-button {
+  font-size: 1.1rem; 
+  font-weight: bold;
+  padding: 15px 20px;
+  background-color: #f0f4f7; 
+  border: none;
+  border-bottom: 1px solid #ddd;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  color: #333; 
+}
+
+.sidebar-header-button:hover {
+  background-color: #e9eef2;
+}
+
+.sidebar-header-button i {
+  font-size: 1.8rem;
+  transition: color 0.3s ease;
+}
+
+/* Kiểu khi nút active (BẬT) */
+.sidebar-header-button.active {
+  color: #E65103; 
+}
+
+.sidebar-header-button.active i {
+  color: #007bff;
+}
+
+/* Kiểu cho nội dung sidebar khi bị vô hiệu hóa (disabled) */
+.sidebar-content.disabled {
+  opacity: 0.5;
+  pointer-events: none; /* Ngăn chặn click vào các input */
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-content.disabled .schedule-filter-group {
+  background-color: #f8f8f8; /* Nền mờ đi một chút */
+}
