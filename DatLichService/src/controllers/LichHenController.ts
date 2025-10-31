@@ -1,18 +1,18 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../config/database';
 import { LichHen } from '../entity/LichHen';
-import { logActivity } from '../utils/logger'; 
+
 
 // Lấy danh sách lịch hẹn
-export const getAllLichHen = async (req: Request, res: Response): Promise<void> => {
+export const getAllLichHen = async (_req: Request, res: Response): Promise<void> => {
   try {
     const result = await AppDataSource.query('SELECT * FROM appointments ORDER BY ngay_dat_lich, gio_dat_lich');
     const lichHen: LichHen[] = result;
-    logActivity(req, req.user?.id || null, 'lấy tất cả lịch hẹn', { count: lichHen.length });
+    
     res.json(lichHen);
   } catch (error) {
     console.error('Lỗi khi lấy danh sách lịch hẹn:', error);
-    logActivity(req, req.user?.id || null, 'GET_ALL_APPOINTMENTS_ERROR', { error: (error as Error).message });
+    
     res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
   }
 };
@@ -40,18 +40,18 @@ export const getLichHenById = async (req: Request, res: Response): Promise<void>
     const result = await AppDataSource.query(query, params);
     
     if (result.length === 0) {
-      logActivity(req, requestingUser.id, 'GET_APPOINTMENT_BY_ID_NOT_FOUND', { appointmentId: id });
+      
       res.status(404).json({ error: 'Không tìm thấy lịch hẹn hoặc bạn không có quyền truy cập.' });
       return;
     }
 
     const lichHen: LichHen = result[0];
     
-    logActivity(req, requestingUser.id, 'GET_APPOINTMENT_BY_ID_SUCCESS', { appointmentId: id });
+    
     res.json(lichHen);
   } catch (error) {
     console.error('Lỗi khi lấy thông tin lịch hẹn:', error);
-    logActivity(req, req.user?.id || null, 'GET_APPOINTMENT_BY_ID_ERROR', { appointmentId: req.params.id, error: (error as Error).message });
+    
     res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
   }
 };
@@ -61,7 +61,7 @@ export const createLichHen = async (req: Request, res: Response): Promise<void> 
   const user_id = req.user?.id; 
 
   if (!user_id) {
-    logActivity(req, null, 'tạo lịch hẹn thất bại', { reason: 'Không có thông tin người dùng từ token' });
+   
     res.status(401).json({ error: 'Xác thực không hợp lệ.' });
     return;
   }
@@ -80,7 +80,7 @@ export const createLichHen = async (req: Request, res: Response): Promise<void> 
 
   // Kiểm tra dữ liệu đầu vào
   if (!doctor_id || !ngay_dat_lich || !gio_dat_lich || !ten_benh_nhan || !email || !so_dien_thoai) {
-    logActivity(req, user_id, 'tạo lịch hẹn thất bại', { reason: 'Thiếu thông tin bắt buộc' });
+    
     res.status(400).json({ error: 'Thiếu thông tin bắt buộc' });
     return;
   }
@@ -106,12 +106,7 @@ export const createLichHen = async (req: Request, res: Response): Promise<void> 
         ]);
 
         if (slotResult.length === 0) {
-          logActivity(req, user_id, 'tạo lịch hẹn thất bại', { 
-              reason: 'Giờ đã kín hoặc không tồn tại', 
-              doctorId: doctor_id, 
-              date: ngay_dat_lich, 
-              time: gio_dat_lich 
-          });
+          
           throw new Error('Giờ này đã kín lịch hoặc bác sĩ không có lịch làm việc.');
         }
 
@@ -151,10 +146,7 @@ export const createLichHen = async (req: Request, res: Response): Promise<void> 
         await transactionalEntityManager.query(updateSlotQuery, [newAppointment.id, timeSlotId]);
     });
 
-    logActivity(req, user_id, 'tạo lịch hẹn thành công', { 
-        appointmentId: newAppointment!.id, 
-        doctorId: doctor_id 
-    });
+    
     res.status(201).json(newAppointment!);
 
   } catch (error) {
@@ -163,7 +155,7 @@ export const createLichHen = async (req: Request, res: Response): Promise<void> 
       res.status(409).json({ error: error.message });
       return; 
     }
-    logActivity(req, req.user?.id || null, 'CREATE_APPOINTMENT_ERROR', { error: (error as Error).message });
+    
     res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
   }
 };
@@ -303,7 +295,7 @@ export const updateLichHen = async (req: Request, res: Response): Promise<void> 
       updatedAppointment = updateResult[0];
     });
 
-    logActivity(req, user_id, 'cập nhật lịch hẹn thành công', { appointmentId: id, updatedFields: Object.keys(req.body) });
+    
     res.json(updatedAppointment!);
 
   } catch (error) {
@@ -312,18 +304,18 @@ export const updateLichHen = async (req: Request, res: Response): Promise<void> 
     // Bắt lỗi tùy chỉnh đã ném
     if (error instanceof Error) {
       if (error.message === '404') {
-        logActivity(req, user_id, 'UPDATE_APPOINTMENT_NOT_FOUND', { appointmentId: id });
+        
         res.status(404).json({ error: 'Không tìm thấy lịch hẹn hoặc bạn không có quyền sửa.' });
         return;
       }
       if (error.message === '409') {
-        logActivity(req, user_id, 'UPDATE_APPOINTMENT_SLOT_CONFLICT', { appointmentId: id });
+        
         res.status(409).json({ error: 'Slot mới bạn chọn đã kín. Vui lòng chọn giờ khác.' });
         return;
       }
     }
     
-    logActivity(req, user_id, 'UPDATE_APPOINTMENT_ERROR', { appointmentId: id, error: (error as Error).message });
+    
     res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
   }
 };
@@ -365,19 +357,19 @@ export const deleteLichHen = async (req: Request, res: Response): Promise<void> 
         [appointmentId]
       );
     });
-    logActivity(req, user_id, 'xóa lịch hẹn thành công', { appointmentId: id });
+
     res.json({ message: 'Xóa lịch hẹn thành công' });
 
   } catch (error) {
     console.error('Lỗi khi xóa lịch hẹn:', error);
 
     if (error instanceof Error && error.message === '404') {
-      logActivity(req, user_id, 'DELETE_APPOINTMENT_NOT_FOUND', { appointmentId: id });
+      
       res.status(404).json({ error: 'Không tìm thấy lịch hẹn hoặc bạn không có quyền xóa.' });
       return;
     }
 
-    logActivity(req, user_id, 'DELETE_APPOINTMENT_ERROR', { appointmentId: id, error: (error as Error).message });
+   
     res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
   }
 };
@@ -394,7 +386,7 @@ export const getLichHenByUserId = async (req: Request, res: Response): Promise<v
 
     // Nếu người yêu cầu là 'user', họ chỉ có thể xem lịch hẹn của chính mình
     if (requestingUser.role === 'user' && requestingUser.id.toString() !== userId) {
-        logActivity(req, requestingUser.id, 'GET_APPOINTMENTS_BY_USER_ID_FORBIDDEN', { targetUserId: userId });
+       
         res.status(403).json({ error: 'Bạn không có quyền truy cập tài nguyên này.' });
         return;
     }
@@ -415,7 +407,7 @@ export const getLichHenByUserId = async (req: Request, res: Response): Promise<v
       [targetUserId] // Sử dụng userId từ URL
     );
     
-    logActivity(req, requestingUser.id, 'GET_APPOINTMENTS_BY_USER_ID_SUCCESS', { targetUserId, count: result.length });
+    
     
     if (result.length === 0) {
       res.json([]);
@@ -425,7 +417,7 @@ export const getLichHenByUserId = async (req: Request, res: Response): Promise<v
     res.json(result);
   } catch (error) {
     console.error('Lỗi khi lấy danh sách lịch hẹn theo user:', error);
-    logActivity(req, req.user?.id || null, 'GET_APPOINTMENTS_BY_USER_ID_ERROR', { error: (error as Error).message });
+    
     res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
   }
 };

@@ -3,14 +3,11 @@ import { AppDataSource } from '../config/database';
 import { DoctorSchedule } from '../entity/DoctorSchedule';
 import { TimeSlot } from '../entity/TimeSlot';
 import { Doctor } from '../entity/Doctor';
-import { logActivity } from '../utils/logger';
 
 
 
-const getUserIdFromRequest = (req: Request): number | null => {
-    
-    return (req as any).user?.id || null; 
-};
+
+
 
 // Hàm trợ giúp tạo Time Slots
 const generateTimeSlots = (start: string, end: string): string[] => {
@@ -34,7 +31,7 @@ const generateTimeSlots = (start: string, end: string): string[] => {
 
 
 export const createSchedule = async (req: Request, res: Response) => {
-    const adminId = getUserIdFromRequest(req);
+    
     const { doctorId, workDate, startTime, endTime } = req.body;
 
     if (!doctorId || !workDate || !startTime || !endTime) {
@@ -86,19 +83,19 @@ export const createSchedule = async (req: Request, res: Response) => {
             newSchedule.timeSlots = newTimeSlots;
         });
 
-        await logActivity(req, adminId, 'tạo lịch làm việc', { scheduleId: (newSchedule! as DoctorSchedule).id, doctorId: doctorId, slotsCount: slotTimes.length });
+        
         return res.status(201).json(newSchedule!);
 
     } catch (error) {
         console.error('Lỗi tạo lịch làm việc:', error);
-        await logActivity(req, adminId, 'CREATE_SCHEDULE_FAILURE', { error: (error as Error).message });
+        
         return res.status(500).json({ error: 'Lỗi máy chủ khi tạo lịch làm việc' });
     }
 };
 
 
 export const updateSchedule = async (req: Request, res: Response) => {
-    const adminId = getUserIdFromRequest(req);
+    
     const { id } = req.params;
     const { workDate, startTime, endTime } = req.body;
 
@@ -163,19 +160,19 @@ export const updateSchedule = async (req: Request, res: Response) => {
         });
 
 
-        await logActivity(req, adminId, 'cập nhật lịch làm việc', { scheduleId: id });
+        
         return res.json(schedule);
 
     } catch (error) {
         console.error('Lỗi cập nhật lịch làm việc:', error);
-        await logActivity(req, adminId, 'UPDATE_SCHEDULE_FAILURE', { scheduleId: id, error: (error as Error).message });
+        
         return res.status(500).json({ error: 'Lỗi máy chủ khi cập nhật lịch làm việc' });
     }
 };
 
 
 export const deleteSchedule = async (req: Request, res: Response) => {
-    const adminId = getUserIdFromRequest(req);
+   
     const { id } = req.params;
 
     try {
@@ -199,19 +196,19 @@ export const deleteSchedule = async (req: Request, res: Response) => {
         
         await scheduleRepo.remove(schedule);
 
-        await logActivity(req, adminId, 'xóa lịch làm việc', { scheduleId: id });
+        
         return res.json({ message: 'Xóa lịch làm việc thành công' });
 
     } catch (error) {
         console.error('Lỗi xóa lịch làm việc:', error);
-        await logActivity(req, adminId, 'DELETE_SCHEDULE_FAILURE', { scheduleId: id, error: (error as Error).message });
+        
         return res.status(500).json({ error: 'Lỗi máy chủ khi xóa lịch làm việc' });
     }
 };
 
 
-export const getAllSchedules = async (req: Request, res: Response) => {
-    const adminId = getUserIdFromRequest(req);
+export const getAllSchedules = async (_req: Request, res: Response) => {
+    
     try {
         const scheduleRepo = AppDataSource.getRepository(DoctorSchedule);
       
@@ -223,18 +220,18 @@ export const getAllSchedules = async (req: Request, res: Response) => {
             }
         });
 
-        await logActivity(req, adminId, 'xem tất cả lịch làm việc', { count: schedules.length });
+        
         return res.json(schedules);
 
     } catch (error) {
         console.error('Lỗi lấy danh sách lịch làm việc:', error);
-        await logActivity(req, adminId, 'GET_ALL_SCHEDULES_FAILURE', { error: (error as Error).message });
+        
         return res.status(500).json({ error: 'Lỗi máy chủ' });
     }
 };
 
 export const getSchedulesByDoctorId = async (req: Request, res: Response) => {
-    const adminId = getUserIdFromRequest(req);
+    
     const { doctorId } = req.params;
 
     try {
@@ -257,17 +254,17 @@ export const getSchedulesByDoctorId = async (req: Request, res: Response) => {
         });
 
         if (!schedules || schedules.length === 0) {
-            await logActivity(req, adminId, 'xem lịch bác sĩ (trống)', { doctorId });
+           
      
             return res.json([]); 
         }
         
-        await logActivity(req, adminId, 'xem lịch bác sĩ', { doctorId, count: schedules.length });
+        
         return res.json(schedules);
 
     } catch (error) {
         console.error('Lỗi lấy lịch làm việc theo bác sĩ:', error);
-        await logActivity(req, adminId, 'GET_SCHEDULES_BY_DOCTOR_FAILURE', { doctorId, error: (error as Error).message });
+        
         return res.status(500).json({ error: 'Lỗi máy chủ' });
     }
 };

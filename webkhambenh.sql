@@ -97,21 +97,8 @@ CREATE TABLE invoices (
     FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE RESTRICT
 );
 
-CREATE TABLE audit_logs (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL, 
-    action_type VARCHAR(100) NOT NULL, 
-    ip_address VARCHAR(45), 
-    user_agent TEXT, 
-    details JSONB, -- Lưu trữ dữ liệu chi tiết về hành động 
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP -- Thời gian thực hiện
-);
 
-COMMENT ON COLUMN audit_logs.user_id IS 'ID người dùng thực hiện hành động. Có thể là NULL cho các hành động không cần đăng nhập (vd: đăng ký).';
-COMMENT ON COLUMN audit_logs.action_type IS 'Một chuỗi định danh cho hành động (vd: LOGIN_FAILURE, UPDATE_PROFILE).';
-COMMENT ON COLUMN audit_logs.ip_address IS 'Địa chỉ IP của client.';
-COMMENT ON COLUMN audit_logs.user_agent IS 'Chuỗi User-Agent từ header của request.';
-COMMENT ON COLUMN audit_logs.details IS 'Dữ liệu JSON chứa thông tin bổ sung, vd: { "appointmentId": 123, "changes": "status updated" }.';
+
 
 CREATE TABLE admins (
     id SERIAL PRIMARY KEY,
