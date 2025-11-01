@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import './AppointmentManagement.css';
 
 // --- TYPE DEFINITIONS ---
@@ -7,27 +7,29 @@ type AppointmentStatus = 'chờ xác nhận' | 'đã xác nhận' | 'chưa thanh
 interface Appointment {
   id: number;
   ten_benh_nhan: string;
-  doctorName: string;
+  doctorName: string; // Frontend dùng camelCase
   ngay_dat_lich: string;
   gio_dat_lich: string;
   trang_thai: AppointmentStatus;
   hasInvoice?: boolean;
 }
 
+
+interface ApiAppointment {
+  id: number;
+  ten_benh_nhan: string;
+  doctor_name: string; // Backend gửi snake_case
+  ngay_dat_lich: string;
+  gio_dat_lich: string;
+  trang_thai: AppointmentStatus;
+  hasinvoice: boolean; 
+  
+}
+
 interface InvoiceService {
   name: string;
   price: number;
 }
-
-// --- MOCK DATA ---
-const MOCK_APPOINTMENTS: Appointment[] = [
-    { id: 1, ten_benh_nhan: 'Trần Văn An', doctorName: 'PGS.TS. BS Nguyễn Thanh Hồi', ngay_dat_lich: '2025-10-20', gio_dat_lich: '09:00', trang_thai: 'chờ xác nhận' },
-    { id: 2, ten_benh_nhan: 'Lê Thị Bình', doctorName: 'GS.TS. BS. Đỗ Quyết', ngay_dat_lich: '2025-10-20', gio_dat_lich: '14:00', trang_thai: 'đã xác nhận' },
-    { id: 3, ten_benh_nhan: 'Phạm Hùng Cường', doctorName: 'BSNT. Lê Thị Hương', ngay_dat_lich: '2025-10-22', gio_dat_lich: '10:30', trang_thai: 'chưa thanh toán', hasInvoice: true },
-    { id: 4, ten_benh_nhan: 'Nguyễn Thị Dung', doctorName: 'PGS.TS. BS Nguyễn Thanh Hồi', ngay_dat_lich: '2025-10-23', gio_dat_lich: '11:00', trang_thai: 'đã thanh toán', hasInvoice: true },
-    { id: 5, ten_benh_nhan: 'Hoàng Văn E', doctorName: 'GS.TS. BS. Đỗ Quyết', ngay_dat_lich: '2025-10-24', gio_dat_lich: '15:00', trang_thai: 'chưa thanh toán', hasInvoice: false },
-];
-
 
 // --- UTILITY COMPONENTS ---
 const Modal: React.FC<{ children: React.ReactNode; title: string; onClose: () => void }> = ({ children, title, onClose }) => (
@@ -119,9 +121,19 @@ const InvoiceModal: React.FC<{ appointment: Appointment; onClose: () => void; on
 };
 
 
-// --- MAIN COMPONENT ---
+// --- MAIN COMPONENT
+const getAuthToken = (): string | null => {
+    
+    return localStorage.getItem('admin_token'); 
+};
+
 const AppointmentManagement: React.FC = () => {
-    const [appointments, setAppointments] = useState<Appointment[]>(MOCK_APPOINTMENTS);
+    // State cho dữ liệu
+    const [appointments, setAppointments] = useState<Appointment[]>([]); // Khởi tạo mảng rỗng
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // State cho UI
     const [searchTerm, setSearchTerm] = useState('');
     const [isCreateInvoiceModalOpen, setIsCreateInvoiceModalOpen] = useState(false);
     const [isViewInvoiceModalOpen, setIsViewInvoiceModalOpen] = useState(false);
@@ -130,9 +142,100 @@ const AppointmentManagement: React.FC = () => {
     
     const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
 
+    const API_URL = process.env.REACT_APP_API_URL;
+
+    // --- LOGIC GỌI API ---
+    
+    // Hàm fetch dữ liệu (gọi GET /api/appointments)
+    const fetchAppointments = async () => {
+        setIsLoading(true);
+        setError(null);
+        
+        const token = getAuthToken();
+        if (!token) {
+            setError("Bạn chưa đăng nhập hoặc không có quyền.");
+            setIsLoading(false);
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/appointments`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.error || `Lỗi ${response.status}`);
+            }
+
+            const data: ApiAppointment[] = await response.json();
+
+            // Map dữ liệu từ backend (snake_case) sang frontend (camelCase)
+            const mappedData: Appointment[] = data.map(item => ({
+                id: item.id,
+                ten_benh_nhan: item.ten_benh_nhan,
+                doctorName: item.doctor_name, // Map
+                ngay_dat_lich: item.ngay_dat_lich,
+                gio_dat_lich: item.gio_dat_lich,
+                trang_thai: item.trang_thai,
+                hasInvoice: item.hasinvoice // Map
+            }));
+            
+            setAppointments(mappedData);
+
+        } catch (err) {
+            console.error('Lỗi khi fetch lịch hẹn:', err);
+            setError(err instanceof Error ? err.message : 'Lỗi không xác định');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Gọi API khi component mount
+    useEffect(() => {
+        fetchAppointments();
+    }, []);
+
+    const handleStatusChange = async (id: number, newStatus: AppointmentStatus) => {
+    const token = getAuthToken();
+    if (!token) {
+        alert("Lỗi xác thực. Vui lòng đăng nhập lại.");
+        return;
+    }
+
+    try {
+        
+        const response = await fetch(`${API_URL}/appointments/${id}/status`, {
+            method: 'PATCH', 
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ trang_thai: newStatus })
+        });
+
+        if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.error || 'Cập nhật thất bại');
+        }
+        await fetchAppointments();
+
+    } catch (err) {
+        console.error('Lỗi khi cập nhật trạng thái:', err);
+        alert(`Lỗi: ${err instanceof Error ? err.message : 'Không thể cập nhật'}`);
+        
+    }
+};
+
+    // --- LOGIC MOCK & UI ---
+
     const filteredAppointments = appointments.filter(a => 
-        a.ten_benh_nhan.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        a.doctorName.toLowerCase().includes(searchTerm.toLowerCase())
+        (a.ten_benh_nhan && a.ten_benh_nhan.toLowerCase().includes(searchTerm.toLowerCase())) || 
+        (a.doctorName && a.doctorName.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     const handleOpenCreateInvoice = (appointment: Appointment) => {
@@ -155,10 +258,6 @@ const AppointmentManagement: React.FC = () => {
             alert('Hóa đơn đã được tạo/cập nhật.');
         }
     }
-    
-    const handleStatusChange = (id: number, newStatus: AppointmentStatus) => {
-        setAppointments(apps => apps.map(app => app.id === id ? { ...app, trang_thai: newStatus } : app));
-    };
     
     const handlePatientSeen = (appointmentId: number) => {
         const action = () => {
@@ -192,65 +291,78 @@ const AppointmentManagement: React.FC = () => {
                 />
             </div>
              <div className="am-table-wrapper">
-                <table className="am-table">
-                    <thead>
-                        <tr>
-                            <th>Bệnh nhân</th>
-                            <th>Bác sĩ</th>
-                            <th>Ngày hẹn</th>
-                            <th>Trạng thái</th>
-                            <th>Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredAppointments.map(app => (
-                            <tr key={app.id}>
-                                <td>{app.ten_benh_nhan}</td>
-                                <td>{app.doctorName}</td>
-                                <td>{app.ngay_dat_lich} @ {app.gio_dat_lich}</td>
-                                <td>
-                                    <span className={`am-status-badge ${getStatusClass(app.trang_thai)}`}>
-                                        {app.trang_thai}
-                                    </span>
-                                </td>
-                                <td className="am-table-actions">
-                                    {app.trang_thai === 'chờ xác nhận' && (
-                                        <button onClick={() => handleStatusChange(app.id, 'đã xác nhận')} className="am-action-btn am-btn-green">Xác nhận</button>
-                                    )}
-                                    {app.trang_thai === 'đã xác nhận' && (
-                                        <>
-                                            <button onClick={() => handlePatientSeen(app.id)} className="am-action-btn am-btn-blue">Đã khám</button>
-                                            <button onClick={() => handleStatusChange(app.id, 'chờ xác nhận')} className="am-action-btn am-btn-gray">Hủy xác nhận</button>
-                                        </>
-                                    )}
-                                    {app.trang_thai === 'chưa thanh toán' && !app.hasInvoice && (
-                                        <button onClick={() => handleOpenCreateInvoice(app)} className="am-action-btn am-btn-purple">Tạo Hóa đơn</button>
-                                    )}
-                                    {app.trang_thai === 'chưa thanh toán' && app.hasInvoice && (
-                                        <>
-                                            <button onClick={() => handleOpenViewInvoice(app)} className="am-action-btn am-btn-blue">Xem Hóa đơn</button>
-                                            <button onClick={() => handleOpenCreateInvoice(app)} className="am-action-btn am-btn-yellow">Sửa Hóa đơn</button>
-                                        </>
-                                    )}
-                                    {app.trang_thai === 'đã thanh toán' && (
-                                        <button onClick={() => handleOpenViewInvoice(app)} className="am-action-btn am-btn-teal">Xem Hóa đơn</button>
-                                    )}
-                                </td>
+                {isLoading && <div className="am-loading">Đang tải dữ liệu...</div>}
+                {error && <div className="am-error">Lỗi: {error}</div>}
+                {!isLoading && !error && (
+                    <table className="am-table">
+                        <thead>
+                            <tr>
+                                <th>Bệnh nhân</th>
+                                <th>Bác sĩ</th>
+                                <th>Ngày hẹn</th>
+                                <th>Trạng thái</th>
+                                <th>Hành động</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {filteredAppointments.length > 0 ? (
+                                filteredAppointments.map(app => (
+                                    <tr key={app.id}>
+                                        <td>{app.ten_benh_nhan}</td>
+                                        <td>{app.doctorName || 'N/A'}</td>
+                                        <td>{app.ngay_dat_lich} @ {app.gio_dat_lich}</td>
+                                        <td>
+                                            <span className={`am-status-badge ${getStatusClass(app.trang_thai)}`}>
+                                                {app.trang_thai}
+                                            </span>
+                                        </td>
+                                        <td className="am-table-actions">
+                                            {app.trang_thai === 'chờ xác nhận' && (
+                                                <button onClick={() => handleStatusChange(app.id, 'đã xác nhận')} className="am-action-btn am-btn-green">Xác nhận</button>
+                                            )}
+                                            {app.trang_thai === 'đã xác nhận' && (
+                                                <>
+                                                    <button onClick={() => handlePatientSeen(app.id)} className="am-action-btn am-btn-blue">Đã khám</button>
+                                                    <button onClick={() => handleStatusChange(app.id, 'chờ xác nhận')} className="am-action-btn am-btn-gray">Hủy xác nhận</button>
+                                                </>
+                                            )}
+                                            
+                                            {app.trang_thai === 'chưa thanh toán' && !app.hasInvoice && (
+                                                <button onClick={() => handleOpenCreateInvoice(app)} className="am-action-btn am-btn-purple">Tạo Hóa đơn</button>
+                                            )}
+                                            {app.trang_thai === 'chưa thanh toán' && app.hasInvoice && (
+                                                <>
+                                                    <button onClick={() => handleOpenViewInvoice(app)} className="am-action-btn am-btn-blue">Xem Hóa đơn</button>
+                                                    <button onClick={() => handleOpenCreateInvoice(app)} className="am-action-btn am-btn-yellow">Sửa Hóa đơn</button>
+                                                </>
+                                            )}
+                                            {app.trang_thai === 'đã thanh toán' && app.hasInvoice && (
+                                                <button onClick={() => handleOpenViewInvoice(app)} className="am-action-btn am-btn-teal">Xem Hóa đơn</button>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={5}>Không tìm thấy lịch hẹn nào.</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                )}
             </div>
+            
+            {/* --- MODALS (GIỮ NGUYÊN) --- */}
             {isCreateInvoiceModalOpen && selectedAppointment && (
                 <InvoiceModal
                     appointment={selectedAppointment}
                     onClose={() => setIsCreateInvoiceModalOpen(false)}
-                    onSave={handleSaveInvoice}
+                    onSave={handleSaveInvoice} // Vẫn gọi hàm mock
                 />
             )}
              {isViewInvoiceModalOpen && selectedAppointment && (
                 <Modal title={`Hóa đơn cho: ${selectedAppointment.ten_benh_nhan}`} onClose={() => setIsViewInvoiceModalOpen(false)}>
-                    <p>Chi tiết hóa đơn sẽ được hiển thị ở đây.</p>
+                    <p>Chi tiết hóa đơn sẽ được hiển thị ở đây (GIẢ LẬP).</p>
                     <p>Bệnh nhân: {selectedAppointment.ten_benh_nhan}</p>
                      <p>Ngày khám: {selectedAppointment.ngay_dat_lich}</p>
                 </Modal>

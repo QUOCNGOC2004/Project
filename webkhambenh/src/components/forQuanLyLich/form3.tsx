@@ -181,36 +181,61 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
           <p><strong>Ngày khám:</strong> {formatDate(appointment.ngay_dat_lich)}</p>
           <p><strong>Giờ khám:</strong> {appointment.gio_dat_lich}</p>
           <p><strong>Bác sĩ:</strong> {appointment.doctor_name}</p>
-          <p><strong>Cơ sở khám:</strong> Số 10,Yên Nghĩa,Hà Đông,Hà Nội</p>
+          <p><strong>Cơ sở khám:</strong> Bệnh viện Đại học Phenikaa</p>
           <p><strong>SĐT bác sĩ:</strong> {appointment.doctor_phone}</p>
         </div>
         <div className="appointment-actions">
-          {appointment.trang_thai === 'đã thanh toán' ? (
-            <>
-              <button className="detail-button" onClick={handleDetailClick}>
-                Chi tiết
-              </button>
-              <button className="consulted-button">
-                <CheckIcon /> Đã khám
-              </button>
-            </>
-          ) : (
-            <>
-              <button className="detail-button" onClick={handleDetailClick}>
-                Chi tiết
-              </button>
-              <button className="edit-button" onClick={handleEditClick}>
-                Sửa
-              </button>
-              <button
-                className="cancel-button"
-                onClick={handleCancelClick}
-                disabled={isCancelling}
-              >
-                {isCancelling ? 'Đang hủy...' : 'Hủy'}
-              </button>
-            </>
-          )}
+          {(() => {
+            switch (appointment.trang_thai) {
+              case 'đã thanh toán':
+                return (
+                  <>
+                    <button className="detail-button" onClick={handleDetailClick}>
+                      Chi tiết
+                    </button>
+                    <button className="consulted-button">
+                      <CheckIcon /> Đã khám
+                    </button>
+                  </>
+                );
+              
+              case 'đã xác nhận':
+                return (
+                  <>
+                    <button className="detail-button" onClick={handleDetailClick}>
+                      Chi tiết
+                    </button>
+                    <button
+                      className="cancel-button"
+                      onClick={handleCancelClick}
+                      disabled={isCancelling}
+                    >
+                      {isCancelling ? 'Đang hủy...' : 'Hủy'}
+                    </button>
+                  </>
+                );
+              
+              // Mặc định (bao gồm 'chờ xác nhận', 'chưa thanh toán')
+              default:
+                return (
+                  <>
+                    <button className="detail-button" onClick={handleDetailClick}>
+                      Chi tiết
+                    </button>
+                    <button className="edit-button" onClick={handleEditClick}>
+                      Sửa
+                    </button>
+                    <button
+                      className="cancel-button"
+                      onClick={handleCancelClick}
+                      disabled={isCancelling}
+                    >
+                      {isCancelling ? 'Đang hủy...' : 'Hủy'}
+                    </button>
+                  </>
+                );
+            }
+          })()}
         </div>
       </div>
 

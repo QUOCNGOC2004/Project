@@ -223,19 +223,26 @@
     text-transform: capitalize;
 }
 
-/* Các màu sắc cho trạng thái  */
+/* Các màu sắc cho trạng thái */
 .status-chờ-xác-nhận { 
     background-color: #ffc107; /* Vàng */
     color: #333;
 }
+.status-đã-xác-nhận {
+    background-color: #007bff; /* Xanh dương */
+    color: white;
+}
+.status-chưa-thanh-toán {
+    background-color: #fd7e14; /* Cam */
+    color: white;
+}
 .status-đã-thanh-toán { 
     background-color: #28a745; /* Xanh lá */
+    color: white;
 }
 .status-cancelled, .status-hủy { 
     background-color: #dc3545; /* Đỏ */
-}
-.status-pending { 
-    background-color: #007bff; /* Xanh dương */
+    color: white;
 }
 
 

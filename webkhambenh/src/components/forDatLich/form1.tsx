@@ -89,7 +89,7 @@ const Form1: React.FC<PropsForm1> = ({ duLieuForm, xuLyThayDoi }) => {
           </label>
           <div className="input-wrapper">
             <a
-              href="https://www.google.com/maps/search/?api=1&query=Số+10,Yên+Nghĩa,Hà+Đông,Hà+Nội"
+              href="https://maps.app.goo.gl/nx3rGJMq5BZtK7Yu8"
               target="_blank"
               rel="noopener noreferrer"
               className="form-input"
@@ -103,7 +103,7 @@ const Form1: React.FC<PropsForm1> = ({ duLieuForm, xuLyThayDoi }) => {
                 height: '35px'
               }}
             >
-              Số 10,Yên Nghĩa,Hà Đông,Hà Nội
+              Bệnh viện Đại học Phenikaa
             </a>
           </div>
         </div>

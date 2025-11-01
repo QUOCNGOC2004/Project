@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './QuanLyLich.css';
 import Form3 from '../../components/forQuanLyLich/form3';
-import { isLoggedIn, getCurrentUser,logout } from '../../ktraLogin';
+import { isLoggedIn, getCurrentUser, logout } from '../../ktraLogin';
 
 interface Appointment {
   id: number;
@@ -23,6 +23,7 @@ const QuanLyLich: React.FC = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string>('chờ xác nhận');
 
   const fetchAppointments = async () => {
     if (!isLoggedIn()) {
@@ -40,11 +41,9 @@ const QuanLyLich: React.FC = () => {
       return;
     }
 
-    // Lấy token từ localStorage
     const token = localStorage.getItem('user_token');
 
     try {
-      // Thêm Authorization header vào yêu cầu fetch
       const response = await fetch(`${process.env.REACT_APP_API_URL}/appointments/user/${currentUser.id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -52,9 +51,8 @@ const QuanLyLich: React.FC = () => {
       });
 
       if (!response.ok) {
-        // Nếu nhận được lỗi 401, có thể token đã hết hạn
         if (response.status === 401) {
-          logout(); // Đăng xuất người dùng
+          logout(); 
           setError('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
           return;
         }
@@ -79,13 +77,12 @@ const QuanLyLich: React.FC = () => {
   };
 
   const handleUpdateAppointment = () => {
-    fetchAppointments(); // Refresh lại danh sách lịch hẹn sau khi cập nhật
+    fetchAppointments(); // Refresh lại danh sách
   };
 
   useEffect(() => {
     fetchAppointments();
 
-    // Thêm event listener cho sự kiện đăng xuất
     const handleLogout = () => {
       setAppointments([]); // Reset appointments
       setError('Vui lòng đăng nhập để xem lịch hẹn');
@@ -94,13 +91,11 @@ const QuanLyLich: React.FC = () => {
 
     document.addEventListener('loginStatusChanged', handleLogout);
 
-    // Cleanup function
     return () => {
       document.removeEventListener('loginStatusChanged', handleLogout);
     };
   }, []);
 
-  // Hàm tạo màu ngẫu nhiên
   const getRandomColor = () => {
     const letters = '0123456789abc';
     let color = '#';
@@ -110,10 +105,8 @@ const QuanLyLich: React.FC = () => {
     return color;
   };
 
-  // Lọc danh sách lịch hẹn theo trạng thái
-  const pendingAppointments = appointments.filter(a => a.trang_thai === 'chờ xác nhận');
-  const paidAppointments = appointments.filter(a => a.trang_thai === 'đã thanh toán');
-  const otherAppointments = appointments.filter(a => a.trang_thai !== 'chờ xác nhận' && a.trang_thai !== 'đã thanh toán');
+  const filteredAppointments = appointments.filter(a => a.trang_thai === selectedStatus);
+
 
   if (loading) {
     return (
@@ -138,14 +131,31 @@ const QuanLyLich: React.FC = () => {
         <p className="management-title-description">Kiểm tra thông tin đặt lịch hẹn</p>
       </div>
 
-      {/* Phần Lịch hẹn Chờ xác nhận */}
+      {/* Dropdown lọc trạng thái */}
+      <div className="filter-container">
+        <label htmlFor="status-filter" className="filter-label">Hiển thị lịch hẹn:</label>
+        <select 
+          id="status-filter" 
+          className="status-dropdown" 
+          value={selectedStatus} 
+          onChange={(e) => setSelectedStatus(e.target.value)}
+        >
+          <option value="chờ xác nhận">Chờ xác nhận</option>
+          <option value="đã xác nhận">Đã xác nhận</option>
+          <option value="chưa thanh toán">Chưa thanh toán</option>
+          <option value="đã thanh toán">Đã thanh toán</option>
+        </select>
+      </div>
+
+      {/* Hiển thị lưới dựa trên kết quả lọc */}
       <div className="management-section">
-        <h2 className="section-title">Chờ xác nhận</h2>
-        {pendingAppointments.length === 0 ? (
-          <div className="no-appointments">Không có lịch khám nào đang chờ xác nhận.</div>
+        {filteredAppointments.length === 0 ? (
+          <div className="no-appointments">
+            Không có lịch hẹn nào "{selectedStatus}".
+          </div>
         ) : (
           <div className="appointment-grid">
-            {pendingAppointments.map((appointment) => (
+            {filteredAppointments.map((appointment) => (
               <Form3
                 key={appointment.id}
                 appointment={appointment}
@@ -157,52 +167,6 @@ const QuanLyLich: React.FC = () => {
           </div>
         )}
       </div>
-
-      <hr className="section-divider" />
-
-      {/* Phần Lịch hẹn Đã thanh toán */}
-      <div className="management-section">
-        <h2 className="section-title">Đã thanh toán</h2>
-        {paidAppointments.length === 0 ? (
-          <div className="no-appointments-paid">
-            Chưa có lịch hẹn nào đã thanh toán, vui lòng kiểm tra mục thanh toán.
-          </div>
-        ) : (
-          <div className="appointment-grid">
-            {paidAppointments.map((appointment) => (
-              <Form3
-                key={appointment.id}
-                appointment={appointment}
-                cardColor={getRandomColor()}
-                onCancel={handleCancelAppointment}
-                onUpdate={handleUpdateAppointment}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Các lịch hẹn có trạng thái khác (chưa phát triển) */}
-      {otherAppointments.length > 0 && (
-        <>
-          <hr className="section-divider" />
-          <div className="management-section">
-            <h2 className="section-title">Các lịch hẹn khác</h2>
-            <div className="appointment-grid">
-              {otherAppointments.map((appointment) => (
-                <Form3
-                  key={appointment.id}
-                  appointment={appointment}
-                  cardColor={getRandomColor()}
-                  onCancel={handleCancelAppointment}
-                  onUpdate={handleUpdateAppointment}
-                />
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-
     </div>
   );
 };

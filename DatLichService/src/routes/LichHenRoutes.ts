@@ -5,7 +5,8 @@ import {
   createLichHen,
   updateLichHen,
   deleteLichHen,
-  getLichHenByUserId
+  getLichHenByUserId,
+  updateAppointmentStatusByAdmin
 } from '../controllers/LichHenController';
 import { auth } from '../middleware/auth';
 
@@ -18,6 +19,7 @@ router.put('/:id', auth(['user']), updateLichHen);
 router.delete('/:id', auth(['user']), deleteLichHen);
 
 router.get('/:id',auth(['admin']), getLichHenById);
+router.patch('/:id/status', auth(['admin']), updateAppointmentStatusByAdmin); 
 
 router.get('/user/:userId', auth(['user', 'admin']), getLichHenByUserId);
 
