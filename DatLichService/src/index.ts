@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import express from "express";
-import cors from "cors";
+// import cors from "cors";
 import { AppDataSource } from "./config/database";
 import lichHenRoutes from "./routes/LichHenRoutes";
 import dotenv from "dotenv";
@@ -13,12 +13,12 @@ app.set('trust proxy', 'loopback');
 
 app.use(helmet()); // Bảo mật HTTP headers
 
-// Cấu hình CORS
-app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:8000'], 
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// // Cấu hình CORS
+// app.use(cors({
+//     origin: ['http://localhost:3000', 'http://localhost:8000'], 
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+//     allowedHeaders: ['Content-Type', 'Authorization']
+// }));
 
 app.use(express.json()); // Phân tích JSON
 

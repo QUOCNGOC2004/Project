@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import express from "express";
-import cors from "cors";
+// import cors from "cors";
 import { AppDataSource } from "./config/database";
 import dotenv from "dotenv";
 import bankAccountRoutes from "./routes/BankAccountRoutes";
@@ -10,11 +10,11 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:8000'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// app.use(cors({
+//     origin: ['http://localhost:3000', 'http://localhost:8000'],
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//     allowedHeaders: ['Content-Type', 'Authorization']
+// }));
 
 app.use(express.json());
 

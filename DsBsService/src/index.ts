@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import express from "express";
-import cors from "cors";
+// import cors from "cors";
 import { AppDataSource } from "./config/database";
 import doctorRoutes from "./routes/doctorRoutes";
 import scheduleRoutes from "./routes/scheduleRoutes";
@@ -15,11 +15,11 @@ app.set('trust proxy', 'loopback');
 app.use(helmet()); // Bảo mật HTTP headers
 
 // Cấu hình CORS
-app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:8000'], // Allow both frontend and Kong Gateway
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// app.use(cors({
+//     origin: ['http://localhost:3000', 'http://localhost:8000'], // Allow both frontend and Kong Gateway
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//     allowedHeaders: ['Content-Type', 'Authorization']
+// }));
 
 app.use(express.json());
 
