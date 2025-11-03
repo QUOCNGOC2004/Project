@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { register, login, getProfile, updateProfile , adminLogin } from "../controllers/authController";
+import { register, login, getProfile, updateProfile , adminLogin , getUserProfileByIdForAdmin } from "../controllers/authController";
 import { auth } from "../middleware/auth";
 
 const router = Router();
@@ -10,6 +10,8 @@ router.post("/login", login);
 //routes đc bảo vệ
 router.get("/profile", auth(['user']), getProfile);
 router.put("/profile", auth(['user']), updateProfile);
+
+router.get("/user/:id", auth(['admin']), getUserProfileByIdForAdmin);
 
 
 export default router; 

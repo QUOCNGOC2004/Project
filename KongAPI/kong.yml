@@ -23,6 +23,7 @@ services:
       - name: auth-protected-route
         paths:
           - /api/auth/profile
+          - /api/auth/user/:id
         strip_path: false
         methods: [GET, PUT , OPTIONS]
         plugins:

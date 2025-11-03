@@ -19,28 +19,28 @@ services:
     networks:
       - webkhambenh-network
 
-  # Database
-  db:
-    image: postgres:13
-    container_name: webkhambenh-db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: webkhambenh
-      PGDATA: /var/lib/postgresql/data/pgdata
-    ports:
-      - "5432:5432"
-    volumes:
-      - ./webkhambenh.sql:/docker-entrypoint-initdb.d/webkhambenh.sql
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - webkhambenh-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d webkhambenh"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-  # Bỏ comment nếu muốn full trong docker
+  # # Database
+  # db:
+  #   image: postgres:13
+  #   container_name: webkhambenh-db
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_DB: webkhambenh
+  #     PGDATA: /var/lib/postgresql/data/pgdata
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - ./webkhambenh.sql:/docker-entrypoint-initdb.d/webkhambenh.sql
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - webkhambenh-network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U postgres -d webkhambenh"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5
+  # #Bỏ comment nếu muốn full trong docker
   # # Auth Service
   # auth-service:
   #   build: ./AuthService

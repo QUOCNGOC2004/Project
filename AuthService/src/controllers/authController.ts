@@ -189,17 +189,6 @@ export const updateProfile = async (req: Request, res: Response): Promise<Respon
     }
 };
 
-// Thêm hàm logout để ghi log
-export const logout = async (_req: Request, res: Response): Promise<Response> => {
-    try {
-        // Phía client sẽ xóa token, server chỉ cần xác nhận
-        return res.status(200).json({ message: "Đăng xuất thành công." });
-    } catch (error) {
-        
-        return res.status(500).json({ error: "Lỗi máy chủ" });
-    }
-};
-
 export const adminLogin = async (req: Request, res: Response) => {
     const { username, password } = req.body;
     const adminRepository = AppDataSource.getRepository(Admin);
@@ -235,5 +224,36 @@ export const adminLogin = async (req: Request, res: Response) => {
     } catch (error) {
         console.error("Lỗi đăng nhập admin:", error);
         return res.status(500).json({ message: "Lỗi máy chủ nội bộ" });
+    }
+};
+
+export const getUserProfileByIdForAdmin = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const { id } = req.params;
+        const userId = parseInt(id, 10);
+
+        if (isNaN(userId)) {
+            return res.status(400).json({ error: "ID người dùng không hợp lệ" });
+        }
+
+        const userRepository = AppDataSource.getRepository(User);
+        const user = await userRepository.findOneBy({ id: userId });
+
+        if (!user) {
+            return res.status(404).json({ error: "Không tìm thấy người dùng" });
+        }
+
+        return res.json({
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                so_dien_thoai: user.so_dien_thoai,
+                gioi_tinh: user.gioi_tinh,
+                ngay_sinh: user.ngay_sinh
+            }
+        });
+    } catch (error) {
+        return res.status(500).json({ error: "Lỗi máy chủ" });
     }
 };
