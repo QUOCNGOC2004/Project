@@ -119,10 +119,10 @@ const DoctorDetailModal: React.FC<{ doctor: Doctor; onClose: () => void }> = ({ 
             <strong>Mô tả bác sĩ:</strong>
             <span>{doctor.moTaBacSi}</span>
 
-            <strong>Link ảnh:</strong>
+            {/* <strong>Link ảnh:</strong>
             <span className="dm-link-wrap">
               <a href={doctor.linkAnh} target="_blank" rel="noopener noreferrer">{doctor.linkAnh}</a>
-            </span>
+            </span> */}
           </div>
         </div>
       </div>

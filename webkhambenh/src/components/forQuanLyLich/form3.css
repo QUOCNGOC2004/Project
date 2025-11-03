@@ -53,7 +53,8 @@
 
 .detail-button,
 .edit-button,
-.cancel-button {
+.cancel-button,
+.pay-button {
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 4px;
@@ -78,6 +79,15 @@
 
 .edit-button:hover {
   background-color: #3182ce;
+}
+
+.pay-button {
+  background-color: #e85907;
+  color: white;
+}
+
+.pay-button:hover {
+  background-color: #f99108;
 }
 
 .cancel-button {

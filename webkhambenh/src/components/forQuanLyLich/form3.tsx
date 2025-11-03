@@ -61,7 +61,9 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
 
   const currentAppointmentData = {
     ...appointment,
-    ...(appointment.trang_thai === 'đã thanh toán' ? mockPaidData : {})
+    ...((appointment.trang_thai === 'đã thanh toán' || appointment.trang_thai === 'chưa thanh toán') 
+      ? mockPaidData 
+      : {})
   };
 
 
@@ -82,6 +84,13 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
   const handleCloseModal = () => setShowModal(false);
   const handleEditClick = () => setShowEditModal(true);
   const handleCloseEditModal = () => setShowEditModal(false);
+
+  // --- THAY ĐỔI 2: Thêm hàm xử lý cho nút Thanh toán ---
+  const handlePayClick = () => {
+    // Logic thanh toán (ví dụ: chuyển hướng sang trang thanh toán VNPAY, Momo...)
+    // Hiện tại chỉ là placeholder
+    alert('Chức năng thanh toán đang được phát triển!');
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -199,6 +208,18 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
                   </>
                 );
               
+              case 'chưa thanh toán':
+                return (
+                  <>
+                    <button className="detail-button" onClick={handleDetailClick}>
+                      Chi tiết
+                    </button>
+                    <button className="pay-button" onClick={handlePayClick}>
+                      Thanh toán
+                    </button>
+                  </>
+                );
+
               case 'đã xác nhận':
                 return (
                   <>
@@ -215,7 +236,7 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
                   </>
                 );
               
-              // Mặc định (bao gồm 'chờ xác nhận', 'chưa thanh toán')
+              // Mặc định (thẻ chờ xác nhận)
               default:
                 return (
                   <>
@@ -296,20 +317,20 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
                 <p className="reason-text">{appointment.ly_do_kham || 'Không có lý do khám chi tiết.'}</p>
               </div>
 
-              {/* Chỉ hiển thị phần này cho lịch đã thanh toán */}
-              {appointment.trang_thai === 'đã thanh toán' && (
+              {/* Chỉ hiển thị phần này cho lịch đã/chưa thanh toán */}
+              {(appointment.trang_thai === 'đã thanh toán' || appointment.trang_thai === 'chưa thanh toán') && (
                 <>
                   <div className="divider"></div>
                   <div className="info-section-title">Bệnh lý sau khi khám</div>
                   <div className="reason-box">
-                    <p className="reason-text">{currentAppointmentData.benh_ly}</p>
+                    <p className="reason-text">{currentAppointmentData.benh_ly || 'Chưa có thông tin.'}</p>
                   </div>
 
                   <div className="divider"></div>
 
                   <div className="info-section-title">Lời khuyên của Bác sĩ</div>
                   <div className="reason-box">
-                    <p className="reason-text">{currentAppointmentData.loi_khuyen}</p>
+                    <p className="reason-text">{currentAppointmentData.loi_khuyen || 'Chưa có thông tin.'}</p>
                   </div>
                 </>
               )}
