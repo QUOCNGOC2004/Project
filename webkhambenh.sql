@@ -97,7 +97,8 @@ CREATE TABLE invoices (
     FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE RESTRICT
 );
 
-
+ALTER TABLE invoices
+ADD COLUMN status VARCHAR(20) DEFAULT 'pending';
 
 
 CREATE TABLE admins (

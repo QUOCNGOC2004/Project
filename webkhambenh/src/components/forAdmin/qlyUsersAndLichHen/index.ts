@@ -40,11 +40,6 @@ export interface ApiAppointment {
   ly_do_kham: string;
 }
 
-export interface InvoiceService {
-  name: string;
-  price: number;
-}
-
 export interface DoctorDetails {
     phone: string;
 }
@@ -70,4 +65,27 @@ export interface BankAccount {
   account_holder: string;
   account_number: string;
   is_default: boolean;
+}
+
+export interface InvoiceService {
+  name: string;
+  price: number;
+}
+
+export interface InvoiceServiceDetails {
+    benhLy: string;
+    loiKhuyen: string;
+    services: InvoiceService[];
+}
+
+export interface Invoice {
+    id: number;
+    appointment_id: number;
+    invoice_code: string;
+    total_amount: number;
+    status: 'pending' | 'paid' | 'cancelled';
+    service_details: InvoiceServiceDetails | null; 
+    payment_date?: string | Date;
+    transaction_id?: string;
+    created_at: string | Date;
 }

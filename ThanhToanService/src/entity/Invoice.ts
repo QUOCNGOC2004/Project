@@ -1,5 +1,15 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from "typeorm";
 
+export interface IServiceItem {
+    name: string;
+    price: number;
+}
+export interface IServiceDetails {
+    benhLy: string;
+    loiKhuyen: string;
+    services: IServiceItem[];
+}
+
 @Entity("invoices")
 export class Invoice {
     @PrimaryGeneratedColumn()
@@ -18,7 +28,7 @@ export class Invoice {
     status!: string;
 
     @Column({ type: "jsonb", nullable: true })
-    service_details?: any;
+    service_details?: IServiceDetails;
 
     @Column({ type: "timestamptz", nullable: true })
     payment_date?: Date;
@@ -29,5 +39,4 @@ export class Invoice {
     
     @CreateDateColumn({ type: "timestamptz" })
     created_at!: Date;
-
 }

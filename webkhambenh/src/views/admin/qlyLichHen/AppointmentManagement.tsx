@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './AppointmentManagement.css';
 import { getAuthToken } from '../../../components/forAdmin/qlyUsersAndLichHen/auth';
-import { formatDate, formatTime } from '../../../components/forAdmin/qlyUsersAndLichHen/formatters';
 import { 
     Appointment, 
     ApiAppointment, 
     AppointmentStatus, 
     DoctorDetails, 
-    UserDetails 
+    UserDetails,
+    Invoice
 } from '../../../components/forAdmin/qlyUsersAndLichHen/index';
 
 import { Modal, ConfirmationModal } from '../../../components/forAdmin/qlyUsersAndLichHen/Modal';
@@ -17,8 +17,8 @@ import AppointmentDetailModal from '../../../components/forAdmin/qlyUsersAndLich
 
 // --- MAIN COMPONENT
 interface AppointmentManagementProps {
-  userIdToFilter?: number; // Prop này là tùy chọn
-  isEmbedded?: boolean;    // Prop để điều chỉnh giao diện khi bị nhúng
+  userIdToFilter?: number;
+  isEmbedded?: boolean;   
 }
 
 
@@ -31,16 +31,16 @@ const AppointmentManagement: React.FC<AppointmentManagementProps> = ({ userIdToF
     
     // State cho Modals
     const [isCreateInvoiceModalOpen, setIsCreateInvoiceModalOpen] = useState(false);
-    const [isViewInvoiceModalOpen, setIsViewInvoiceModalOpen] = useState(false);
     const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-    const [selectedAppointmentDetail, setSelectedAppointmentDetail] = useState<Appointment | null>(null);
     
     // State cho dữ liệu chi tiết trong Modal
     const [doctorDetail, setDoctorDetail] = useState<DoctorDetails | null>(null);
     const [userDetail, setUserDetail] = useState<UserDetails | null>(null); 
+    const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+    const [isInvoiceLoading, setIsInvoiceLoading] = useState(false); 
     const [isModalLoading, setIsModalLoading] = useState(false); 
 
     const API_URL = process.env.REACT_APP_API_URL;
@@ -105,6 +105,25 @@ const AppointmentManagement: React.FC<AppointmentManagementProps> = ({ userIdToF
     useEffect(() => {
         fetchAppointments();
     }, [fetchAppointments]);
+
+    const fetchInvoice = async (appointmentId: number, token: string): Promise<Invoice | null> => {
+        try {
+            const response = await fetch(`${API_URL}/invoices/appointment/${appointmentId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.status === 404) {
+                return null;
+            }
+            if (!response.ok) {
+                throw new Error('Không thể tải thông tin hóa đơn');
+            }
+            const res = await response.json();
+            return res.data as Invoice;
+        } catch (err) {
+            console.error(err);
+            return null;
+        }
+    };
 
     const handleStatusChange = async (id: number, newStatus: AppointmentStatus) => {
         const token = getAuthToken();
@@ -176,39 +195,103 @@ const AppointmentManagement: React.FC<AppointmentManagementProps> = ({ userIdToF
         const token = getAuthToken();
         if (!token) { alert("Lỗi xác thực Admin."); return; }
         
-        setSelectedAppointmentDetail(appointment);
+        setSelectedAppointment(appointment);
         setIsDetailModalOpen(true);
-        setIsModalLoading(true);
+        setIsModalLoading(true); 
+        
         setDoctorDetail(null);
         setUserDetail(null);
+        setSelectedInvoice(null);
+        setIsInvoiceLoading(true); 
 
         const doctorPromise = fetchDoctorDetails(appointment.doctorId);
         const userPromise = fetchUserDetails(appointment.userId, token);
-        await Promise.allSettled([doctorPromise, userPromise]);
         
-        setIsModalLoading(false);
+        let invoicePromise: Promise<Invoice | null> = Promise.resolve(null);
+        
+        // KIỂM TRA `hasInvoice` TỪ STATE
+        if (appointment.hasInvoice) {
+            invoicePromise = fetchInvoice(appointment.id, token);
+        }
+
+        const [,, invoiceResult] = await Promise.allSettled([doctorPromise, userPromise, invoicePromise]);
+        
+        if (invoiceResult.status === 'fulfilled') {
+            setSelectedInvoice(invoiceResult.value);
+        }
+        setIsInvoiceLoading(false); 
+        
+        setIsModalLoading(false); 
     };
 
-    const handleOpenCreateInvoice = (e: React.MouseEvent, appointment: Appointment) => {
+    const handleOpenCreateInvoice = async (e: React.MouseEvent, appointment: Appointment) => {
         e.stopPropagation(); 
+        const token = getAuthToken();
+        if (!token) { alert("Lỗi xác thực Admin."); return; }
+
         setSelectedAppointment(appointment);
+        setSelectedInvoice(null); 
+        
+        if (appointment.hasInvoice) {
+            setIsModalLoading(true);
+            const invoice = await fetchInvoice(appointment.id, token);
+            setSelectedInvoice(invoice);
+            setIsModalLoading(false);
+        }
+        
         setIsCreateInvoiceModalOpen(true);
     };
 
     const handleOpenViewInvoice = (e: React.MouseEvent, appointment: Appointment) => {
         e.stopPropagation(); 
-        setSelectedAppointment(appointment);
-        setIsViewInvoiceModalOpen(true);
+        handleOpenDetailModal(appointment);
     };
 
-    const handleSaveInvoice = () => {
-        if(selectedAppointment) {
-            setAppointments(apps => apps.map(a => 
-                a.id === selectedAppointment.id ? {...a, hasInvoice: true } : a
-            ));
+    const handleSaveInvoice = async (invoiceData: any) => {
+        if (!selectedAppointment) return;
+
+        const token = getAuthToken();
+        if (!token) {
+            alert("Lỗi xác thực. Vui lòng đăng nhập lại.");
+            return;
+        }
+
+        // Lưu ID lịch hẹn đang chọn lại
+        const savedAppointmentId = selectedAppointment.id;
+
+        try {
+            const response = await fetch(`${API_URL}/invoices/appointment/${savedAppointmentId}`, {
+                method: 'PUT', 
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(invoiceData) 
+            });
+            
+            if (!response.ok) {
+                 const err = await response.json();
+                 throw new Error(err.message || 'Lưu hóa đơn thất bại');
+            }
+
+            setAppointments(currentApps => 
+                currentApps.map(app => 
+                    app.id === savedAppointmentId 
+                        ? { ...app, hasInvoice: true } 
+                        : app
+                )
+            );
+
             setIsCreateInvoiceModalOpen(false);
             setSelectedAppointment(null);
+            setSelectedInvoice(null);
+            
             alert('Hóa đơn đã được tạo/cập nhật.');
+
+            
+        } catch (err) {
+             console.error('Lỗi khi lưu hóa đơn:', err);
+             alert(`Lỗi: ${err instanceof Error ? err.message : 'Không thể lưu'}`);
         }
     }
     
@@ -227,10 +310,21 @@ const AppointmentManagement: React.FC<AppointmentManagementProps> = ({ userIdToF
          handleStatusChange(id, status);
     }
     
+    const closeDetailModal = () => {
+        setIsDetailModalOpen(false);
+        setSelectedAppointment(null);
+        setSelectedInvoice(null);
+    }
+    
+    const closeCreateInvoiceModal = () => {
+        setIsCreateInvoiceModalOpen(false);
+        setSelectedAppointment(null);
+        setSelectedInvoice(null);
+    }
+
     return (
         <div className={isEmbedded ? "am-container-embedded" : "am-container"}>
             
-            {/* Chỉ hiển thị header nếu KHÔNG bị nhúng */}
             {!isEmbedded && (
                 <div className="am-header">
                     <h2>Quản lý Lịch hẹn</h2>
@@ -244,7 +338,6 @@ const AppointmentManagement: React.FC<AppointmentManagementProps> = ({ userIdToF
                 </div>
             )}
 
-            {/* Component Bảng đã được tách ra */}
             <AppointmentTable
                 appointments={filteredAppointments}
                 isLoading={isLoading}
@@ -260,19 +353,13 @@ const AppointmentManagement: React.FC<AppointmentManagementProps> = ({ userIdToF
             {isCreateInvoiceModalOpen && selectedAppointment && (
                 <InvoiceModal
                     appointment={selectedAppointment}
-                    onClose={() => setIsCreateInvoiceModalOpen(false)}
-                    onSave={handleSaveInvoice} 
+                    invoiceToEdit={selectedInvoice} 
+                    isLoading={isModalLoading}
+                    onClose={closeCreateInvoiceModal}
+                    onSave={handleSaveInvoice}
                 />
             )}
-             {isViewInvoiceModalOpen && selectedAppointment && (
-                <Modal title={`Hóa đơn cho: ${selectedAppointment.ten_benh_nhan}`} onClose={() => setIsViewInvoiceModalOpen(false)}>
-                    <div className="modal-body">
-                        <p>Chi tiết hóa đơn sẽ được hiển thị ở đây (GIẢ LẬP).</p>
-                        <p>Bệnh nhân: {selectedAppointment.ten_benh_nhan}</p>
-                        <p>Ngày khám: {formatDate(selectedAppointment.ngay_dat_lich)}</p>
-                    </div>
-                </Modal>
-            )}
+            
             {isConfirmModalOpen && (
                  <ConfirmationModal
                     title="Xác nhận"
@@ -286,13 +373,15 @@ const AppointmentManagement: React.FC<AppointmentManagementProps> = ({ userIdToF
                 </ConfirmationModal>
             )}
             
-            {isDetailModalOpen && selectedAppointmentDetail && (
+            {isDetailModalOpen && selectedAppointment && (
                 <AppointmentDetailModal
-                    appointment={selectedAppointmentDetail}
+                    appointment={selectedAppointment}
                     doctor={doctorDetail}
                     user={userDetail}
+                    invoice={selectedInvoice}
                     isLoading={isModalLoading}
-                    onClose={() => setIsDetailModalOpen(false)}
+                    isInvoiceLoading={isInvoiceLoading}
+                    onClose={closeDetailModal}
                 />
             )}
         </div>

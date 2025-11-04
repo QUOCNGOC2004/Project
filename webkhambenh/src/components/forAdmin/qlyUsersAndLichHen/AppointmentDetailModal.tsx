@@ -1,5 +1,5 @@
 import React from 'react';
-import { Appointment, DoctorDetails, UserDetails } from './index';
+import { Appointment, DoctorDetails, UserDetails, Invoice } from './index'; 
 import { formatDate, formatTime } from './formatters';
 import { Modal } from './Modal';
 import './AppointmentDetailModal.css';
@@ -8,26 +8,63 @@ interface AppointmentDetailModalProps {
     appointment: Appointment;
     doctor: DoctorDetails | null;
     user: UserDetails | null; 
-    isLoading: boolean;
+    invoice: Invoice | null; 
+    isLoading: boolean; 
+    isInvoiceLoading: boolean; 
     onClose: () => void;
 }
 
-const AppointmentDetailModal: React.FC<AppointmentDetailModalProps> = ({ appointment, doctor, user, isLoading, onClose }) => {
-    
-    // Dữ liệu hóa đơn giả lập
-    const mockInvoice = {
-        benhLy: "Viêm họng cấp",
-        loiKhuyen: "Uống nhiều nước ấm, tránh đồ lạnh, nghỉ ngơi.",
-        services: [
-            { name: "Phí khám", price: 300000 },
-            { name: "Xét nghiệm nhanh COVID", price: 150000 }
-        ],
-        total: 450000
-    };
+const AppointmentDetailModal: React.FC<AppointmentDetailModalProps> = ({ 
+    appointment, 
+    doctor, 
+    user, 
+    invoice, 
+    isLoading, 
+    isInvoiceLoading, 
+    onClose 
+}) => {
 
     const renderDetailItem = (label: string, value: string | undefined | null) => (
         <p><strong>{label}:</strong> {value || '(Chưa cập nhật)'}</p>
     );
+
+    // Function render chi tiết hóa đơn (mới)
+    const renderInvoiceDetails = () => {
+        if (isInvoiceLoading) {
+            return <p className="am-detail-loading">Đang tải thông tin hóa đơn...</p>;
+        }
+        
+        if (!invoice || !invoice.service_details) {
+            return <p className="am-detail-loading">Chưa có thông tin hóa đơn chi tiết.</p>;
+        }
+
+        const { service_details, total_amount, status } = invoice;
+        
+        return (
+            <>
+                <div className="am-detail-grid">
+                    {renderDetailItem("Mã HĐ", invoice.invoice_code)}
+                    {renderDetailItem("Trạng thái", status === 'pending' ? 'Chưa thanh toán' : 'Đã thanh toán')}
+                    {renderDetailItem("Bệnh lý", service_details.benhLy)}
+                    {renderDetailItem("Lời khuyên", service_details.loiKhuyen)}
+                </div>
+                <label>Chi tiết dịch vụ:</label>
+                <ul className="am-detail-service-list">
+                    {service_details.services.map((s, i) => (
+                        <li key={i}>
+                            <span>{s.name}</span>
+                            <span>{new Intl.NumberFormat('vi-VN').format(s.price)} VND</span>
+                        </li>
+                    ))}
+                </ul>
+                <p className="am-detail-total">
+                    <strong>Tổng cộng:</strong>
+                    <span>{new Intl.NumberFormat('vi-VN').format(total_amount)} VND</span>
+                </p>
+            </>
+        );
+    };
+
 
     return (
         <Modal title={`Chi tiết Lịch hẹn #${appointment.id}`} onClose={onClose}>
@@ -87,26 +124,10 @@ const AppointmentDetailModal: React.FC<AppointmentDetailModalProps> = ({ appoint
                     )}
                 </div>
 
-                {/* Phần 4: Thông tin Hóa đơn (Giả lập) */}
+                {/* Phần 4: Thông tin Hóa đơn */}
                 <div className="am-detail-section">
-                    <h4 className="am-detail-header">Thông tin Hóa đơn (Giả lập)</h4>
-                    <div className="am-detail-grid">
-                        {renderDetailItem("Bệnh lý", mockInvoice.benhLy)}
-                        {renderDetailItem("Lời khuyên", mockInvoice.loiKhuyen)}
-                    </div>
-                    <label>Chi tiết dịch vụ:</label>
-                    <ul className="am-detail-service-list">
-                        {mockInvoice.services.map((s, i) => (
-                            <li key={i}>
-                                <span>{s.name}</span>
-                                <span>{new Intl.NumberFormat('vi-VN').format(s.price)} VND</span>
-                            </li>
-                        ))}
-                    </ul>
-                    <p className="am-detail-total">
-                        <strong>Tổng cộng:</strong>
-                        <span>{new Intl.NumberFormat('vi-VN').format(mockInvoice.total)} VND</span>
-                    </p>
+                    <h4 className="am-detail-header">Thông tin Hóa đơn</h4>
+                    {renderInvoiceDetails()}
                 </div>
 
             </div>
