@@ -273,3 +273,17 @@
     margin-top: 0.5rem;
     border-top: 1px solid #e2e8f0;
 }
+
+.am-container-embedded {
+    font-family: Arial, sans-serif;
+    padding: 0; 
+    margin: 0;
+}
+
+
+.am-container-embedded .am-table-wrapper {
+     box-shadow: none;
+     border-radius: 0;
+     max-height: 60vh; /* Giới hạn chiều cao trong modal */
+     overflow-y: auto; 
+}

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import './AppointmentManagement.css';
 
 // --- TYPE DEFINITIONS ---
@@ -21,8 +21,6 @@ interface Appointment {
   soDienThoai: string;
   lyDoKham: string;
 }
-
-
 interface ApiAppointment {
   id: number;
   ten_benh_nhan: string;
@@ -40,12 +38,10 @@ interface ApiAppointment {
   so_dien_thoai: string;
   ly_do_kham: string;
 }
-
 interface InvoiceService {
   name: string;
   price: number;
 }
-
 interface DoctorDetails {
     phone: string;
 }
@@ -66,12 +62,10 @@ const formatDate = (dateString: string) => {
         year: 'numeric'
     });
 };
-
 const formatTime = (timeString: string) => {
     if (!timeString) return 'N/A';
     return timeString.substring(0, 5);
 };
-
 
 // --- UTILITY COMPONENTS ---
 const Modal: React.FC<{ children: React.ReactNode; title: string; onClose: () => void }> = ({ children, title, onClose }) => (
@@ -85,7 +79,6 @@ const Modal: React.FC<{ children: React.ReactNode; title: string; onClose: () =>
         </div>
     </div>
 );
-
 const ConfirmationModal: React.FC<{ title: string; confirmText: string; onConfirm: () => void; onCancel: () => void; children: React.ReactNode }> = ({ title, confirmText, onConfirm, onCancel, children }) => {
     return (
         <Modal title={title} onClose={onCancel}>
@@ -105,7 +98,6 @@ const InvoiceModal: React.FC<{ appointment: Appointment; onClose: () => void; on
     const [benhLy, setBenhLy] = useState('');
     const [loiKhuyen, setLoiKhuyen] = useState('');
     const [services, setServices] = useState<InvoiceService[]>([{ name: 'Phí khám', price: 300000 }]);
-    
     const total = useMemo(() => services.reduce((sum, service) => sum + service.price, 0), [services]);
 
     const handleServiceChange = (index: number, field: keyof InvoiceService, value: string | number) => {
@@ -117,17 +109,14 @@ const InvoiceModal: React.FC<{ appointment: Appointment; onClose: () => void; on
         }
         setServices(newServices);
     };
-
     const addService = () => {
         setServices([...services, { name: '', price: 0 }]);
     };
-
     const removeService = (index: number) => {
         if (services.length > 1) {
             setServices(services.filter((_, i) => i !== index));
         }
     };
-
     return (
         <Modal title={appointment.hasInvoice ? `Sửa hóa đơn cho: ${appointment.ten_benh_nhan}`: `Tạo hóa đơn cho: ${appointment.ten_benh_nhan}`} onClose={onClose}>
             <div className="am-modal-body">
@@ -181,8 +170,6 @@ const AppointmentDetailModal: React.FC<{
         ],
         total: 450000
     };
-
-    // (MỚI) Hàm render nội dung KV
     const renderDetailItem = (label: string, value: string | undefined | null) => (
         <p><strong>{label}:</strong> {value || '(Chưa cập nhật)'}</p>
     );
@@ -281,22 +268,23 @@ const getAuthToken = (): string | null => {
     return localStorage.getItem('admin_token'); 
 };
 
-const AppointmentManagement: React.FC = () => {
+interface AppointmentManagementProps {
+  userIdToFilter?: number; // Prop này là tùy chọn
+  isEmbedded?: boolean;    // Prop để điều chỉnh giao diện khi bị nhúng
+}
+
+
+const AppointmentManagement: React.FC<AppointmentManagementProps> = ({ userIdToFilter, isEmbedded }) => {
     // State cho dữ liệu
-    const [appointments, setAppointments] = useState<Appointment[]>([]); // Khởi tạo mảng rỗng
+    const [appointments, setAppointments] = useState<Appointment[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
-    // State cho UI
     const [searchTerm, setSearchTerm] = useState('');
     const [isCreateInvoiceModalOpen, setIsCreateInvoiceModalOpen] = useState(false);
     const [isViewInvoiceModalOpen, setIsViewInvoiceModalOpen] = useState(false);
     const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-    
     const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
-
-    // (CẬP NHẬT) State cho Modal Chi tiết
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [selectedAppointmentDetail, setSelectedAppointmentDetail] = useState<Appointment | null>(null);
     const [doctorDetail, setDoctorDetail] = useState<DoctorDetails | null>(null);
@@ -307,7 +295,7 @@ const AppointmentManagement: React.FC = () => {
 
     // --- LOGIC GỌI API ---
     
-    const fetchAppointments = async () => {
+    const fetchAppointments = useCallback(async () => {
         setIsLoading(true);
         setError(null);
         
@@ -319,7 +307,13 @@ const AppointmentManagement: React.FC = () => {
         }
 
         try {
-            const response = await fetch(`${API_URL}/appointments`, {
+            // (MỚI) Quyết định URL dựa trên prop
+            const baseUrl = `${API_URL}/appointments`;
+            const url = userIdToFilter 
+                        ? `${baseUrl}/user/${userIdToFilter}` // Endpoint lấy lịch hẹn theo user
+                        : baseUrl;                           // Endpoint mặc định (lấy tất cả)
+
+            const response = await fetch(url, {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
             });
@@ -358,41 +352,44 @@ const AppointmentManagement: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [userIdToFilter, API_URL]); 
 
+    // useEffect phụ thuộc vào fetchAppointments
     useEffect(() => {
         fetchAppointments();
-    }, []);
+    }, [fetchAppointments]);
 
+    // handleStatusChange cần gọi lại fetchAppointments
     const handleStatusChange = async (id: number, newStatus: AppointmentStatus) => {
-    const token = getAuthToken();
-    if (!token) {
-        alert("Lỗi xác thực. Vui lòng đăng nhập lại.");
-        return;
-    }
-
-    try {
-        
-        const response = await fetch(`${API_URL}/appointments/${id}/status`, {
-            method: 'PATCH', 
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ trang_thai: newStatus })
-        });
-
-        if (!response.ok) {
-            const errData = await response.json();
-            throw new Error(errData.error || 'Cập nhật thất bại');
+        const token = getAuthToken();
+        if (!token) {
+            alert("Lỗi xác thực. Vui lòng đăng nhập lại.");
+            return;
         }
-        await fetchAppointments();
 
-    } catch (err) {
-        console.error('Lỗi khi cập nhật trạng thái:', err);
-        alert(`Lỗi: ${err instanceof Error ? err.message : 'Không thể cập nhật'}`);
-    }
-};
+        try {
+            
+            const response = await fetch(`${API_URL}/appointments/${id}/status`, {
+                method: 'PATCH', 
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ trang_thai: newStatus })
+            });
+
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.error || 'Cập nhật thất bại');
+            }
+            // Gọi lại fetchAppointments để làm mới danh sách
+            await fetchAppointments(); 
+
+        } catch (err) {
+            console.error('Lỗi khi cập nhật trạng thái:', err);
+            alert(`Lỗi: ${err instanceof Error ? err.message : 'Không thể cập nhật'}`);
+        }
+    };
 
     const fetchDoctorDetails = async (doctorId: number) => {
         if (!doctorId) {
@@ -412,7 +409,6 @@ const AppointmentManagement: React.FC = () => {
             setDoctorDetail(null); 
         }
     };
-
     const fetchUserDetails = async (userId: number, token: string) => {
         if (!userId) {
             setUserDetail(null);
@@ -437,14 +433,13 @@ const AppointmentManagement: React.FC = () => {
             setUserDetail(null); 
         }
     };
-
+    
     // --- LOGIC MOCK & UI ---
 
     const filteredAppointments = appointments.filter(a => 
         (a.ten_benh_nhan && a.ten_benh_nhan.toLowerCase().includes(searchTerm.toLowerCase())) || 
         (a.doctorName && a.doctorName.toLowerCase().includes(searchTerm.toLowerCase()))
     );
-
     const handleOpenDetailModal = async (appointment: Appointment) => {
         const token = getAuthToken();
         if (!token) {
@@ -467,7 +462,6 @@ const AppointmentManagement: React.FC = () => {
         
         setIsModalLoading(false);
     };
-
 
     const handleOpenCreateInvoice = (e: React.MouseEvent, appointment: Appointment) => {
         e.stopPropagation(); 
@@ -501,12 +495,10 @@ const AppointmentManagement: React.FC = () => {
         setConfirmAction(() => action);
         setIsConfirmModalOpen(true);
     };
-
     const handleChangeStatus = (e: React.MouseEvent, id: number, status: AppointmentStatus) => {
          e.stopPropagation(); 
          handleStatusChange(id, status);
     }
-
     const getStatusClass = (status: AppointmentStatus) => {
         switch (status) {
             case 'chờ xác nhận': return 'am-status-yellow';
@@ -518,17 +510,22 @@ const AppointmentManagement: React.FC = () => {
     };
 
     return (
-        <div className="am-container">
-            <div className="am-header">
-                <h2>Quản lý Lịch hẹn</h2>
-                <input 
-                    type="text" 
-                    placeholder="Tìm bệnh nhân hoặc bác sĩ..." 
-                    className="am-search-input"
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                />
-            </div>
+        <div className={isEmbedded ? "am-container-embedded" : "am-container"}>
+            
+            {/* Chỉ hiển thị header nếu KHÔNG bị nhúng */}
+            {!isEmbedded && (
+                <div className="am-header">
+                    <h2>Quản lý Lịch hẹn</h2>
+                    <input 
+                        type="text" 
+                        placeholder="Tìm bệnh nhân hoặc bác sĩ..." 
+                        className="am-search-input"
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                    />
+                </div>
+            )}
+
              <div className="am-table-wrapper">
                 {isLoading && <div className="am-loading">Đang tải dữ liệu...</div>}
                 {error && <div className="am-error">Lỗi: {error}</div>}

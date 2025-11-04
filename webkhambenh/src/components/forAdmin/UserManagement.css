@@ -61,5 +61,17 @@
     cursor: pointer;
     text-decoration: underline;
     font-size: 0.875rem;
-    color: #e53e3e;
+    color: #d13f0e;
+}
+.um-action-link:hover {
+    color: #c53030; 
+}
+
+.um-action-link.um-link-button {
+    
+    color: #3182ce; 
+}
+
+.um-action-link.um-link-button:hover {
+    color: #2b6cb0; 
 }
