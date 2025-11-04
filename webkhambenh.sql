@@ -88,18 +88,15 @@ CREATE TABLE invoices (
     appointment_id INTEGER NOT NULL UNIQUE, 
     invoice_code VARCHAR(50) NOT NULL UNIQUE, 
     total_amount DECIMAL(12, 2) NOT NULL, 
+    status VARCHAR(20) DEFAULT 'pending',
     service_details JSONB, -- Lưu chi tiết các dịch vụ dưới dạng JSON
     payment_date TIMESTAMP WITH TIME ZONE, 
     transaction_id VARCHAR(255), 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
     
-    FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE RESTRICT
+    FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE
 );
-
-ALTER TABLE invoices
-ADD COLUMN status VARCHAR(20) DEFAULT 'pending';
-
 
 CREATE TABLE admins (
     id SERIAL PRIMARY KEY,

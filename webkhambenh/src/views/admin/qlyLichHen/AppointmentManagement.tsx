@@ -42,6 +42,11 @@ const AppointmentManagement: React.FC<AppointmentManagementProps> = ({ userIdToF
     const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
     const [isInvoiceLoading, setIsInvoiceLoading] = useState(false); 
     const [isModalLoading, setIsModalLoading] = useState(false); 
+    const [confirmModalProps, setConfirmModalProps] = useState({
+        title: '',
+        message: '',
+        confirmText: ''
+    });
 
     const API_URL = process.env.REACT_APP_API_URL;
 
@@ -148,6 +153,35 @@ const AppointmentManagement: React.FC<AppointmentManagementProps> = ({ userIdToF
         }
     };
 
+    const handleDeleteAppointment = async (id: number) => {
+        const token = getAuthToken();
+        if (!token) {
+            alert("Lỗi xác thực. Vui lòng đăng nhập lại.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/appointments/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || 'Xóa lịch hẹn thất bại');
+            }
+
+            alert('Xóa lịch hẹn thành công.');
+            setAppointments(apps => apps.filter(app => app.id !== id));
+            setIsDetailModalOpen(false);
+            setSelectedAppointment(null);
+
+        } catch (err) {
+            console.error('Lỗi khi xóa lịch hẹn:', err);
+            alert(`Lỗi: ${err instanceof Error ? err.message : 'Không thể xóa'}`);
+        }
+    };
+
     const fetchDoctorDetails = async (doctorId: number) => {
         if (!doctorId) {
             setDoctorDetail({ phone: 'Không rõ' }); return;
@@ -209,7 +243,6 @@ const AppointmentManagement: React.FC<AppointmentManagementProps> = ({ userIdToF
         
         let invoicePromise: Promise<Invoice | null> = Promise.resolve(null);
         
-        // KIỂM TRA `hasInvoice` TỪ STATE
         if (appointment.hasInvoice) {
             invoicePromise = fetchInvoice(appointment.id, token);
         }
@@ -256,7 +289,6 @@ const AppointmentManagement: React.FC<AppointmentManagementProps> = ({ userIdToF
             return;
         }
 
-        // Lưu ID lịch hẹn đang chọn lại
         const savedAppointmentId = selectedAppointment.id;
 
         try {
@@ -297,11 +329,38 @@ const AppointmentManagement: React.FC<AppointmentManagementProps> = ({ userIdToF
     
     const handlePatientSeen = (e: React.MouseEvent, appointmentId: number) => {
         e.stopPropagation(); 
+        setConfirmModalProps({
+            title: "Xác nhận",
+            message: "Bệnh nhân đã khám bệnh chưa?",
+            confirmText: "Đã khám"
+        });
+
         const action = () => {
             handleStatusChange(appointmentId, 'chưa thanh toán');
             setIsConfirmModalOpen(false);
         };
         setConfirmAction(() => action);
+        setIsConfirmModalOpen(true);
+    };
+
+    const handleOpenDeleteConfirm = () => {
+        if (!selectedAppointment) return;
+        
+        const appointmentIdToDelete = selectedAppointment.id;
+        
+        setConfirmModalProps({
+            title: "Xác nhận xóa",
+            message: `Bạn có chắc chắn muốn xóa lịch hẹn #${appointmentIdToDelete} của bệnh nhân ${selectedAppointment.ten_benh_nhan}? Hành động này không thể hoàn tác.`,
+            confirmText: "Xóa"
+        });
+
+        const action = () => {
+            handleDeleteAppointment(appointmentIdToDelete);
+            setIsConfirmModalOpen(false);
+        };
+
+        setConfirmAction(() => action);
+        setIsDetailModalOpen(false); 
         setIsConfirmModalOpen(true);
     };
 
@@ -362,14 +421,14 @@ const AppointmentManagement: React.FC<AppointmentManagementProps> = ({ userIdToF
             
             {isConfirmModalOpen && (
                  <ConfirmationModal
-                    title="Xác nhận"
-                    confirmText="Đã khám"
+                    title={confirmModalProps.title}
+                    confirmText={confirmModalProps.confirmText}
                     onConfirm={() => {
                         if (confirmAction) confirmAction();
                     }}
                     onCancel={() => setIsConfirmModalOpen(false)}
                 >
-                    Bệnh nhân đã khám bệnh chưa?
+                    {confirmModalProps.message}
                 </ConfirmationModal>
             )}
             
@@ -382,6 +441,7 @@ const AppointmentManagement: React.FC<AppointmentManagementProps> = ({ userIdToF
                     isLoading={isModalLoading}
                     isInvoiceLoading={isInvoiceLoading}
                     onClose={closeDetailModal}
+                    onDelete={handleOpenDeleteConfirm} 
                 />
             )}
         </div>

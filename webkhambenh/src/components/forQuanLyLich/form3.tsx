@@ -261,7 +261,7 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
       </div>
 
       {showModal && (
-        <div className="modal-overlay">
+        <div className="modal-overlay1">
           <div className="modal-content">
             <div className="modal-header">
               <h3 className="header-title"> Chi tiết Lịch hẹn</h3>
@@ -341,7 +341,7 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
 
 
       {showEditModal && (
-        <div className="modal-overlay">
+        <div className="modal-overlay1">
           <div className="modal-content edit-modal">
             <div className="modal-header">
               <h3>Sửa lịch hẹn</h3>

@@ -16,7 +16,7 @@ router.get('/',auth(['admin']) ,getAllLichHen);
 
 router.post('/', auth(['user']), createLichHen); 
 router.put('/:id', auth(['user']), updateLichHen); 
-router.delete('/:id', auth(['user']), deleteLichHen);
+router.delete('/:id', auth(['user', 'admin']), deleteLichHen);
 
 router.get('/:id',auth(['admin']), getLichHenById);
 router.patch('/:id/status', auth(['admin']), updateAppointmentStatusByAdmin); 

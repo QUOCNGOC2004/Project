@@ -11,7 +11,7 @@ export const getAllLichHen = async (_req: Request, res: Response): Promise<void>
       SELECT 
         a.*,
         d.name AS doctor_name,
-        CASE WHEN i.id IS NOT NULL THEN true ELSE false END AS "hasInvoice"
+        CASE WHEN i.id IS NOT NULL THEN true ELSE false END AS "hasinvoice"
       FROM appointments a
       LEFT JOIN doctors d ON a.doctor_id = d.id
       LEFT JOIN invoices i ON a.id = i.appointment_id
@@ -41,7 +41,7 @@ export const getLichHenById = async (req: Request, res: Response): Promise<void>
       SELECT 
         a.*,
         d.name AS doctor_name,
-        CASE WHEN i.id IS NOT NULL THEN true ELSE false END AS "hasInvoice"
+        CASE WHEN i.id IS NOT NULL THEN true ELSE false END AS "hasinvoice"
       FROM appointments a
       LEFT JOIN doctors d ON a.doctor_id = d.id
       LEFT JOIN invoices i ON a.id = i.appointment_id
@@ -335,21 +335,34 @@ export const updateLichHen = async (req: Request, res: Response): Promise<void> 
 
 // Xóa lịch hẹn
 export const deleteLichHen = async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params;
-  const user_id = req.user?.id; 
+  const { id } = req.params; // ID của lịch hẹn cần xóa
+  const requestingUser = req.user; 
 
-  if (!user_id) {
-      res.status(401).json({ error: 'Xác thực không hợp lệ.' });
-      return;
+  if (!requestingUser) {
+    res.status(401).json({ error: 'Xác thực không hợp lệ.' });
+    return;
   }
 
   try {
     await AppDataSource.transaction(async transactionalEntityManager => {
+      let findQuery = `
+        SELECT id FROM appointments 
+        WHERE id = $1 
+      `;
+      
+      const queryParams: (string | number)[] = [id];
+
+      // 2. Nếu người dùng không phải là 'admin', thì thêm điều kiện user_id
+      if (requestingUser.role !== 'admin') {
+        findQuery += ` AND user_id = $2 `;
+        queryParams.push(requestingUser.id);
+      }
+      findQuery += ` FOR UPDATE`;
+
+      // 3. Thực thi truy vấn
       const appointmentResult = await transactionalEntityManager.query(
-        `SELECT id FROM appointments 
-         WHERE id = $1 AND user_id = $2 
-         FOR UPDATE`, 
-        [id, user_id]
+        findQuery,
+        queryParams
       );
 
       if (appointmentResult.length === 0) {
@@ -412,9 +425,11 @@ export const getLichHenByUserId = async (req: Request, res: Response): Promise<v
         a.*,
         d.name as doctor_name,
         d.phone as doctor_phone,
-        d.mo_ta_bac_si as mo_ta_bac_si
+        d.mo_ta_bac_si as mo_ta_bac_si,
+        CASE WHEN i.id IS NOT NULL THEN true ELSE false END AS "hasinvoice"
       FROM appointments a 
       LEFT JOIN doctors d ON a.doctor_id = d.id 
+      LEFT JOIN invoices i ON a.id = i.appointment_id
       WHERE a.user_id = $1
       ORDER BY a.ngay_dat_lich DESC, a.gio_dat_lich DESC`,
       [targetUserId] // Sử dụng userId từ URL

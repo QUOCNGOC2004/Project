@@ -33,7 +33,7 @@ const AppointmentTable: React.FC<AppointmentTableProps> = ({
     onPatientSeen,
     onStatusChange,
     onOpenCreateInvoice,
-    onOpenViewInvoice
+    onOpenViewInvoice // Không dùng
 }) => {
     
     if (isLoading) {
@@ -90,7 +90,6 @@ const AppointmentTable: React.FC<AppointmentTableProps> = ({
                                     )}
                                     {app.trang_thai === 'chưa thanh toán' && app.hasInvoice && (
                                         <>
-                                            <button onClick={(e) => onOpenViewInvoice(e, app)} className="am-action-btn am-btn-blue">Xem Hóa đơn</button>
                                             <button onClick={(e) => onOpenCreateInvoice(e, app)} className="am-action-btn am-btn-yellow">Sửa Hóa đơn</button>
                                         </>
                                     )}

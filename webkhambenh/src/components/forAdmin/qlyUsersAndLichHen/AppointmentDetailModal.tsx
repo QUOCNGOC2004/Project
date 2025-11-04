@@ -12,6 +12,7 @@ interface AppointmentDetailModalProps {
     isLoading: boolean; 
     isInvoiceLoading: boolean; 
     onClose: () => void;
+    onDelete: () => void;
 }
 
 const AppointmentDetailModal: React.FC<AppointmentDetailModalProps> = ({ 
@@ -21,7 +22,8 @@ const AppointmentDetailModal: React.FC<AppointmentDetailModalProps> = ({
     invoice, 
     isLoading, 
     isInvoiceLoading, 
-    onClose 
+    onClose,
+    onDelete
 }) => {
 
     const renderDetailItem = (label: string, value: string | undefined | null) => (
@@ -131,8 +133,21 @@ const AppointmentDetailModal: React.FC<AppointmentDetailModalProps> = ({
                 </div>
 
             </div>
-            <div className="modal-actions">
-                <button type="button" onClick={onClose} className="modal-button modal-button-secondary">Đóng</button>
+            <div className="modal-actions modal-actions-split">
+                <button 
+                    type="button" 
+                    onClick={onDelete} 
+                    className="modal-button modal-button-danger"
+                >
+                    Xóa Lịch Hẹn
+                </button>
+                <button 
+                    type="button" 
+                    onClick={onClose} 
+                    className="modal-button modal-button-secondary"
+                >
+                    Đóng
+                </button>
             </div>
         </Modal>
     );
