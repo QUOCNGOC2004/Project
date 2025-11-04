@@ -25,7 +25,7 @@ services:
           - /api/auth/profile
           - /api/auth/user
         strip_path: false
-        methods: [GET, PUT , OPTIONS]
+        methods: [GET, PUT ,DELETE, OPTIONS]
         plugins:
           - name: jwt 
           - name: rate-limiting

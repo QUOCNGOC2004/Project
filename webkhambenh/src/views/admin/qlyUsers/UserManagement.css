@@ -15,6 +15,9 @@
     font-weight: bold;
 }
 
+.um-clickable-row {
+    cursor: pointer;
+}
 
 .um-role-cell {
     text-transform: capitalize;
@@ -39,4 +42,15 @@
 
 .um-action-link.um-link-button:hover {
     color: #2b6cb0; 
+}
+
+.um-container .modal-content {
+    max-width: 60rem;
+   
+}
+
+
+.um-container .am-container-embedded .common-table-wrapper {
+    padding-left: 50px;
+    padding-top: 50px;
 }

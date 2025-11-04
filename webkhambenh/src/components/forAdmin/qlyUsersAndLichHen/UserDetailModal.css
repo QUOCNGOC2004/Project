@@ -1,0 +1,53 @@
+.user-detail-modal-body {
+    padding: 1.5rem;
+    background-color: #f9fafb; 
+}
+
+.user-detail-section {
+    background-color: #ffffff;
+    border: 1px solid #ff9100;
+    border-radius: 0.375rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.user-detail-header {
+    font-size: 1.1rem; 
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    background-color: #cacaca;
+    border-radius: 0.375rem 0.375rem 0 0;
+}
+
+.user-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem 1rem;
+    padding: 1rem;
+}
+
+.user-detail-grid p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #4a5568;
+    word-break: break-word;
+}
+
+.user-detail-grid p strong {
+    font-weight: 600;
+    color: #2d3748;
+    display: block; 
+}
+
+.user-detail-loading,
+.user-detail-error {
+    padding: 1rem;
+    color: #718096;
+    font-style: italic;
+    text-align: center;
+}
+
+.user-detail-error {
+    color: #c53030;
+}

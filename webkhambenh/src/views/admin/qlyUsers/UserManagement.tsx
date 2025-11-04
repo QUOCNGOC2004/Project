@@ -1,3 +1,4 @@
+import UserDetailModal from '../../../components/forAdmin/qlyUsersAndLichHen/UserDetailModal';
 import React, { useState, useEffect } from 'react';
 import './UserManagement.css';
 import '../../../components/forAdmin/qlyUsersAndLichHen/Table.css';
@@ -12,8 +13,13 @@ const UserManagement: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    // State cho modal "Xem lịch"
+    const [isApptModalOpen, setIsApptModalOpen] = useState(false);
+    const [selectedUserForAppt, setSelectedUserForAppt] = useState<User | null>(null);
+
+    // State cho modal "Chi tiết"
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [selectedUserForDetail, setSelectedUserForDetail] = useState<User | null>(null);
 
     const API_URL = process.env.REACT_APP_API_URL;
 
@@ -22,7 +28,7 @@ const UserManagement: React.FC = () => {
         setIsLoading(true);
         setError(null);
         
-        const token = getAuthToken(); // Dùng hàm import
+        const token = getAuthToken();
         if (!token) {
             setError("Bạn chưa đăng nhập hoặc không có quyền.");
             setIsLoading(false);
@@ -56,7 +62,7 @@ const UserManagement: React.FC = () => {
 
     useEffect(() => {
         fetchUsers();
-    }, [API_URL]); // Thêm API_URL vào dependency array
+    }, [API_URL]); 
 
     const handleDelete = async (id: number) => {
         if (window.confirm('Bạn có chắc chắn muốn xóa người dùng này không? Thao tác này không thể hoàn tác.')) {
@@ -82,14 +88,24 @@ const UserManagement: React.FC = () => {
         }
     };
 
-    const handleOpenModal = (user: User) => {
-        setSelectedUser(user);
-        setIsModalOpen(true);
+    // --- Handler cho modal "Xem lịch" ---
+    const handleOpenApptModal = (user: User) => {
+        setSelectedUserForAppt(user);
+        setIsApptModalOpen(true);
+    };
+    const handleCloseApptModal = () => {
+        setIsApptModalOpen(false);
+        setSelectedUserForAppt(null);
     };
 
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-        setSelectedUser(null);
+    // --- Handler cho modal "Chi tiết" ---
+    const handleOpenDetailModal = (user: User) => {
+        setSelectedUserForDetail(user);
+        setIsDetailModalOpen(true);
+    };
+    const handleCloseDetailModal = () => {
+        setIsDetailModalOpen(false);
+        setSelectedUserForDetail(null);
     };
     
     return (
@@ -98,12 +114,10 @@ const UserManagement: React.FC = () => {
                 <h2>Quản lý Người dùng</h2>
             </div>
             
-            {/* Dùng class CSS chung cho table wrapper */}
             <div className="common-table-wrapper">
                 {isLoading && <div className="common-loading">Đang tải dữ liệu...</div>}
                 {error && <div className="common-error">Lỗi: {error}</div>}
                 {!isLoading && !error && (
-                    /* Dùng class CSS chung cho table */
                     <table className="common-table" style={{minWidth: '600px'}}>
                         <thead>
                             <tr>
@@ -116,19 +130,33 @@ const UserManagement: React.FC = () => {
                         <tbody>
                             {users.length > 0 ? (
                                 users.map(user => (
-                                    <tr key={user.id}>
+                                    <tr key={user.id}
+                                        onClick={() => handleOpenDetailModal(user)}
+                                        className="um-clickable-row" 
+                                    >
                                         <td>{user.username}</td>
                                         <td>{user.email}</td>
                                         <td>
                                             <button 
-                                                onClick={() => handleOpenModal(user)} 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleOpenApptModal(user);
+                                                }} 
                                                 className="um-action-link um-link-button"
                                             >
                                                 Xem lịch
                                             </button>
                                         </td>
                                         <td>
-                                            <button onClick={() => handleDelete(user.id)} className="um-action-link">Xóa</button>
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDelete(user.id);
+                                                }} 
+                                                className="um-action-link"
+                                            >
+                                                Xóa
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
@@ -142,17 +170,25 @@ const UserManagement: React.FC = () => {
                 )}
             </div>
 
-            {/*Render AppointmentManagement bên trong Modal (Dùng Modal chung) */}
-            {isModalOpen && selectedUser && (
-                <Modal title={`Quản lý lịch hẹn của: ${selectedUser.username}`} onClose={handleCloseModal}>
-                    {/* CSS cho modal-body chung đã có padding, nên ta thêm 1 div để reset nó */}
+            {/* Modal "Xem lịch hẹn" */}
+            {isApptModalOpen && selectedUserForAppt && (
+                <Modal title={`Quản lý lịch hẹn của: ${selectedUserForAppt.username}`} onClose={handleCloseApptModal}>
                     <div style={{ padding: '0', margin: '-1.5rem' }}> 
                         <AppointmentManagement 
-                            userIdToFilter={selectedUser.id} 
+                            userIdToFilter={selectedUserForAppt.id} 
                             isEmbedded={true} 
                         />
                     </div>
                 </Modal>
+            )}
+
+            {/* Render Modal "Chi tiết" */}
+            {isDetailModalOpen && selectedUserForDetail && (
+                <UserDetailModal
+                    userId={selectedUserForDetail.id}
+                    username={selectedUserForDetail.username}
+                    onClose={handleCloseDetailModal}
+                />
             )}
         </div>
     );

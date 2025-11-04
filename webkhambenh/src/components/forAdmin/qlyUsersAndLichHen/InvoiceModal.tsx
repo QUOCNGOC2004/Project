@@ -1,4 +1,3 @@
-// src/components/appointments/InvoiceModal.tsx
 import React, { useState, useMemo } from 'react';
 import { Appointment, InvoiceService } from './index';
 import { Modal } from './Modal';

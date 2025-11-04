@@ -62,3 +62,12 @@ export interface User {
   username: string;
   email: string;
 }
+
+export interface BankAccount {
+  id: number;
+  user_id: number;
+  bank_name: string;
+  account_holder: string;
+  account_number: string;
+  is_default: boolean;
+}
