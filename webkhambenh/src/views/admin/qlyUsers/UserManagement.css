@@ -1,0 +1,42 @@
+
+.um-container {
+    font-family: Arial, sans-serif;
+}
+
+.um-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.um-header h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+
+.um-role-cell {
+    text-transform: capitalize;
+}
+
+.um-action-link {
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 0.875rem;
+    color: #d13f0e;
+    padding: 0;
+}
+.um-action-link:hover {
+    color: #c53030; 
+}
+
+.um-action-link.um-link-button {
+    color: #3182ce; 
+}
+
+.um-action-link.um-link-button:hover {
+    color: #2b6cb0; 
+}

@@ -1,0 +1,38 @@
+
+.am-container {
+    font-family: Arial, sans-serif;
+}
+
+.am-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.am-header h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.am-search-input {
+    padding: 0.5rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 0.25rem;
+    width: 33.33%;
+}
+
+
+.am-container-embedded {
+    font-family: Arial, sans-serif;
+    padding: 0; 
+    margin: 0;
+}
+
+/* Điều chỉnh wrapper của bảng chung khi bị nhúng */
+.am-container-embedded .common-table-wrapper {
+     box-shadow: none;
+     border-radius: 0;
+     max-height: 60vh; /* Giới hạn chiều cao trong modal */
+     overflow-y: auto; 
+}

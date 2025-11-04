@@ -1,33 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './UserManagement.css';
-import AppointmentManagement from './AppointmentManagement';
-
-// --- TYPE DEFINITIONS ---
-interface User {
-  id: number;
-  username: string;
-  email: string;
-}
-
-
-// --- HELPER FUNCTIONS ---
-const getAuthToken = (): string | null => {
-    return localStorage.getItem('admin_token'); 
-};
-
-// MODAL COMPONENT
-const Modal: React.FC<{ children: React.ReactNode; title: string; onClose: () => void }> = ({ children, title, onClose }) => (
-    <div className="um-modal-overlay">
-        <div className="um-modal-content">
-            <div className="um-modal-header">
-                <h3>{title}</h3>
-                <button onClick={onClose} className="um-modal-close-btn">&times;</button>
-            </div>
-            {children} 
-        </div>
-    </div>
-);
-
+import '../../../components/forAdmin/qlyUsersAndLichHen/Table.css';
+import AppointmentManagement from '../qlyLichHen/AppointmentManagement';
+import { User } from '../../../components/forAdmin/qlyUsersAndLichHen/index';
+import { getAuthToken } from '../../../components/forAdmin/qlyUsersAndLichHen/auth'; 
+import { Modal } from '../../../components/forAdmin/qlyUsersAndLichHen/Modal'; 
 
 // --- MAIN COMPONENT ---
 const UserManagement: React.FC = () => {
@@ -45,7 +22,7 @@ const UserManagement: React.FC = () => {
         setIsLoading(true);
         setError(null);
         
-        const token = getAuthToken();
+        const token = getAuthToken(); // Dùng hàm import
         if (!token) {
             setError("Bạn chưa đăng nhập hoặc không có quyền.");
             setIsLoading(false);
@@ -79,7 +56,7 @@ const UserManagement: React.FC = () => {
 
     useEffect(() => {
         fetchUsers();
-    }, []);
+    }, [API_URL]); // Thêm API_URL vào dependency array
 
     const handleDelete = async (id: number) => {
         if (window.confirm('Bạn có chắc chắn muốn xóa người dùng này không? Thao tác này không thể hoàn tác.')) {
@@ -88,22 +65,16 @@ const UserManagement: React.FC = () => {
                 alert("Lỗi xác thực.");
                 return;
             }
-
             try {
                 const response = await fetch(`${API_URL}/auth/user/${id}`, {
                     method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
-
                 if (!response.ok) {
                     const errData = await response.json();
                     throw new Error(errData.message || 'Xóa thất bại');
                 }
-                
                 await fetchUsers();
-
             } catch (err) {
                 console.error('Lỗi khi xóa user:', err);
                 alert(`Lỗi: ${err instanceof Error ? err.message : 'Không thể xóa'}`);
@@ -126,11 +97,14 @@ const UserManagement: React.FC = () => {
             <div className="um-header">
                 <h2>Quản lý Người dùng</h2>
             </div>
-            <div className="um-table-wrapper">
-                {isLoading && <div className="um-loading">Đang tải dữ liệu...</div>}
-                {error && <div className="um-error">Lỗi: {error}</div>}
+            
+            {/* Dùng class CSS chung cho table wrapper */}
+            <div className="common-table-wrapper">
+                {isLoading && <div className="common-loading">Đang tải dữ liệu...</div>}
+                {error && <div className="common-error">Lỗi: {error}</div>}
                 {!isLoading && !error && (
-                    <table className="um-table">
+                    /* Dùng class CSS chung cho table */
+                    <table className="common-table" style={{minWidth: '600px'}}>
                         <thead>
                             <tr>
                                 <th>Tên đăng nhập</th>
@@ -168,10 +142,11 @@ const UserManagement: React.FC = () => {
                 )}
             </div>
 
-            {/*Render AppointmentManagement bên trong Modal */}
+            {/*Render AppointmentManagement bên trong Modal (Dùng Modal chung) */}
             {isModalOpen && selectedUser && (
                 <Modal title={`Quản lý lịch hẹn của: ${selectedUser.username}`} onClose={handleCloseModal}>
-                    <div className="um-modal-body" style={{ padding: '0' }}> 
+                    {/* CSS cho modal-body chung đã có padding, nên ta thêm 1 div để reset nó */}
+                    <div style={{ padding: '0', margin: '-1.5rem' }}> 
                         <AppointmentManagement 
                             userIdToFilter={selectedUser.id} 
                             isEmbedded={true} 

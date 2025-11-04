@@ -3,8 +3,8 @@ import { useHistory } from 'react-router-dom';
 import './Admin.css';
 import DoctorManagement from '../../components/forAdmin/DoctorManagement';
 import ScheduleManagement from '../../components/forAdmin/ScheduleManagement';
-import AppointmentManagement from '../../components/forAdmin/AppointmentManagement';
-import UserManagement from '../../components/forAdmin/UserManagement';
+import AppointmentManagement from './qlyLichHen/AppointmentManagement';
+import UserManagement from './qlyUsers/UserManagement';
 
 
 const isAdminLoggedIn = (): boolean => {

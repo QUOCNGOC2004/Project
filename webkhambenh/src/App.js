@@ -9,7 +9,7 @@ import Auth from './views/login/Auth';
 import Navbar8 from './components/forHome/navbar8';
 import ChatBot from './views/chatBott/ChatBot';
 import Profile from './views/caNhann/Profile';
-import AdminPage from './views/admin/Admin';
+import AdminPage from './views/admin/admin';
 import AdminLogin from './views/admin/AdminLogin';
 import { Fragment } from 'react';
 

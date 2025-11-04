@@ -1,0 +1,44 @@
+.am-table-actions {
+    display: flex;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+/* Status Badge */
+.am-status-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.am-status-yellow { background-color: #fefcbf; color: #b7791f; }
+.am-status-cyan { background-color: #c4f1f9; color: #0b7285; }
+.am-status-red { background-color: #fed7d7; color: #c53030; }
+.am-status-green { background-color: #c6f6d5; color: #2f855a; }
+.am-status-gray { background-color: #e2e8f0; color: #4a5568; }
+
+/* Action Buttons */
+.am-action-btn {
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.25rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.am-btn-green { background-color: #48bb78; }
+.am-btn-green:hover { background-color: #38a169; }
+.am-btn-blue { background-color: #4299e1; }
+.am-btn-blue:hover { background-color: #3182ce; }
+.am-btn-gray { background-color: #a0aec0; }
+.am-btn-gray:hover { background-color: #718096; }
+.am-btn-purple { background-color: #9f7aea; }
+.am-btn-purple:hover { background-color: #805ad5; }
+.am-btn-yellow { background-color: #f6e05e; }
+.am-btn-yellow:hover { background-color: #d69e2e; }
+.am-btn-teal { background-color: #4fd1c5; }
+.am-btn-teal:hover { background-color: #38b2ac; }
