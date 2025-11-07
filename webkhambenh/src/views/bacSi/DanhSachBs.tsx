@@ -4,6 +4,7 @@ import './DanhSachBs.css';
 import DoctorCard from '../../components/forDsBs/DoctorCard';
 import FilterSection from '../../components/forDsBs/FilterSection';
 import Sidebar, { ScheduleFilterState } from '../../components/forDsBs/Sidebar'; 
+import DoctorScheduleModal from '../../components/forDsBs/DoctorScheduleModal';
 
 interface Doctor {
   id: number;
@@ -33,6 +34,7 @@ const DanhSachBs: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
   const [isScheduleFilterActive, setIsScheduleFilterActive] = useState(false);
+  const [selectedDoctorId, setSelectedDoctorId] = useState<number | null>(null);
   const [scheduleFilters, setScheduleFilters] = useState<ScheduleFilterState>({
     date: getTodayDate(),
     shifts: { sang: false, chieu: false, toi: false },
@@ -163,6 +165,7 @@ const DanhSachBs: React.FC = () => {
                 experience={doctor.kinhNghiem}
                 hocVi={doctor.hocVi}
                 moTaBacSi={doctor.moTaBacSi}
+                onViewSchedule={() => setSelectedDoctorId(doctor.id)}
               />
             ))
           ) : (
@@ -170,6 +173,12 @@ const DanhSachBs: React.FC = () => {
           )}
         </div>
       </div>
+      {selectedDoctorId && (
+        <DoctorScheduleModal
+          doctorId={selectedDoctorId}
+          onClose={() => setSelectedDoctorId(null)}
+        />
+      )}
     </div>
   );
 };

@@ -1,0 +1,154 @@
+.dsm-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(3px);
+}
+
+.dsm-modal {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.dsm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: white;
+}
+
+.dsm-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.dsm-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #888;
+  padding: 0;
+}
+.dsm-close-btn:hover {
+  color: #111;
+}
+
+.dsm-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.dsm-loading,
+.dsm-error,
+.dsm-empty {
+  text-align: center;
+  padding: 2rem;
+  color: #555;
+  font-size: 1.1rem;
+}
+.dsm-loading .spin-icon {
+  animation: spin 1s linear infinite;
+  margin-right: 0.5rem;
+}
+.dsm-empty p {
+  margin: 0.5rem 0;
+}
+.dsm-empty svg {
+  color: #aaa;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.dsm-schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.dsm-shift-group {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+.dsm-shift-date {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #E65103;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px dashed #ccc;
+  padding-bottom: 0.5rem;
+}
+
+.dsm-shift-time {
+  font-size: 0.9rem;
+  color: #444;
+  margin-bottom: 1rem;
+}
+
+.dsm-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.75rem;
+}
+
+.dsm-slot-btn {
+  background-color: #E65103;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.dsm-slot-btn:hover {
+  background-color: #b87328;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dsm-slot-btn.disabled {
+  background-color: #e0e0e0;
+  color: #999;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.dsm-slot-btn.disabled span {
+  font-size: 0.75rem;
+  display: block;
+  font-weight: 400;
+}
+
+a.dsm-slot-btn {
+  text-decoration: none;
+}

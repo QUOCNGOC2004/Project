@@ -9,14 +9,11 @@ interface DoctorCardProps {
   id: number;
   hocVi: string;      
   moTaBacSi: string;  
+  onViewSchedule: () => void;
 }
 
 
-const DoctorCard: React.FC<DoctorCardProps> = ({ name, imageUrl, experience, id, hocVi, moTaBacSi }) => {
-  const queryParams = new URLSearchParams({
-    doctorName: name,
-    id: id.toString()
-  }).toString();
+const DoctorCard: React.FC<DoctorCardProps> = ({ name, imageUrl, experience, id, hocVi, moTaBacSi, onViewSchedule }) => {
 
   return (
     <div className="doctor-card">
@@ -34,12 +31,13 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ name, imageUrl, experience, id,
       <p className="doctor-specialty">Học vị: {hocVi}</p>
       <p className="doctor-experience">Kinh nghiệm: {experience} năm</p>
 
-      <a href={`/dat-lich?${queryParams}`}>
-        <button className="appointment-button">
-          <i className='bx bx-calendar-check'></i>
-          Đặt lịch khám
-        </button>
-      </a>
+      <button 
+        className="appointment-button"
+        onClick={onViewSchedule} 
+      >
+        <i className='bx bx-calendar-check'></i>
+        Xem lịch & Đặt khám
+      </button>
     </div>
   );
 };

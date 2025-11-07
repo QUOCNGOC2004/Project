@@ -377,3 +377,46 @@ export const createBatchSchedules = async (req: Request, res: Response) => {
         return res.status(500).json({ error: 'Lỗi máy chủ khi tạo lịch làm việc' });
     }
 };
+
+
+export const getDoctorScheduleDetails = async (req: Request, res: Response) => {
+    try {
+        const { doctorId } = req.params;
+
+        const doctorRepo = AppDataSource.getRepository(Doctor);
+        const doctor = await doctorRepo.findOne({ where: { id: parseInt(doctorId) } });
+        
+        if (!doctor) {
+            return res.status(404).json({ error: 'Không tìm thấy bác sĩ' });
+        }
+
+        const scheduleRepo = AppDataSource.getRepository(DoctorSchedule);
+        const schedules = await scheduleRepo.find({
+            where: { doctorId: parseInt(doctorId) },
+            relations: ['timeSlots'],
+            order: {
+                workDate: 'ASC',    
+                startTime: 'ASC' 
+            }
+        });
+
+        if (schedules.length === 0) {
+            return res.json({
+                doctorName: doctor.name,
+                hocVi: doctor.hocVi,
+                schedules: []
+            });
+        }
+        
+        // Trả về cả thông tin bác sĩ và lịch làm việc
+        return res.json({
+            doctorName: doctor.name,
+            hocVi: doctor.hocVi,
+            schedules: schedules
+        });
+
+    } catch (error) {
+        console.error('Lỗi lấy lịch chi tiết của bác sĩ:', error);
+        return res.status(500).json({ error: 'Lỗi máy chủ' });
+    }
+};

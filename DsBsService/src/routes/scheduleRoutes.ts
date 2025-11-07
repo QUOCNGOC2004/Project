@@ -5,19 +5,20 @@ import {
     deleteSchedule,
     getAllSchedules,
     getSchedulesByDoctorId,
-    createBatchSchedules
+    createBatchSchedules,
+    getDoctorScheduleDetails
 } from '../controllers/scheduleController';
 import { auth } from '../middleware/auth';
 
 const router = Router();
-router.use(auth(['admin']));
 
-router.get('/', getAllSchedules);
-router.post('/', createSchedule);
-router.post('/batch', createBatchSchedules);
+router.get('/',[auth(['admin'])] ,getAllSchedules);
+router.post('/', [auth(['admin'])], createSchedule);
+router.post('/batch',[auth(['admin'])] ,createBatchSchedules);
 // (Route này phải đặt trước route /:id)
-router.get('/doctor/:doctorId', getSchedulesByDoctorId);
-router.put('/:id', updateSchedule);
-router.delete('/:id', deleteSchedule);
+router.get('/doctor/:doctorId',[auth(['admin'])] ,getSchedulesByDoctorId);
+router.get('/:doctorId/schedule',[auth(['user'])] ,getDoctorScheduleDetails);
+router.put('/:id',[auth(['admin'])] ,updateSchedule);
+router.delete('/:id',[auth(['admin'])] , deleteSchedule);
 
 export default router;
