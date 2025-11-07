@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './AppointmentManagement.css';
-import { getAuthToken } from '../../../components/forAdmin/qlyUsersAndLichHen/auth';
+import { getAuthToken } from '../../../components/forAdmin/qlyUsersAndLichHen/hamXuLy';
 import { 
     Appointment, 
     ApiAppointment, 

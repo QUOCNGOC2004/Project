@@ -1,6 +1,6 @@
 import React from 'react';
 import { Appointment, DoctorDetails, UserDetails, Invoice } from './index'; 
-import { formatDate, formatTime } from './formatters';
+import { formatDate, formatTime } from './hamXuLy';
 import { Modal } from './Modal';
 import './AppointmentDetailModal.css';
 

@@ -4,7 +4,7 @@ import './UserManagement.css';
 import '../../../components/forAdmin/qlyUsersAndLichHen/Table.css';
 import AppointmentManagement from '../qlyLichHen/AppointmentManagement';
 import { User } from '../../../components/forAdmin/qlyUsersAndLichHen/index';
-import { getAuthToken } from '../../../components/forAdmin/qlyUsersAndLichHen/auth'; 
+import { getAuthToken } from '../../../components/forAdmin/qlyUsersAndLichHen/hamXuLy'; 
 import { Modal } from '../../../components/forAdmin/qlyUsersAndLichHen/Modal'; 
 
 // --- MAIN COMPONENT ---

@@ -31,6 +31,18 @@ interface Schedule {
 
 type NewScheduleData = Omit<Schedule, 'id' | 'doctor' | 'timeSlots'>;
 
+// Dữ liệu cho NHIỀU lịch (lặp lại)
+interface BatchScheduleData {
+    doctorId: number;
+    startTime: string;
+    endTime: string;
+    anchorDate: string; // Ngày làm mốc
+    selectedDays: number[]; // Mảng các ngày [0, 1, 2...]
+}
+
+
+type ApiScheduleResponse = Omit<Schedule, 'doctor'>;
+
 const formatTime = (timeString: string): string => {
     if (typeof timeString !== 'string' || timeString.length < 5) {
         return timeString;
@@ -41,9 +53,10 @@ const formatTime = (timeString: string): string => {
 interface ScheduleFormProps {
     doctors: Doctor[];
     onAdd: (scheduleData: NewScheduleData) => Promise<void>;
+    onAddBatch: (batchData: BatchScheduleData) => Promise<void>;
 }
 
-const ScheduleForm: React.FC<ScheduleFormProps> = ({ doctors, onAdd }) => {
+const ScheduleForm: React.FC<ScheduleFormProps> = ({ doctors, onAdd, onAddBatch }) => {
     const [formData, setFormData] = useState({
         doctorId: '',
         workDate: '',
@@ -51,6 +64,23 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ doctors, onAdd }) => {
         endTime: ''
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const [isRepeating, setIsRepeating] = useState(false);
+    const [repeatDays, setRepeatDays] = useState<Record<string, boolean>>({
+        '1': false, // Thứ 2
+        '2': false, // Thứ 3
+        '3': false, // Thứ 4
+        '4': false, // Thứ 5
+        '5': false, // Thứ 6
+        '6': false, // Thứ 7
+        '0': false, // Chủ Nhật
+    });
+
+    // Xử lý khi tích chọn các ngày
+    const handleRepeatDayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, checked } = e.target;
+        setRepeatDays(prev => ({ ...prev, [name]: checked }));
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -61,18 +91,49 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ doctors, onAdd }) => {
 
         setIsSubmitting(true);
         try {
+            if (isRepeating) {
+                
+                // 1. Chuyển đổi { '1': true, '2': false } thành [1]
+                const selectedDays = Object.keys(repeatDays)
+                    .filter(dayKey => repeatDays[dayKey] === true)
+                    .map(dayKey => parseInt(dayKey));
+
+                if (selectedDays.length === 0) {
+                    alert('Bạn đã chọn "Lặp lại" nhưng chưa chọn ngày nào trong tuần.');
+                    setIsSubmitting(false); 
+                    return;
+                }
+
+                // 2. Tạo data cho API batch
+                const batchData: BatchScheduleData = {
+                    doctorId: parseInt(formData.doctorId),
+                    startTime: formData.startTime,
+                    endTime: formData.endTime,
+                    anchorDate: formData.workDate, // Dùng workDate làm mốc
+                    selectedDays: selectedDays
+                };
+                
+                await onAddBatch(batchData);
+
+            } else {
             await onAdd({
                 ...formData,
                 doctorId: parseInt(formData.doctorId),
             });
+            }
+
+            // Reset form sau khi thành công
             setFormData(prev => ({
                 ...prev,
                 startTime: '',
                 endTime: ''
             }));
+            // Reset state lặp lại
+            setIsRepeating(false);
+            setRepeatDays({ '1': false, '2': false, '3': false, '4': false, '5': false, '6': false, '0': false });
+
         } catch (error) {
-            console.error('Lỗi khi thêm lịch:', error);
-            alert(`Không thể thêm lịch: ${error instanceof Error ? error.message : String(error)}`);
+            console.error('Lỗi khi submit form:', error);
         } finally {
             setIsSubmitting(false);
         }
@@ -90,6 +151,38 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ doctors, onAdd }) => {
     const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
     }
+
+    // --- JSX cho modal/form lặp lại ---
+    const renderRepeatOptions = () => (
+    <div className="sm-form-group sm-repeat-options-container">
+        <label className="sm-repeat-options-label">
+            Chọn các ngày trong tuần để lặp lại
+        </label>
+        <div className="sm-repeat-days-grid">
+            <label>
+                <input type="checkbox" name="1" checked={repeatDays['1']} onChange={handleRepeatDayChange} /> T2
+            </label>
+            <label>
+                <input type="checkbox" name="2" checked={repeatDays['2']} onChange={handleRepeatDayChange} /> T3
+            </label>
+            <label>
+                <input type="checkbox" name="3" checked={repeatDays['3']} onChange={handleRepeatDayChange} /> T4
+            </label>
+            <label>
+                <input type="checkbox" name="4" checked={repeatDays['4']} onChange={handleRepeatDayChange} /> T5
+            </label>
+            <label>
+                <input type="checkbox" name="5" checked={repeatDays['5']} onChange={handleRepeatDayChange} /> T6
+            </label>
+            <label>
+                <input type="checkbox" name="6" checked={repeatDays['6']} onChange={handleRepeatDayChange} /> T7
+            </label>
+            <label>
+                <input type="checkbox" name="0" checked={repeatDays['0']} onChange={handleRepeatDayChange} /> CN
+            </label>
+        </div>
+    </div>
+);
 
     return (
         <form onSubmit={handleSubmit} className="sm-form">
@@ -122,9 +215,23 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ doctors, onAdd }) => {
                     <button type="button" onClick={() => handleShiftSelect('evening')} className="sm-shift-btn sm-shift-evening">Ca Tối</button>
                 </div>
                 <button type="submit" className="sm-button sm-button-add" disabled={isSubmitting}>
-                    {isSubmitting ? 'Đang thêm...' : 'Thêm Lịch'}
+                    {isSubmitting ? 'Đang xử lý...' : (isRepeating ? 'Thêm Lịch Lặp' : 'Thêm 1 Lịch')}
                 </button>
             </div>
+            
+            <div className="sm-form-group" style={{ marginTop: '0.5rem', marginBottom: '0' }}>
+                <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', fontWeight: 'bold' }}>
+                    <input 
+                        type="checkbox" 
+                        checked={isRepeating} 
+                        onChange={(e) => setIsRepeating(e.target.checked)}
+                        style={{ width: 'auto', margin: '0 0.5rem 0 0' }}
+                    />
+                    Lặp lại theo tuần
+                </label>
+            </div>
+            {isRepeating && renderRepeatOptions()}
+
         </form>
     );
 };
@@ -190,6 +297,18 @@ const ScheduleManagement: React.FC = () => {
     }, []);
 
 
+    const mapSchedulesWithDoctorInfo = (
+        apiSchedules: ApiScheduleResponse[]
+    ): Schedule[] => {
+        return apiSchedules.map(apiSch => {
+            const doctor = doctors.find(d => d.id === apiSch.doctorId);
+            return {
+                ...apiSch,
+                doctor: doctor || { id: apiSch.doctorId, name: 'Không rõ' }
+            };
+        });
+    };
+
     const handleAddSchedule = async (scheduleData: NewScheduleData) => {
         const authHeaders = getAuthHeaders();
         if (!authHeaders) {
@@ -209,21 +328,57 @@ const ScheduleManagement: React.FC = () => {
                 throw new Error(errorData.error || 'Không thể tạo lịch');
             }
 
-            const newScheduleApi: Omit<Schedule, 'doctor'> = await response.json();
-            const doctor = doctors.find(d => d.id === newScheduleApi.doctorId);
+            const newScheduleApi: ApiScheduleResponse = await response.json();
+            const newScheduleWithDoctor = mapSchedulesWithDoctorInfo([newScheduleApi])[0];
 
-            const newSchedule: Schedule = {
-                ...newScheduleApi,
-                doctor: doctor || { id: newScheduleApi.doctorId, name: 'Không rõ' }
-            };
-
-            setSchedules(prevSchedules => [...prevSchedules, newSchedule]);
-            alert('Đã thêm lịch làm việc mới!');
+            setSchedules(prevSchedules => [...prevSchedules, newScheduleWithDoctor]);
+            alert('Đã thêm 1 lịch làm việc mới!');
 
         } catch (error) {
             console.error('Lỗi khi thêm lịch:', error);
             alert(`Không thể thêm lịch: ${error instanceof Error ? error.message : String(error)}`);
+            
+            throw error;
+        }
+    };
 
+    const handleAddBatchSchedule = async (batchData: BatchScheduleData) => {
+        const authHeaders = getAuthHeaders();
+        if (!authHeaders) {
+            alert('Lỗi xác thực, vui lòng đăng nhập lại.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${SCHEDULES_API}/batch`, {
+                method: 'POST',
+                headers: authHeaders,
+                body: JSON.stringify(batchData)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Không thể tạo lịch hàng loạt');
+            }
+
+            // API trả về một MẢNG
+            const newSchedulesApi: ApiScheduleResponse[] = await response.json();
+
+            if (newSchedulesApi.length === 0) {
+                alert('Không có lịch nào được thêm (có thể do không có ngày nào hợp lệ).');
+                return;
+            }
+
+            // Sử dụng hàm helper
+            const newSchedulesWithDoctor = mapSchedulesWithDoctorInfo(newSchedulesApi);
+
+            // Thêm MẢNG lịch mới vào state
+            setSchedules(prevSchedules => [...prevSchedules, ...newSchedulesWithDoctor]);
+            alert(`Đã thêm thành công ${newSchedulesWithDoctor.length} lịch làm việc mới!`);
+
+        } catch (error) {
+            console.error('Lỗi khi thêm lịch hàng loạt:', error);
+            alert(`Không thể thêm lịch lặp lại: ${error instanceof Error ? error.message : String(error)}`);
             throw error;
         }
     };
@@ -294,7 +449,11 @@ const ScheduleManagement: React.FC = () => {
 
             <div className="sm-form-container">
                 <h3>Thêm Lịch Mới</h3>
-                <ScheduleForm doctors={doctors} onAdd={handleAddSchedule} />
+                <ScheduleForm 
+                    doctors={doctors} 
+                    onAdd={handleAddSchedule} 
+                    onAddBatch={handleAddBatchSchedule}
+                />
             </div>
 
             <div className="sm-calendar-container">

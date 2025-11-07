@@ -7,7 +7,6 @@
 
 .common-table {
     width: 100%;
-    /* min-width: 800px;  Bỏ min-width chung, component con tự quyết định */
     font-size: 0.875rem;
     border-collapse: collapse;
 }

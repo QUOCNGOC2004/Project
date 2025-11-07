@@ -309,3 +309,40 @@
     right: -5px; 
     z-index: 5;
 }
+
+.sm-repeat-options-container {
+    border: 1px solid #e2e8f0;
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+    margin-top: 0.5rem;
+}
+
+
+.sm-repeat-options-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+    display: block; 
+}
+
+.sm-repeat-days-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+
+.sm-repeat-days-grid label {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    color: #4a5568;
+    cursor: pointer; 
+}
+
+.sm-repeat-days-grid input[type="checkbox"] {
+    width: auto;  
+    margin: 0;    
+}

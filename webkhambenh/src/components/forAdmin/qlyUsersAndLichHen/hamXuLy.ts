@@ -1,4 +1,8 @@
 
+export const getAuthToken = (): string | null => {
+    return localStorage.getItem('admin_token'); 
+};
+
 export const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);

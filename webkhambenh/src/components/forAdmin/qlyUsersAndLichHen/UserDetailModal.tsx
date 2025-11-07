@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal } from './Modal';
-import { getAuthToken } from './auth';
-import { formatDate } from './formatters';
+import { getAuthToken,formatDate } from './hamXuLy';
 import { UserDetails, BankAccount } from './index';
 import './UserDetailModal.css'; 
 

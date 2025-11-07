@@ -1,6 +1,6 @@
 import React from 'react';
 import { Appointment, AppointmentStatus } from './index';
-import { formatDate, formatTime } from './formatters';
+import { formatDate, formatTime } from './hamXuLy';
 import './AppointmentTable.css';
 import './Table.css'; 
 
