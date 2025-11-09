@@ -297,3 +297,129 @@
     /* Giới hạn chiều cao trên mobile */
   }
 }
+
+.payment-page-wrapper .bank-transfer-info {
+  background: var(--light-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.payment-page-wrapper .bank-transfer-info h4 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: var(--primary-color);
+}
+
+.payment-page-wrapper .bank-transfer-info p {
+  margin: 0.4rem 0;
+  line-height: 1.6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.payment-page-wrapper .payment-reference {
+  background: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.payment-page-wrapper .payment-reference h4 {
+  margin-top: 0;
+  color: #856404;
+  font-weight: 700;
+}
+
+.payment-page-wrapper .payment-reference p {
+  margin-bottom: 1rem;
+}
+
+.payment-page-wrapper .reference-code-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  background: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  border: 1px dashed var(--danger-color);
+}
+
+.payment-page-wrapper .reference-code-box span {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--danger-color);
+}
+
+
+.payment-page-wrapper .btn-copy {
+  
+  width: auto;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: var(--dark-color);
+  color: white;
+  border: none;
+  transition: background-color 0.2s;
+}
+
+.payment-page-wrapper .btn-copy:hover {
+  background-color: #555;
+}
+
+.payment-page-wrapper .bank-transfer-info .btn-copy {
+    background-color: #6c757d;
+}
+.payment-page-wrapper .bank-transfer-info .btn-copy:hover {
+    background-color: #5a6268;
+}
+
+
+.payment-page-wrapper .payment-form {
+  display: none;
+}
+
+
+.payment-page-wrapper .placeholder.invoice-pending {
+  background-color: #fff8e1;
+  border: 1px dashed #ffe57f;
+  color: #6d4c41;
+}
+
+.payment-page-wrapper .placeholder.invoice-pending .icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #fbc02d; 
+}
+
+.payment-page-wrapper .placeholder.invoice-pending h3 {
+  color: #bf360c; 
+}
+
+.payment-page-wrapper .placeholder.invoice-pending p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+
+.payment-page-wrapper .appointment-item .appointment-price {
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: var(--success-color);
+}
+
+.payment-page-wrapper .appointment-item .appointment-price:not(:first-child) {
+  color: #ff6f00; 
+  font-style: italic;
+  font-size: 1.1rem;
+}

@@ -190,7 +190,7 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
           <p><strong>Ngày khám:</strong> {formatDate(appointment.ngay_dat_lich)}</p>
           <p><strong>Giờ khám:</strong> {appointment.gio_dat_lich}</p>
           <p><strong>Bác sĩ:</strong> {appointment.doctor_name}</p>
-          <p><strong>Cơ sở khám:</strong> Bệnh viện Đại học Phenikaa</p>
+          <p><strong>Cơ sở khám:</strong> Phòng khám Đại học Phenikaa</p>
           <p><strong>SĐT bác sĩ:</strong> {appointment.doctor_phone}</p>
         </div>
         <div className="appointment-actions">

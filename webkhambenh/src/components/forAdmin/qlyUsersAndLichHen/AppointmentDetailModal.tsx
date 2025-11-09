@@ -47,6 +47,7 @@ const AppointmentDetailModal: React.FC<AppointmentDetailModalProps> = ({
                 <div className="am-detail-grid">
                     {renderDetailItem("Mã HĐ", invoice.invoice_code)}
                     {renderDetailItem("Trạng thái", status === 'pending' ? 'Chưa thanh toán' : 'Đã thanh toán')}
+                    {renderDetailItem("Ngày tạo HĐ", formatDate(invoice.created_at as string))}
                     {renderDetailItem("Bệnh lý", service_details.benhLy)}
                     {renderDetailItem("Lời khuyên", service_details.loiKhuyen)}
                 </div>

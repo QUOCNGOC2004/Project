@@ -412,7 +412,6 @@ export const getLichHenByUserId = async (req: Request, res: Response): Promise<v
 
     // Nếu người yêu cầu là 'user', họ chỉ có thể xem lịch hẹn của chính mình
     if (requestingUser.role === 'user' && requestingUser.id.toString() !== userId) {
-       
         res.status(403).json({ error: 'Bạn không có quyền truy cập tài nguyên này.' });
         return;
     }
@@ -422,20 +421,29 @@ export const getLichHenByUserId = async (req: Request, res: Response): Promise<v
     
     const result = await AppDataSource.query(
       `SELECT 
-        a.*,
-        d.name as doctor_name,
-        d.phone as doctor_phone,
-        d.mo_ta_bac_si as mo_ta_bac_si,
-        CASE WHEN i.id IS NOT NULL THEN true ELSE false END AS "hasinvoice"
-      FROM appointments a 
-      LEFT JOIN doctors d ON a.doctor_id = d.id 
-      LEFT JOIN invoices i ON a.id = i.appointment_id
-      WHERE a.user_id = $1
-      ORDER BY a.ngay_dat_lich DESC, a.gio_dat_lich DESC`,
+          a.*, 
+          a.id as appointment_id,
+          
+          -- Các trường cho QuanLyLich
+          d.name as doctor_name,
+          d.phone as doctor_phone,
+          d.mo_ta_bac_si,
+          
+          -- Các trường cho ThanhToan
+          i.invoice_code,
+          i.total_amount,
+          i.service_details,
+          i.created_at as invoice_created_at,
+
+          CASE WHEN i.id IS NOT NULL THEN true ELSE false END AS "hasinvoice"
+          
+       FROM appointments a 
+       LEFT JOIN doctors d ON a.doctor_id = d.id 
+       LEFT JOIN invoices i ON a.id = i.appointment_id
+       WHERE a.user_id = $1
+       ORDER BY a.ngay_dat_lich DESC, a.gio_dat_lich DESC`,
       [targetUserId] // Sử dụng userId từ URL
     );
-    
-    
     
     if (result.length === 0) {
       res.json([]);
@@ -445,7 +453,6 @@ export const getLichHenByUserId = async (req: Request, res: Response): Promise<v
     res.json(result);
   } catch (error) {
     console.error('Lỗi khi lấy danh sách lịch hẹn theo user:', error);
-    
     res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
   }
 };

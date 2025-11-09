@@ -103,7 +103,7 @@ const Form1: React.FC<PropsForm1> = ({ duLieuForm, xuLyThayDoi }) => {
                 height: '35px'
               }}
             >
-              Bệnh viện Đại học Phenikaa
+              Phòng khám Đại học Phenikaa
             </a>
           </div>
         </div>

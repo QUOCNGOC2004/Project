@@ -1,5 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './ThanhToan.css';
+
+
+const getAuthToken = (): string | null => {
+  return localStorage.getItem('user_token');
+};
+const getUserId = (): string | null => {
+  const userInfoString = localStorage.getItem('user_info');
+  if (!userInfoString) {
+    return null;
+  }
+  try {
+    // Parse chuỗi JSON và lấy ra trường 'id'
+    const userInfo = JSON.parse(userInfoString);
+    return userInfo.id || null;
+  } catch (e) {
+    console.error("Không thể parse user_info từ localStorage:", e);
+    return null;
+  }
+};
 
 // --- Định nghĩa kiểu dữ liệu ---
 interface Service {
@@ -7,63 +26,36 @@ interface Service {
   price: number;
 }
 
+interface ApiAppointment {
+  appointment_id: number;
+  user_id: number;
+  ngay_dat_lich: string;
+  gio_dat_lich: string;
+  ten_benh_nhan: string;
+  trang_thai: 'chưa thanh toán' | 'đã thanh toán';
+  doctor_name: string;
+
+  invoice_code: string | null;
+  total_amount: number | null;
+  service_details: { benhLy: string, loiKhuyen: string, services: Service[] } | null;
+  invoice_created_at: string | null;
+}
+
 interface Appointment {
-  id: string;
+  id: number;
+  invoiceCode: string | null;
   patientName: string;
   doctorName: string;
   date: string;
-  status: 'chua-thanh-toan' | 'da-thanh-toan';
-  services: Service[];
-  totalAmount: number;
+  status: 'chưa thanh toán' | 'đã thanh toán';
+  services: Service[] | null;
+  totalAmount: number | null;
   transactionId?: string;
   paymentDate?: string;
+  invoiceCreatedAt: string | null;
 }
 
-// --- Dữ liệu mẫu ---
-const mockAppointments: Appointment[] = [
-  {
-    id: 'TXN1001',
-    patientName: 'Nguyễn Văn An',
-    doctorName: 'BS. Trần Thị B',
-    date: '2025-09-28',
-    status: 'chua-thanh-toan',
-    services: [
-      { name: 'Phí khám tổng quát', price: 300000 },
-      { name: 'Xét nghiệm máu', price: 250000 },
-      { name: 'Thuốc A', price: 150000 },
-    ],
-    totalAmount: 700000,
-  },
-  {
-    id: 'TXN1002',
-    patientName: 'Lê Thị Cẩm',
-    doctorName: 'BS. Phạm Văn D',
-    date: '2025-09-27',
-    status: 'da-thanh-toan',
-    transactionId: 'PAY20250927XYZ',
-    paymentDate: '2025-09-27 15:30:00',
-    services: [
-      { name: 'Phí khám chuyên khoa', price: 500000 },
-      { name: 'Siêu âm ổ bụng', price: 450000 },
-    ],
-    totalAmount: 950000,
-  },
-  {
-    id: 'TXN1003',
-    patientName: 'Hoàng Minh Khang',
-    doctorName: 'BS. Trần Thị B',
-    date: '2025-09-26',
-    status: 'chua-thanh-toan',
-    services: [
-      { name: 'Phí tái khám', price: 150000 },
-      { name: 'Đo điện tim', price: 200000 },
-      { name: 'Thuốc B và C', price: 450000 },
-    ],
-    totalAmount: 800000,
-  },
-];
-
-// --- Component con ---
+// --- Component con (Xem khi đã thanh toán thành công) ---
 const PaymentSuccessView: React.FC<{ appointment: Appointment }> = ({ appointment }) => (
   <div className="payment-success">
     <div className="icon">✅</div>
@@ -72,31 +64,38 @@ const PaymentSuccessView: React.FC<{ appointment: Appointment }> = ({ appointmen
       Cảm ơn bạn đã hoàn tất thanh toán cho lịch hẹn ngày {appointment.date}.
     </p>
     <div className="transaction-id">
-      Mã giao dịch: <strong>{appointment.transactionId}</strong>
+      Mã giao dịch: <strong>{appointment.invoiceCode}</strong>
     </div>
-    <p>Thanh toán vào lúc: {appointment.paymentDate}</p>
+    {/* <p>Thanh toán vào lúc: {appointment.paymentDate}</p> */}
     <button className="btn btn-success" style={{ marginTop: '1rem' }}>
       Tải Hóa Đơn PDF
     </button>
   </div>
 );
 
-const PaymentForm: React.FC<{
+// --- Component con (Hướng dẫn chuyển khoản) ---
+const BankTransferDetails: React.FC<{
   appointment: Appointment;
-  onSubmit: (id: string) => void;
-  isProcessing: boolean;
   formatCurrency: (amount: number) => string;
-}> = ({ appointment, onSubmit, isProcessing, formatCurrency }) => {
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(appointment.id);
+}> = ({ appointment, formatCurrency }) => {
+
+  const handleCopyClick = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Đã sao chép: ' + text);
+    }, (err) => {
+      alert('Không thể sao chép tự động. Lỗi: ' + err);
+    });
   };
+
+  const services = appointment.services || [];
+  const totalAmount = appointment.totalAmount || 0;
+  const invoiceCode = appointment.invoiceCode || 'LỖI_KHÔNG_CÓ_MÃ';
 
   return (
     <>
       <div className="invoice-details">
         <h3>Chi tiết chi phí - BN: {appointment.patientName}</h3>
-        {appointment.services.map((s, i) => (
+        {services.map((s, i) => (
           <div className="service-item" key={i}>
             <span>{s.name}</span>
             <strong>{formatCurrency(s.price)}</strong>
@@ -104,129 +103,209 @@ const PaymentForm: React.FC<{
         ))}
         <div className="total-amount">
           <span>Tổng cộng</span>
-          <span className="amount">{formatCurrency(appointment.totalAmount)}</span>
+          <span className="amount">{formatCurrency(totalAmount)}</span>
+        </div>
+      </div>
+      
+      <div className="bank-transfer-info">
+        <h4>Chi tiết hóa đơn</h4>
+        <p><strong>Mã hóa đơn:</strong> {invoiceCode}</p>
+        <p><><strong>Ngày tạo hóa đơn:</strong> {appointment.invoiceCreatedAt || 'N/A'}</></p>
+      </div>
+
+      <div className="bank-transfer-info">
+        <h4>Thông tin phòng khám</h4>
+        <p><strong>Tên phòng khám:</strong> Phòng khám Đại học Phenikaa</p>
+        <p><strong>Địa chỉ:</strong> Trịnh Văn Bô, Xuân Phương, Nam Từ Liêm, Hà Nội</p>
+        <p><strong>SĐT:</strong> 0981714085</p>
+        <p><strong>Email liên hệ:</strong> phenikaa@gmail.com</p>
+      </div>
+
+      <div className="bank-transfer-info">
+        <h4>Thông tin chuyển khoản</h4>
+        <p><strong>Ngân hàng:</strong> VpBank</p>
+        <p><strong>Chủ tài khoản:</strong> Nguyễn Quốc Ngọc</p>
+        <p><strong>Số tài khoản:</strong> 0981714085 <button className="btn-copy" onClick={() => handleCopyClick('0981714085')}>Copy</button></p>
+      </div>
+
+      <div className="payment-reference">
+        <h4>Nội dung chuyển khoản (BẮT BUỘC)</h4>
+        <p>Vui lòng sao chép chính xác mã dưới đây vào nội dung chuyển khoản:</p>
+        <div className="reference-code-box">
+          <span>{invoiceCode}</span>
+          <button className="btn-copy" onClick={() => handleCopyClick(invoiceCode)}>Sao Chép Mã</button>
         </div>
       </div>
 
-      <form className="payment-form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="payment-method">Phương thức thanh toán</label>
-          <select id="payment-method" name="payment-method">
-            <option value="credit-card">Thẻ Tín dụng / Ghi nợ</option>
-            <option value="bank-transfer">Chuyển khoản ngân hàng</option>
-            <option value="e-wallet">Ví điện tử</option>
-          </select>
-        </div>
-        <div className="form-group">
-          <label htmlFor="card-holder">Tên chủ thẻ</label>
-          <input
-            type="text"
-            id="card-holder"
-            name="card-holder"
-            defaultValue={appointment.patientName}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="card-number">Số thẻ</label>
-          <input
-            type="text"
-            id="card-number"
-            name="card-number"
-            placeholder="0000 0000 0000 0000"
-            required
-          />
-        </div>
-        <div className="card-details">
-          <div className="form-group" style={{ flex: 1 }}>
-            <label htmlFor="expiry-date">Ngày hết hạn</label>
-            <input type="text" id="expiry-date" placeholder="MM/YY" required />
-          </div>
-          <div className="form-group" style={{ flex: 1 }}>
-            <label htmlFor="cvv">CVV</label>
-            <input type="text" id="cvv" placeholder="123" required />
-          </div>
-        </div>
-        <button type="submit" className="btn btn-primary" disabled={isProcessing}>
-          {isProcessing
-            ? 'Đang xử lý...'
-            : `Thanh toán ${formatCurrency(appointment.totalAmount)}`}
-        </button>
-      </form>
+      <p style={{ textAlign: 'center', fontSize: '0.85rem', marginTop: '1rem', color: '#6c757d' }}>
+        *Vui lòng thực hiện chuyển khoản trên ứng dụng ngân hàng của bạn. Hệ thống sẽ tự động cập nhật trạng thái sau khi nhận được thanh toán.
+      </p>
     </>
   );
 };
 
 // --- Component chính ---
 const ThanhToan: React.FC = () => {
-  const [appointments, setAppointments] = useState<Appointment[]>(mockAppointments);
-  const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const API_URL = process.env.REACT_APP_API_URL;
 
   const formatCurrency = (amount: number): string =>
     new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 
-  const handlePaymentSubmit = (id: string) => {
-    setIsProcessing(true);
-    setTimeout(() => {
-      const updated = appointments.map((a) =>
-        a.id === id
-          ? {
-              ...a,
-              status: 'da-thanh-toan' as const,
-              transactionId: `PAY${Date.now()}`,
-              paymentDate: new Date().toLocaleString('vi-VN'),
-            }
-          : a
-      );
-      setAppointments(updated);
-      setIsProcessing(false);
-    }, 1500);
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN', {
+      day: '2-digit', month: '2-digit', year: 'numeric'
+    });
   };
 
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      const token = getAuthToken();
+      const userId = getUserId();
+
+      if (!token || !userId) {
+        setError("Vui lòng đăng nhập để xem thông tin thanh toán.");
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/appointments/user/${userId}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Không thể tải danh sách lịch hẹn.');
+        }
+
+        const data: ApiAppointment[] = await response.json();
+
+        const filteredAndMappedData: Appointment[] = data
+          .filter(a => a.trang_thai === 'chưa thanh toán' || a.trang_thai === 'đã thanh toán')
+          .map(a => ({
+            id: a.appointment_id,
+            invoiceCode: a.invoice_code,
+            patientName: a.ten_benh_nhan,
+            doctorName: a.doctor_name,
+            date: formatDate(a.ngay_dat_lich),
+            status: a.trang_thai,
+            services: a.service_details?.services || null,
+            totalAmount: a.total_amount || null,
+            transactionId: a.trang_thai === 'đã thanh toán' ? a.invoice_code! : undefined,
+            invoiceCreatedAt: a.invoice_created_at ? formatDate(a.invoice_created_at) : null 
+          }));
+        
+        setAppointments(filteredAndMappedData);
+
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Lỗi không xác định');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, [API_URL]);
+
+
   const selected = appointments.find((a) => a.id === selectedAppointmentId);
+
+  // Hiển thị danh sách bên trái
+  const renderAppointmentList = () => {
+    if (isLoading) {
+      return <div className="placeholder">Đang tải danh sách thanh toán...</div>;
+    }
+    if (error) {
+      return <div className="placeholder" style={{ color: 'red' }}>{error}</div>;
+    }
+    if (appointments.length === 0) {
+      return <div className="placeholder">Bạn không có lịch hẹn nào cần thanh toán hoặc đã thanh toán.</div>;
+    }
+
+    return (
+      <ul id="appointments-ul">
+        {appointments.map((a) => (
+          <li
+            key={a.id}
+            className={`appointment-item ${selectedAppointmentId === a.id ? 'active' : ''
+              }`}
+            onClick={() => setSelectedAppointmentId(a.id)}
+          >
+            <div className="appointment-price">
+              {a.totalAmount !== null
+                ? formatCurrency(a.totalAmount)
+                : (a.status === 'chưa thanh toán' ? "Chờ Hóa Đơn" : "N/A")}
+            </div>
+            <div className="appointment-info">Ngày khám: {a.date}</div>
+            <div className="appointment-info">Bác sĩ: {a.doctorName}</div>
+
+            <span className={`status-badge ${a.status === 'chưa thanh toán' ? 'status-chua-thanh-toan' : 'status-da-thanh-toan'
+              }`}>
+              {a.status} 
+            </span>
+          </li>
+        ))}
+      </ul>
+    );
+  };
+
+  // Hiển thị chi tiết bên phải
+  const renderDetailsPanel = () => {
+    if (!selected) {
+      return (
+        <div className="placeholder">
+          <p>Vui lòng chọn một lịch hẹn để xem chi tiết</p>
+        </div>
+      );
+    }
+
+    if (selected.status === 'đã thanh toán') {
+      return <PaymentSuccessView appointment={selected} />;
+    }
+
+    // Nếu 'chua-thanh-toan'
+    // Kiểm tra xem đã có hóa đơn (invoiceCode và totalAmount) chưa
+    if (!selected.invoiceCode || selected.totalAmount === null || !selected.services) {
+      return (
+        <div className="placeholder invoice-pending">
+          <div className="icon">📄</div>
+          <h3>Chưa có hóa đơn</h3>
+          <p>Quản trị viên chưa tạo hóa đơn chi tiết cho lịch hẹn này.</p>
+          <p>Vui lòng chờ hoặc liên hệ phòng khám để được hỗ trợ.</p>
+        </div>
+      );
+    }
+
+    // Nếu 'chua-thanh-toan' và CÓ hóa đơn
+    return (
+      <BankTransferDetails
+        appointment={selected}
+        formatCurrency={formatCurrency}
+      />
+    );
+  };
 
   return (
     <div className="payment-page-wrapper">
       <div className="payment-container">
         <div className="appointment-list">
           <h2>Danh sách thanh toán</h2>
-          <ul id="appointments-ul">
-            {appointments.map((a) => (
-              <li
-                key={a.id}
-                className={`appointment-item ${
-                  selectedAppointmentId === a.id ? 'active' : ''
-                }`}
-                onClick={() => setSelectedAppointmentId(a.id)}
-              >
-                <div className="appointment-price">{formatCurrency(a.totalAmount)}</div>
-                <div className="appointment-info">Ngày khám: {a.date}</div>
-                <div className="appointment-info">Bác sĩ: {a.doctorName}</div>
-                <span className={`status-badge status-${a.status}`}>
-                  {a.status === 'chua-thanh-toan' ? 'Chưa thanh toán' : 'Đã thanh toán'}
-                </span>
-              </li>
-            ))}
-          </ul>
+          {renderAppointmentList()}
         </div>
 
         <div className="payment-details">
           <h2>Chi tiết thanh toán</h2>
-          {!selected ? (
-            <div className="placeholder">
-              <p>Vui lòng chọn một lịch hẹn để xem chi tiết</p>
-            </div>
-          ) : selected.status === 'da-thanh-toan' ? (
-            <PaymentSuccessView appointment={selected} />
-          ) : (
-            <PaymentForm
-              appointment={selected}
-              onSubmit={handlePaymentSubmit}
-              isProcessing={isProcessing}
-              formatCurrency={formatCurrency}
-            />
-          )}
+          {renderDetailsPanel()}
         </div>
       </div>
     </div>
