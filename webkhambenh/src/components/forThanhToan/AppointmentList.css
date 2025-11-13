@@ -1,0 +1,80 @@
+.payment-page-wrapper #appointments-ul {
+  list-style: none;
+  padding: 5px;
+  margin: 0;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.payment-page-wrapper .appointment-item {
+  padding: 1rem;
+  border: 1.5px solid var(--primary-color);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.payment-page-wrapper .appointment-item:hover,
+.payment-page-wrapper .appointment-item.active {
+  border-color: #E65103;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.1);
+  transform: translateY(-2px);
+  background-color: #f4d6c6;
+}
+
+.payment-page-wrapper .appointment-item .appointment-price {
+  font-weight: 700;
+  color: var(--success-color);
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.payment-page-wrapper .appointment-item .appointment-info {
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+  color: #6c757d;
+  background-color: #f4d6c600 ;
+  padding: 0.1rem 0.8rem;
+}
+
+.payment-page-wrapper .status-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.payment-page-wrapper .status-chua-thanh-toan {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.payment-page-wrapper .status-da-thanh-toan {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.payment-page-wrapper .appointment-item .appointment-price {
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: var(--success-color);
+}
+
+.payment-page-wrapper .appointment-item .appointment-price:not(:first-child) {
+  color: #ff6f00; 
+  font-style: italic;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 992px) {
+  .payment-page-wrapper #appointments-ul {
+    max-height: 250px;
+  }
+}

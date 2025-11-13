@@ -1,0 +1,94 @@
+.payment-page-wrapper .invoice-details {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.payment-page-wrapper .invoice-details h3 {
+  margin-top: 0;
+  color: var(--dark-color);
+}
+
+.payment-page-wrapper .service-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.payment-page-wrapper .service-item:last-child {
+  border-bottom: none;
+}
+
+.payment-page-wrapper .total-amount {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--dark-color);
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 2px solid var(--dark-color);
+}
+
+.payment-page-wrapper .total-amount .amount {
+  color: var(--success-color);
+}
+
+.payment-page-wrapper .bank-transfer-info {
+  background: var(--light-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.payment-page-wrapper .bank-transfer-info h4 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: var(--primary-color);
+}
+
+.payment-page-wrapper .bank-transfer-info p {
+  margin: 0.4rem 0;
+  line-height: 1.6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.payment-page-wrapper .payment-qr-code {
+  text-align: center;
+  background: #f8f9fa; 
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.payment-page-wrapper .payment-qr-code h4 {
+  margin-top: 0;
+  color: #E65103; 
+  font-weight: 700;
+}
+
+.payment-page-wrapper .payment-qr-code .qr-image-container {
+  margin: 1rem auto;
+  max-width: 250px; 
+  border: 4px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px; 
+  background: white;
+}
+
+.payment-page-wrapper .payment-qr-code img {
+  width: 100%;
+  height: auto;
+  display: block; 
+}
+
+.payment-page-wrapper .payment-qr-code p {
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}

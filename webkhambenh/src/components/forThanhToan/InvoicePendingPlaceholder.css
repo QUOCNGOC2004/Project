@@ -1,0 +1,20 @@
+.payment-page-wrapper .placeholder.invoice-pending {
+  background-color: #fff8e1;
+  border: 1px dashed #ffe57f;
+  color: #6d4c41;
+}
+
+.payment-page-wrapper .placeholder.invoice-pending .icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #fbc02d; 
+}
+
+.payment-page-wrapper .placeholder.invoice-pending h3 {
+  color: #bf360c; 
+}
+
+.payment-page-wrapper .placeholder.invoice-pending p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
