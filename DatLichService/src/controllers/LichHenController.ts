@@ -346,7 +346,8 @@ export const deleteLichHen = async (req: Request, res: Response): Promise<void> 
   try {
     await AppDataSource.transaction(async transactionalEntityManager => {
       let findQuery = `
-        SELECT id FROM appointments 
+        SELECT id, user_id, ten_benh_nhan, ngay_dat_lich 
+        FROM appointments 
         WHERE id = $1 
       `;
       
@@ -369,8 +370,25 @@ export const deleteLichHen = async (req: Request, res: Response): Promise<void> 
         throw new Error('404'); 
       }
 
-      const appointmentId = appointmentResult[0].id;
+      const appointmentToDelete = appointmentResult[0]; // Thông tin lịch hẹn
+      const appointmentId = appointmentToDelete.id;
 
+      // Chỉ tạo thông báo nếu người xóa là Admin
+      if (requestingUser.role === 'admin') {
+        try {
+          const ngayKhamFormatted = new Date(appointmentToDelete.ngay_dat_lich).toLocaleDateString('vi-VN');
+          const message = `Lịch hẹn của bạn (BN: ${appointmentToDelete.ten_benh_nhan}, ngày ${ngayKhamFormatted}) đã bị xóa.`;
+          const type = 'appointment_deleted';
+          
+          await transactionalEntityManager.query(
+            `INSERT INTO notifications (user_id, message, type) VALUES ($1, $2, $3)`,
+            [appointmentToDelete.user_id, message, type]
+          );
+        } catch (notificationError) {
+           console.error("Lỗi khi tạo thông báo xóa:", notificationError);
+        }
+      }
+      
       await transactionalEntityManager.query(
         `UPDATE time_slots 
          SET is_available = TRUE, appointment_id = NULL 
@@ -501,6 +519,56 @@ export const updateAppointmentStatusByAdmin = async (req: Request, res: Response
 
   } catch (error) {
     console.error('Lỗi khi cập nhật trạng thái lịch hẹn:', error);
+    res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
+  }
+};
+
+// Lấy thông báo
+export const getNotificationsByUserId = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ error: 'Xác thực không hợp lệ.' });
+      return;
+    }
+
+    // Lấy tất cả thông báo, mới nhất lên đầu
+    const notifications = await AppDataSource.query(
+      `SELECT * FROM notifications 
+       WHERE user_id = $1 
+       ORDER BY created_at DESC`,
+      [userId]
+    );
+    
+    res.json(notifications);
+
+  } catch (error) {
+    console.error('Lỗi khi lấy thông báo:', error);
+    res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
+  }
+};
+
+//  Đánh dấu đã đọc 
+export const markNotificationsAsRead = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ error: 'Xác thực không hợp lệ.' });
+      return;
+    }
+
+    // Đánh dấu tất cả thông báo CHƯA ĐỌC của user này thành ĐÃ ĐỌC
+    await AppDataSource.query(
+      `UPDATE notifications 
+       SET is_read = TRUE 
+       WHERE user_id = $1 AND is_read = FALSE`,
+      [userId]
+    );
+    
+    res.json({ success: true, message: 'Đã đánh dấu đã đọc' });
+
+  } catch (error) {
+    console.error('Lỗi khi đánh dấu đã đọc:', error);
     res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
   }
 };

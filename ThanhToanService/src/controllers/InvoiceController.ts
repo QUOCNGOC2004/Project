@@ -61,6 +61,9 @@ export class InvoiceController {
                 where: { appointment_id: parseInt(appointmentId, 10) } 
             });
 
+    
+            const isCreating = !invoice;
+
             if (!invoice) {
                 invoice = new Invoice();
                 invoice.appointment_id = parseInt(appointmentId, 10);
@@ -78,8 +81,39 @@ export class InvoiceController {
 
             const savedInvoice = await invoiceRepo.save(invoice);
             
-            const message = invoice.id ? 'Invoice updated successfully' : 'Invoice created successfully';
-            const statusCode = invoice.id ? 200 : 201;
+            try {
+                const appointmentResult = await AppDataSource.query(
+                  `SELECT user_id, ngay_dat_lich FROM appointments WHERE id = $1`,
+                  [savedInvoice.appointment_id]
+                );
+
+                if (appointmentResult.length > 0) {
+                  const { user_id, ngay_dat_lich } = appointmentResult[0];
+                  
+                  const ngayKhamFormatted = new Date(ngay_dat_lich).toLocaleDateString('vi-VN');
+                  let message = "";
+                  let type = "";
+
+                  if (isCreating) {
+                      message = `Hóa đơn cho lịch hẹn ngày ${ngayKhamFormatted} vừa được tạo. Vui lòng kiểm tra và thanh toán.`;
+                      type = 'invoice_created';
+                  } else {
+                      message = `Hóa đơn cho lịch hẹn ngày ${ngayKhamFormatted} vừa được cập nhật. Vui lòng kiểm tra và thanh toán.`;
+                      type = 'invoice_updated';
+                  }
+
+                  // 2. INSERT thông báo
+                  await AppDataSource.query(
+                    `INSERT INTO notifications (user_id, message, type) VALUES ($1, $2, $3)`,
+                    [user_id, message, type]
+                  );
+                }
+            } catch (notificationError) {
+                console.error("Lỗi khi tạo thông báo hóa đơn:", notificationError);
+            }
+    
+            const message = isCreating ? 'Invoice created successfully' : 'Invoice updated successfully';
+            const statusCode = isCreating ? 201 : 200;
 
             return res.status(statusCode).json({ success: true, message, data: savedInvoice });
 

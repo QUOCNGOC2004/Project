@@ -139,3 +139,14 @@ COMMENT ON TABLE time_slots IS 'Lưu các khung giờ khám bệnh chi tiết tr
 COMMENT ON COLUMN time_slots.slot_time IS 'Thời gian bắt đầu của một khung giờ khám (ví dụ: 08:00, 08:30).';
 COMMENT ON COLUMN time_slots.is_available IS 'Cho biết khung giờ này còn trống hay không.';
 COMMENT ON COLUMN time_slots.appointment_id IS 'Liên kết tới lịch hẹn đã đặt cho khung giờ này.';
+
+CREATE TABLE notifications (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    message TEXT NOT NULL,
+    type VARCHAR(50), 
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_notifications_user_id ON notifications(user_id);
