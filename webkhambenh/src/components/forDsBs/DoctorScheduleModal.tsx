@@ -46,6 +46,7 @@ const DoctorScheduleModal: React.FC<DoctorScheduleModalProps> = ({ doctorId, onC
   const [data, setData] = useState<ScheduleResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hidePast, setHidePast] = useState(true);
 
   useEffect(() => {
     const fetchSchedule = async () => {
@@ -97,54 +98,106 @@ const DoctorScheduleModal: React.FC<DoctorScheduleModalProps> = ({ doctorId, onC
       );
     }
 
-    return (
-      <div className="dsm-schedule-list">
-        {data.schedules.map((shift) => (
-          <div key={shift.id} className="dsm-shift-group">
-            <h3 className="dsm-shift-date">{formatDate(shift.workDate)}</h3>
-            <p className="dsm-shift-time">
-              <strong>Ca làm việc:</strong> {formatTime(shift.startTime)} - {formatTime(shift.endTime)}
-            </p>
-            <div className="dsm-slots-grid">
-              {shift.timeSlots.map((slot) => {
-                
-                if (slot.isAvailable) {
-                  // Tạo query string
-                  const queryParams = new URLSearchParams({
-                    doctorName: data.doctorName,
-                    id: doctorId.toString(),
-                    ngayHen: shift.workDate,
-                    gioHen: formatTime(slot.slotTime),
-                  }).toString();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const filteredSchedules = data.schedules.filter(shift => {
+      if (!hidePast) {
+        return true;
+      }
+      
+      const [year, month, day] = shift.workDate.split('-').map(Number);
+      const shiftDate = new Date(year, month - 1, day);
+      return shiftDate >= today; 
+    });
 
-                  return (
-                    <a
-                      key={slot.id}
-                      href={`/dat-lich?${queryParams}`}
-                      className="dsm-slot-btn" 
-                      onClick={onClose} 
-                    >
-                      {formatTime(slot.slotTime)}
-                    </a>
-                  );
-                } 
-                
-                else {
-                  return (
-                    <span
-                      key={slot.id}
-                      className="dsm-slot-btn disabled"
-                    >
-                      {formatTime(slot.slotTime)}
-                      <span> (Đã đặt)</span>
-                    </span>
-                  );
-                }
-              })}
-            </div>
+    return (
+      <>
+        <div className="dsm-filter-toggle">
+          <label>
+            <input
+              type="checkbox"
+              checked={hidePast}
+              onChange={(e) => setHidePast(e.target.checked)}
+            />
+            Không xem lịch đã qua
+          </label>
+        </div>
+
+        {filteredSchedules.length === 0 ? (
+          <div className="dsm-empty" style={{ paddingTop: '1rem' }}>
+            <p>Không có lịch làm việc nào (từ hôm nay trở đi).</p>
+            <p>Bỏ chọn "Không xem lịch đã qua" để xem tất cả.</p>
           </div>
-        ))}
-      </div>
+        ) : (
+          <div className="dsm-schedule-list">
+            {filteredSchedules.map((shift) => {
+              const [year, month, day] = shift.workDate.split('-').map(Number);
+              const shiftDate = new Date(year, month - 1, day); 
+              const isPastDate = shiftDate < today;
+
+              return (
+                <div key={shift.id} className="dsm-shift-group">
+                  <h3 className="dsm-shift-date">{formatDate(shift.workDate)}</h3>
+                  <p className="dsm-shift-time">
+                    <strong>Ca làm việc:</strong> {formatTime(shift.startTime)} - {formatTime(shift.endTime)}
+                  </p>
+                  <div className="dsm-slots-grid">
+                    {shift.timeSlots.map((slot) => {
+                      
+                      // Điều kiện 1: Nếu ngày đã qua, vô hiệu hóa
+                      if (isPastDate) {
+                        return (
+                          <span
+                            key={slot.id}
+                            className="dsm-slot-btn disabled"
+                            title="Ngày làm việc này đã qua"
+                          >
+                            {formatTime(slot.slotTime)}
+                            <span> (Đã qua)</span>
+                          </span>
+                        );
+                      }
+                      
+                      // Điều kiện 2: Nếu ngày không qua, nhưng slot không 'available'
+                      if (!slot.isAvailable) {
+                        return (
+                          <span
+                            key={slot.id}
+                            className="dsm-slot-btn disabled"
+                          >
+                            {formatTime(slot.slotTime)}
+                            <span> (Đã đặt)</span>
+                          </span>
+                        );
+                      }
+
+                      // Điều kiện 3: Ngày hợp lệ và slot 'available'
+                      const queryParams = new URLSearchParams({
+                        doctorName: data.doctorName,
+                        id: doctorId.toString(),
+                        ngayHen: shift.workDate,
+                        gioHen: formatTime(slot.slotTime),
+                      }).toString();
+
+                      return (
+                        <a
+                          key={slot.id}
+                          href={`/dat-lich?${queryParams}`}
+                          className="dsm-slot-btn" 
+                          onClick={onClose} 
+                        >
+                          {formatTime(slot.slotTime)}
+                        </a>
+                      );
+
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </>
     );
   };
 

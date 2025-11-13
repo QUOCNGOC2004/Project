@@ -423,3 +423,43 @@
   font-style: italic;
   font-size: 1.1rem;
 }
+
+
+.payment-page-wrapper .payment-qr-code {
+  text-align: center;
+  background: #f8f9fa; 
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.payment-page-wrapper .payment-qr-code h4 {
+  margin-top: 0;
+  color: #E65103; 
+  font-weight: 700;
+}
+
+.payment-page-wrapper .payment-qr-code .qr-image-container {
+  margin: 1rem auto;
+  max-width: 250px; 
+  border: 4px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px; 
+  background: white;
+}
+
+.payment-page-wrapper .payment-qr-code img {
+  width: 100%;
+  height: auto;
+  display: block; 
+}
+
+.payment-page-wrapper .payment-qr-code p {
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.payment-page-wrapper .payment-reference {
+  display: none;
+}

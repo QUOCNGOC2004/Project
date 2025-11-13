@@ -9,6 +9,16 @@ const CheckIcon = () => (
   </svg>
 );
 
+interface IServiceItem {
+    name: string;
+    price: number;
+}
+export interface IServiceDetails {
+    benhLy: string;
+    loiKhuyen: string;
+    services: IServiceItem[];
+}
+
 
 interface Appointment {
   id: number;
@@ -24,9 +34,8 @@ interface Appointment {
   ngay_sinh: string;
   so_dien_thoai: string;
   trang_thai: string;
-  gia_tien?: number;
-  benh_ly?: string;
-  loi_khuyen?: string;
+  total_amount?: number | null;
+  service_details?: IServiceDetails | null;
 }
 
 interface Form3Props {
@@ -53,18 +62,6 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
   });
   const history = useHistory();
 
-  const mockPaidData = {
-    gia_tien: 500000,
-    benh_ly: "Viêm họng cấp",
-    loi_khuyen: "Uống nhiều nước ấm, tránh đồ lạnh và cay nóng. Súc họng bằng nước muối sinh lý 2-3 lần/ngày. Uống thuốc theo đơn và tái khám sau 5 ngày nếu không đỡ."
-  };
-
-  const currentAppointmentData = {
-    ...appointment,
-    ...((appointment.trang_thai === 'đã thanh toán' || appointment.trang_thai === 'chưa thanh toán') 
-      ? mockPaidData 
-      : {})
-  };
 
 
   const formatDate = (dateString: string) => {
@@ -85,11 +82,8 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
   const handleEditClick = () => setShowEditModal(true);
   const handleCloseEditModal = () => setShowEditModal(false);
 
-  // --- THAY ĐỔI 2: Thêm hàm xử lý cho nút Thanh toán ---
   const handlePayClick = () => {
-    // Logic thanh toán (ví dụ: chuyển hướng sang trang thanh toán VNPAY, Momo...)
-    // Hiện tại chỉ là placeholder
-    alert('Chức năng thanh toán đang được phát triển!');
+    history.push('/thanh-toan');
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -276,10 +270,10 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
                     {appointment.trang_thai}
                   </span>
                 </div>
-                {currentAppointmentData.gia_tien && (
+                {appointment.total_amount != null && (
                   <div className="price-container">
                     <span className="info-label">Chi phí:</span>
-                    <span className="price-value">{formatCurrency(currentAppointmentData.gia_tien)}</span>
+                    <span className="price-value">{formatCurrency(appointment.total_amount)}</span>
                   </div>
                 )}
               </div>
@@ -323,14 +317,14 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
                   <div className="divider"></div>
                   <div className="info-section-title">Bệnh lý sau khi khám</div>
                   <div className="reason-box">
-                    <p className="reason-text">{currentAppointmentData.benh_ly || 'Chưa có thông tin.'}</p>
+                    <p className="reason-text">{appointment.service_details?.benhLy || 'Chưa có thông tin.'}</p>
                   </div>
 
                   <div className="divider"></div>
 
                   <div className="info-section-title">Lời khuyên của Bác sĩ</div>
                   <div className="reason-box">
-                    <p className="reason-text">{currentAppointmentData.loi_khuyen || 'Chưa có thông tin.'}</p>
+                    <p className="reason-text">{appointment.service_details?.loiKhuyen || 'Chưa có thông tin.'}</p>
                   </div>
                 </>
               )}

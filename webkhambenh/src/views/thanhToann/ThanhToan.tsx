@@ -79,17 +79,20 @@ const BankTransferDetails: React.FC<{
   formatCurrency: (amount: number) => string;
 }> = ({ appointment, formatCurrency }) => {
 
-  const handleCopyClick = (text: string) => {
-    navigator.clipboard.writeText(text).then(() => {
-      alert('Đã sao chép: ' + text);
-    }, (err) => {
-      alert('Không thể sao chép tự động. Lỗi: ' + err);
-    });
-  };
 
   const services = appointment.services || [];
   const totalAmount = appointment.totalAmount || 0;
   const invoiceCode = appointment.invoiceCode || 'LỖI_KHÔNG_CÓ_MÃ';
+
+  const BANK_BIN = "970432"; 
+  const ACCOUNT_NUMBER = "0981714085"; 
+  const ACCOUNT_NAME = "Nguyen Quoc Ngoc"; 
+
+  const encodedMemo = encodeURIComponent(invoiceCode);
+  const encodedName = encodeURIComponent(ACCOUNT_NAME);
+
+  // Mẫu template API: https://api.vietqr.io/image/<BIN>-<STK>-<TEMPLATE>.png?amount=<SOTIEN>&addInfo=<NOIDUNG>&accountName=<TENTK>
+  const qrUrl = `https://api.vietqr.io/image/${BANK_BIN}-${ACCOUNT_NUMBER}-qr_only.png?amount=${totalAmount}&addInfo=${encodedMemo}&accountName=${encodedName}`;
 
   return (
     <>
@@ -125,16 +128,19 @@ const BankTransferDetails: React.FC<{
         <h4>Thông tin chuyển khoản</h4>
         <p><strong>Ngân hàng:</strong> VpBank</p>
         <p><strong>Chủ tài khoản:</strong> Nguyễn Quốc Ngọc</p>
-        <p><strong>Số tài khoản:</strong> 0981714085 <button className="btn-copy" onClick={() => handleCopyClick('0981714085')}>Copy</button></p>
+        <p><strong>Số tài khoản:</strong> 0981714085</p>
       </div>
 
-      <div className="payment-reference">
-        <h4>Nội dung chuyển khoản (BẮT BUỘC)</h4>
-        <p>Vui lòng sao chép chính xác mã dưới đây vào nội dung chuyển khoản:</p>
-        <div className="reference-code-box">
-          <span>{invoiceCode}</span>
-          <button className="btn-copy" onClick={() => handleCopyClick(invoiceCode)}>Sao Chép Mã</button>
+      <div className="payment-qr-code">
+        <h4>Quét mã QR để thanh toán</h4>
+        <p>Mở ứng dụng ngân hàng của bạn và quét mã dưới đây:</p>
+        <div className="qr-image-container">
+          <img src={qrUrl} alt="Mã QR thanh toán VietQR" />
         </div>
+        <p style={{ fontSize: '0.9rem', color: '#555' }}>
+          Số tiền (<strong>{formatCurrency(totalAmount)}</strong>) và nội dung 
+          (<strong>{invoiceCode}</strong>) sẽ được tự động điền.
+        </p>
       </div>
 
       <p style={{ textAlign: 'center', fontSize: '0.85rem', marginTop: '1rem', color: '#6c757d' }}>
