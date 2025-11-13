@@ -1,23 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './QuanLyLich.css';
 import Form3 from '../../components/forQuanLyLich/form3';
+import { Appointment } from '../../components/forQuanLyLich/appointmentTypes'; 
+import { StatusFilter } from '../../components/forQuanLyLich/StatusFilter'; 
 import { isLoggedIn, getCurrentUser, logout } from '../../ktraLogin';
-
-interface Appointment {
-  id: number;
-  ngay_dat_lich: string;
-  gio_dat_lich: string;
-  doctor_name: string;
-  doctor_phone: string;
-  mo_ta_bac_si: string;
-  ten_benh_nhan: string;
-  email: string;
-  gioi_tinh: string;
-  ngay_sinh: string;
-  so_dien_thoai: string;
-  ly_do_kham: string;
-  trang_thai: string;
-}
 
 const QuanLyLich: React.FC = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -84,7 +70,7 @@ const QuanLyLich: React.FC = () => {
     fetchAppointments();
 
     const handleLogout = () => {
-      setAppointments([]); // Reset appointments
+      setAppointments([]); 
       setError('Vui lòng đăng nhập để xem lịch hẹn');
       setLoading(false);
     };
@@ -106,7 +92,6 @@ const QuanLyLich: React.FC = () => {
   };
 
   const filteredAppointments = appointments.filter(a => a.trang_thai === selectedStatus);
-
 
   if (loading) {
     return (
@@ -131,21 +116,10 @@ const QuanLyLich: React.FC = () => {
         <p className="management-title-description">Kiểm tra thông tin đặt lịch hẹn</p>
       </div>
 
-      {/* Dropdown lọc trạng thái */}
-      <div className="filter-container">
-        <label htmlFor="status-filter" className="filter-label">Hiển thị lịch hẹn:</label>
-        <select 
-          id="status-filter" 
-          className="status-dropdown" 
-          value={selectedStatus} 
-          onChange={(e) => setSelectedStatus(e.target.value)}
-        >
-          <option value="chờ xác nhận">Chờ xác nhận</option>
-          <option value="đã xác nhận">Đã xác nhận</option>
-          <option value="chưa thanh toán">Chưa thanh toán</option>
-          <option value="đã thanh toán">Đã thanh toán</option>
-        </select>
-      </div>
+      <StatusFilter 
+        selectedStatus={selectedStatus}
+        onChange={setSelectedStatus}
+      />
 
       {/* Hiển thị lưới dựa trên kết quả lọc */}
       <div className="management-section">
