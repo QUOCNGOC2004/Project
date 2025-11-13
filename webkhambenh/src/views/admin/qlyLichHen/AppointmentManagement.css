@@ -33,6 +33,6 @@
 .am-container-embedded .common-table-wrapper {
      box-shadow: none;
      border-radius: 0;
-     max-height: 60vh; /* Giới hạn chiều cao trong modal */
+     height: 70vh; /* Giới hạn chiều cao trong modal */
      overflow-y: auto; 
 }
