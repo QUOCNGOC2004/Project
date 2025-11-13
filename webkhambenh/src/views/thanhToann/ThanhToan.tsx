@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './ThanhToan.css';
+import { useLocation, useHistory } from 'react-router-dom';
 
 
 const getAuthToken = (): string | null => {
@@ -159,6 +160,9 @@ const ThanhToan: React.FC = () => {
 
   const API_URL = process.env.REACT_APP_API_URL;
 
+  const location = useLocation<{ selectId?: number }>();
+  const history = useHistory();
+
   const formatCurrency = (amount: number): string =>
     new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 
@@ -180,6 +184,9 @@ const ThanhToan: React.FC = () => {
         setIsLoading(false);
         return;
       }
+      
+      setError(null);
+      setIsLoading(true);
 
       try {
         const response = await fetch(`${API_URL}/appointments/user/${userId}`, {
@@ -213,6 +220,16 @@ const ThanhToan: React.FC = () => {
         
         setAppointments(filteredAndMappedData);
 
+        if (location.state && location.state.selectId) {
+          const idToSelect = location.state.selectId;
+          const foundInList = filteredAndMappedData.find(a => a.id === idToSelect);
+          
+          if (foundInList) {
+            setSelectedAppointmentId(idToSelect);
+          }
+          history.replace({ ...history.location, state: undefined });
+        }
+
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Lỗi không xác định');
       } finally {
@@ -221,7 +238,21 @@ const ThanhToan: React.FC = () => {
     };
 
     fetchAppointments();
-  }, [API_URL]);
+
+    const handleLogout = () => {
+      setAppointments([]); 
+      setError('Vui lòng đăng nhập để xem thông tin thanh toán.'); 
+      setIsLoading(false); 
+      setSelectedAppointmentId(null); 
+    };
+
+    document.addEventListener('loginStatusChanged', handleLogout);
+
+    return () => {
+      document.removeEventListener('loginStatusChanged', handleLogout);
+    };
+
+  }, [API_URL, history, location.state]); 
 
 
   const selected = appointments.find((a) => a.id === selectedAppointmentId);
@@ -279,8 +310,6 @@ const ThanhToan: React.FC = () => {
       return <PaymentSuccessView appointment={selected} />;
     }
 
-    // Nếu 'chua-thanh-toan'
-    // Kiểm tra xem đã có hóa đơn (invoiceCode và totalAmount) chưa
     if (!selected.invoiceCode || selected.totalAmount === null || !selected.services) {
       return (
         <div className="placeholder invoice-pending">
@@ -292,7 +321,6 @@ const ThanhToan: React.FC = () => {
       );
     }
 
-    // Nếu 'chua-thanh-toan' và CÓ hóa đơn
     return (
       <BankTransferDetails
         appointment={selected}

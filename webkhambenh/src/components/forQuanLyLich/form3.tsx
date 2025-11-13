@@ -83,7 +83,10 @@ const Form3: React.FC<Form3Props> = ({ appointment, cardColor, onCancel, onUpdat
   const handleCloseEditModal = () => setShowEditModal(false);
 
   const handlePayClick = () => {
-    history.push('/thanh-toan');
+    history.push({
+      pathname: '/thanh-toan',
+      state: { selectId: appointment.id }
+    });
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
