@@ -1,5 +1,7 @@
 import { Router } from "express";
-import { register, login, getProfile, updateProfile, adminLogin, getUserProfileByIdForAdmin, getAllUsers,deleteUser } from "../controllers/authController";
+import { register, login, adminLogin } from "../controllers/authController";
+import { getProfile, updateProfile } from "../controllers/authControllerUser";
+import { getUserProfileByIdForAdmin, getAllUsers, deleteUser } from "../controllers/authControllerAdmin";
 import { auth } from "../middleware/auth";
 
 const router = Router();

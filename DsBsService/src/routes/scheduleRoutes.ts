@@ -7,7 +7,7 @@ import {
     getSchedulesByDoctorId,
     createBatchSchedules,
     getDoctorScheduleDetails
-} from '../controllers/scheduleController';
+} from '../controllers/scheduleControllerAdmin';
 import { auth } from '../middleware/auth';
 
 const router = Router();

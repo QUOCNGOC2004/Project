@@ -1,8 +1,6 @@
 import { Router } from 'express';
-import {
-    getDoctors, getDoctorById, filterDoctors, createDoctor,
-    updateDoctor, deleteDoctor
-} from '../controllers/doctorController';
+import { getDoctors, getDoctorById, filterDoctors } from '../controllers/doctorController';
+import { createDoctor, updateDoctor, deleteDoctor } from '../controllers/doctorControllerAdmin';
 import { auth } from '../middleware/auth';
 
 const router = Router();

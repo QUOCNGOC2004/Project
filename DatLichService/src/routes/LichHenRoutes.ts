@@ -1,31 +1,37 @@
 import { Router } from 'express';
 import {
-  getAllLichHen,
-  getLichHenById,
   createLichHen,
   updateLichHen,
   deleteLichHen,
-  getLichHenByUserId,
+  getLichHenByUserId
+} from '../controllers/LichHenControllerUser';
+
+import {
+  getAllLichHen,
+  getLichHenById,
   updateAppointmentStatusByAdmin,
-  getNotificationsByUserId, 
+} from '../controllers/LichHenControllerAdmin';
+
+import {
+  getNotificationsByUserId,
   markNotificationsAsRead
-} from '../controllers/LichHenController';
+} from '../controllers/NotificationController';
 import { auth } from '../middleware/auth';
 
 const router = Router();
 
-router.get('/',auth(['admin']) ,getAllLichHen);
+router.get('/', auth(['admin']), getAllLichHen);
 
-router.post('/', auth(['user']), createLichHen); 
+router.post('/', auth(['user']), createLichHen);
 
 router.get('/user/my-notifications', auth(['user']), getNotificationsByUserId);
 router.patch('/user/my-notifications/mark-as-read', auth(['user']), markNotificationsAsRead);
 
-router.put('/:id', auth(['user']), updateLichHen); 
+router.put('/:id', auth(['user']), updateLichHen);
 router.delete('/:id', auth(['user', 'admin']), deleteLichHen);
 
-router.get('/:id',auth(['admin']), getLichHenById);
-router.patch('/:id/status', auth(['admin']), updateAppointmentStatusByAdmin); 
+router.get('/:id', auth(['admin']), getLichHenById);
+router.patch('/:id/status', auth(['admin']), updateAppointmentStatusByAdmin);
 
 router.get('/user/:userId', auth(['user', 'admin']), getLichHenByUserId);
 
