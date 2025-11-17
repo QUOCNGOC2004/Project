@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 import './ChatBot.css';
 
-const API_URL =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=';
+const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 const apiKey = process.env.REACT_APP_GEMINI_API_KEY; 
 
 const ChatBot = () => {
@@ -43,14 +43,22 @@ const ChatBot = () => {
     };
 
     try {
-      const response = await fetch(API_URL + apiKey, {
+      
+      if (!apiKey) throw new Error('Thiếu API Key');
+
+      
+      const finalUrl = `${API_URL}?key=${apiKey}`;
+
+      const response = await fetch(finalUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({}));
+        console.error("API Error:", errorData);
+        throw new Error(`Lỗi: ${response.status} - ${errorData.error?.message || response.statusText}`);
       }
 
       const result = await response.json();
@@ -61,9 +69,9 @@ const ChatBot = () => {
       } else {
         appendMessage('Xin lỗi, tôi không thể trả lời câu hỏi này. Vui lòng thử lại sau.', false);
       }
-    } catch (error) {
-      console.error('Lỗi khi gọi API Gemini:', error);
-      appendMessage('Xin lỗi, có lỗi xảy ra. Vui lòng thử lại sau.', false);
+    } catch (error: any) {
+      console.error('Lỗi Chatbot:', error);
+      appendMessage(`Sự cố: ${error.message}`, false);
     } finally {
       setIsLoading(false);
     }
@@ -83,7 +91,7 @@ const ChatBot = () => {
               key={index}
               className={`chat-bubble ${msg.isUser ? 'user' : 'bot'}`}
             >
-              {msg.text}
+              <ReactMarkdown>{msg.text}</ReactMarkdown>
             </div>
           ))}
           {isLoading && (
