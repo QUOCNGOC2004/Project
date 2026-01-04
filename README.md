@@ -40,7 +40,6 @@ Hệ thống Đặt lịch Khám bệnh Trực tuyến là một nền tảng we
 - **Frontend**: React.js
 - **Backend**: Node.js/Express.js
 - **Database**: PostgreSQL
-- **Cache**: Redis
 - **API Gateway**: Kong
 - **Container**: Docker
 - **Authentication**: JWT (JSON Web Token)
@@ -71,7 +70,6 @@ Hệ thống Đặt lịch Khám bệnh Trực tuyến là một nền tảng we
 - Docker Compose
 - Node.js (version 14 trở lên)
 - PostgreSQL
-- Redis
 
 ### Các bước cài đặt
 1. Clone repository:
@@ -87,5 +85,3 @@ docker-compose up -d
 
 3. Truy cập ứng dụng:
 - Frontend: http://localhost:3000
-- Kong API Gateway: http://localhost:8000
-- Kong Admin API: http://localhost:8001
