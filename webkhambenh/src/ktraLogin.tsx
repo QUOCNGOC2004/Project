@@ -8,7 +8,7 @@ interface User {
 }
 
 /**
- * Kiểm tra xem người dùng đã đăng nhập hay chưa
+ * Kiểm tra xem người dùng đã đăng nhập hay chưa!
  * @returns boolean
  */
 export const isLoggedIn = (): boolean => {
